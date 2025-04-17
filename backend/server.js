@@ -1,15 +1,15 @@
-const { log } = require('console');
-const http = require('http');
-const WebSocket = require('ws');
-
-let players = [];
+import http from 'http';
+import WebSocket, { WebSocketServer } from 'ws';
 
 const server = http.createServer((req, res) => {
   res.writeHead(200, { 'Content-Type': 'text/plain' });
+  res.end("WebSocket game server is running.");
 });
 
+const wss = new WebSocketServer({ server });
+
 let nextRoomID = 1;
-const rooms = new Map(); 
+const rooms = new Map();
 
 class Player {
   constructor(nickname, id, conn) {
@@ -22,7 +22,7 @@ class Player {
 class Room {
   constructor(id) {
     this.id = id;
-    this.players = new Map(); 
+    this.players = new Map();
     this.started = false;
   }
 
@@ -44,88 +44,105 @@ class Room {
 }
 
 function findAvailableRoom() {
-    for (const room of rooms.values()) {
-      if (room.players.size < 4 && !room.started) {
-        return room;
-      }
+  for (const room of rooms.values()) {
+    if (!room.started && room.players.size < 4) {
+      return room;
     }
-    const room = new Room(nextRoomID++);
-    rooms.set(room.id, room);
-    return room;
   }
-  
-const wss = new WebSocket.Server({ server });
-wss.on('connection', (ws) => {    
-    
-    ws.on('message', (message) => {
-        const parsedMessage = JSON.parse(message);
-        switch (parsedMessage.type) {
-          case "newPlayer":
-            const id = Date.now() + Math.floor(Math.random() * 1000);
-            const player = new Player(parsedMessage.nickname, id, ws);
-            const room = findAvailableRoom();
-            room.addPlayer(player);            
-            room.broadcast({
-                type: 'updatePlayers',
-                playerCount: room.players.size,
-              });
-            console.log(`Player ${parsedMessage.nickname} joined room ${room.id}`)
-            setTimeout(() => {
-                if (room.players.size >= 2 && !room.started) {
-                  startRoom(room);
-                }
-              }, 10000);
-            break;
-          case "chatMsg":
-           
-            break
-          default:
-            break;
-        }
-       
-    });
+  const room = new Room(nextRoomID++);
+  rooms.set(room.id, room);
+  return room;
+}
 
-    ws.on('close', () => {
-        
-    })
-})
 function startRoom(room) {
-    room.started = true;
-    for (const player of room.players.values()) {
-        log('Starting game for room', room.id);
-      game(player, room);
+  room.started = true;
+  console.log(`Starting game in room ${room.id}`);
+
+  for (const player of room.players.values()) {
+    startGameForPlayer(player, room);
+  }
+}
+
+function startGameForPlayer(player, room) {
+  player.conn.send(JSON.stringify({
+    type: 'startGame',
+    nickname: player.nickname,
+  }));
+
+  player.conn.on('message', (message) => {
+    let data;
+    try {
+      data = JSON.parse(message);
+    } catch (err) {
+      console.error('Invalid message:', err);
+      return;
     }
-  }
-function game(player, room) {
-    player.conn.send(JSON.stringify({
-      type: 'startGame',
+
+    room.broadcast({
+      type: 'chatMsg',
       nickname: player.nickname,
-    }));
-  
-    player.conn.on('message', (message) => {
-      let data;
-      try {
-        data = JSON.parse(message);
-      } catch (err) {
-        console.error('Invalid JSON:', err);
-        return;
-      }
-      broadcastChatMessage(data, room);
+      messageText: data.messageText || ''
     });
-  
-    player.conn.on('close', () => {
-      room.removePlayer(player.id);
-    });
-  }
-  function broadcastChatMessage(data, room) {
-    room.broadcast(data);
-  }
-server.listen(8080, () => {
-  console.log('Server running on http://localhost:8080');
+  });
+
+  player.conn.on('close', () => {
+    room.removePlayer(player.id);
+    room.broadcast({ type: 'updatePlayers', playerCount: room.players.size });
+  });
+}
+
+wss.on('connection', (ws) => {
+  let currentPlayer;
+  let currentRoom;
+
+  ws.on('message', (message) => {
+    let data;
+    try {
+      data = JSON.parse(message);
+    } catch (err) {
+      console.error('Bad message format:', err);
+      return;
+    }
+
+    switch (data.type) {
+      case "newPlayer":
+        const id = Date.now() + Math.floor(Math.random() * 1000);
+        currentPlayer = new Player(data.nickname, id, ws);
+        currentRoom = findAvailableRoom();
+        currentRoom.addPlayer(currentPlayer);
+
+        currentRoom.broadcast({
+          type: 'updatePlayers',
+          playerCount: currentRoom.players.size ,
+        });
+
+        console.log(`Player ${data.nickname} joined Room ${currentRoom.id}`);
+
+        setTimeout(() => {
+          if (currentRoom.players.size >= 2 && !currentRoom.started) {
+            startRoom(currentRoom);
+          }
+        }, 5000);
+        break;
+
+      default:
+        console.log("Unknown message type:", data.type);
+        break;
+    }
+  });
+
+  ws.on('close', () => {
+    if (currentRoom && currentPlayer) {
+      currentRoom.removePlayer(currentPlayer.id);
+      currentRoom.broadcast({
+        type: 'updatePlayers',
+        playerCount: currentRoom.players.size ,
+      });
+    }
+  });
 });
 
-function sand(data) {
-  players.forEach((player) =>{
-    player.ws.send(JSON.stringify(data));
-  })
-}
+// Start server
+server.listen(8080, () => {
+  console.log("Server is running at http://localhost:8080");
+});
