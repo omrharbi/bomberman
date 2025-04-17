@@ -1,5 +1,5 @@
-import { createElement } from './dom.js';
 import { MyEventSystem } from "./event.js";
+import { render } from "./vdom.js";
 export class Router {
     constructor(routes) {
         this.routes = routes;
@@ -34,7 +34,8 @@ export class Router {
             body.innerHTML = '';
             const routeComponents = route();            
             routeComponents.forEach(component => {
-                body.appendChild(createElement(component));
+              //  body.appendChild(createElement(component));
+                render(component,body)
             });
             this.currentRoute = path;
         } else {
