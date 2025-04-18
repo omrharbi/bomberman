@@ -39,7 +39,7 @@ const server = http.createServer((req, res) => {
       res.writeHead(200, { 'Content-Type': contentType });
       res.end(data);
     }
-  });
+  }); 
 });
 
 server.listen(PORT, () => {

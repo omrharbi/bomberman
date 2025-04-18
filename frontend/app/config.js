@@ -36,8 +36,7 @@ export function GamePage() {
         )
     );
 }
-
-
+ 
 export function LoginPage() {
     return jsx(
         'div', { id: 'login' },

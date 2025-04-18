@@ -2,6 +2,8 @@ import { LoginPage, GamePage} from '../app/config.js'
 import { jsx } from '../src/framework.js'
 import { render,updateRender } from '../src/vdom.js'
 import { Router } from '../src/router.js';
+// import draw from './draw.js';
+import TileMap from './tileMap.js';
 const router = new Router({
     '/': () => [LoginPage()],
 });
@@ -54,21 +56,22 @@ function connectToGameServer(name) {
     };
 }
 function handleServerMessages(data) {
-    switch (data.type) {
-        case 'updatePlayers':
-            updatePlayerCount(data.playerCount);
-            break;
-        case 'startGame':
-            startGame(data.nickname)
-            break
-        case 'chatMsg':
-            displayMsg(data)
-            break
-        case 'waiting':
-            document.getElementById('playercount').innerText = `Wait for the next game`;
-        default:
-            break;
-    }
+    startGame(data.nickname)
+    // switch (data.type) {
+    //     case 'updatePlayers':
+    //         updatePlayerCount(data.playerCount);
+    //         break;
+    //     case 'startGame':
+    //         startGame(data.nickname)
+    //         break
+    //     case 'chatMsg':
+    //         displayMsg(data)
+    //         break
+    //     case 'waiting':
+    //         document.getElementById('playercount').innerText = `Wait for the next game`;
+    //     default:
+    //         break;
+    // }
 }
 
 function updatePlayerCount(count) {
@@ -76,16 +79,16 @@ function updatePlayerCount(count) {
 }
 function startGame(nickname){
 
-    let count = 10
-    
-    const interval = setInterval(()=>{
-        count--
-        document.getElementById('playercount').innerText = `start Game in : ${count}s`;
-        if (count == 0){
-            GoToGame(nickname)
-            clearInterval(interval)
-        }
-    },1000)
+    let count = 1
+    GoToGame(nickname)
+    // const interval = setInterval(()=>{
+    //     count--
+    //     document.getElementById('playercount').innerText = `start Game in : ${count}s`;
+    //     if (count == 0){
+    //         GoToGame(nickname)
+    //         clearInterval(interval)
+    //     }
+    // },1000)
 }
 
 function GoToGame(nickname) {
@@ -93,8 +96,19 @@ function GoToGame(nickname) {
     
     const body = document.body;
     render(GamePage(),body)
+    const tileSize = 32;
+    const tileMap = new TileMap(tileSize);
+    let game =document.querySelector(".game-canvas")
+    
+
+    function gameLoop(){
+        tileMap.drawGame(game)
+    }
+    gameLoop()
+    // setInterval(gameLoop   ,1000/60)
     chat(nickname)
 }
+
 
 function chat(nickname) {
     

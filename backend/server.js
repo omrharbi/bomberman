@@ -104,31 +104,31 @@ wss.on('connection', (ws) => {
       return;
     }
 
-    switch (data.type) {
-      case "newPlayer":
-        const id = Date.now() + Math.floor(Math.random() * 1000);
-        currentPlayer = new Player(data.nickname, id, ws);
-        currentRoom = findAvailableRoom();
-        currentRoom.addPlayer(currentPlayer);
+    // switch (data.type) {
+    //   case "newPlayer":
+    //     const id = Date.now() + Math.floor(Math.random() * 1000);
+    //     currentPlayer = new Player(data.nickname, id, ws);
+    //     currentRoom = findAvailableRoom();
+    //     currentRoom.addPlayer(currentPlayer);
 
-        currentRoom.broadcast({
-          type: 'updatePlayers',
-          playerCount: currentRoom.players.size ,
-        });
+    //     currentRoom.broadcast({
+    //       type: 'updatePlayers',
+    //       playerCount: currentRoom.players.size ,
+    //     });
 
-        console.log(`Player ${data.nickname} joined Room ${currentRoom.id}`);
+    //     console.log(`Player ${data.nickname} joined Room ${currentRoom.id}`);
 
-        setTimeout(() => {
-          if (currentRoom.players.size >= 2 && !currentRoom.started) {
-            startRoom(currentRoom);
-          }
-        }, 5000);
-        break;
+    //     // setTimeout(() => {
+    //     //   if (currentRoom.players.size >= 1 && !currentRoom.started) {
+    //         startRoom(currentRoom);
+    //     //   }
+    //     // }, 5000);
+    //     break;
 
-      default:
-        console.log("Unknown message type:", data.type);
-        break;
-    }
+    //   default:
+    //     console.log("Unknown message type:", data.type);
+    //      break;
+    // }
   });
 
   ws.on('close', () => {
