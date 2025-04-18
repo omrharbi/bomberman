@@ -19,15 +19,16 @@ function login() {
 login()
 
 function waiting() {
-    const div = document.getElementById('input');
-    render(jsx('p',{id:'playercount'}),div)
-    const contDiv = document.getElementById('cont');
-    const waitingGif = jsx('img', {
-        src: '/img/output-waiting.gif',
-        alt: 'Waiting...',
-        style: ' margin-top: 10px;' // optional styling
-    });
-    render(waitingGif, contDiv);
+    // const div = document.getElementById('input');
+    // render(jsx('p',{id:'playercount'}),div)
+    // const contDiv = document.getElementById('cont');
+    // const waitingGif = jsx('img', {
+    //     src: '/img/output-waiting.gif',
+    //     alt: 'Waiting...',
+    //     style: ' margin-top: 10px;' // optional styling
+    // });
+    // render(waitingGif, contDiv);
+    startGame("TEST")
 
 }
 
@@ -78,14 +79,15 @@ function updatePlayerCount(count) {
 }
 function startGame(nickname){
     let count = 10
-    const interval = setInterval(()=>{
-        count--
-        document.getElementById('cont').innerText = `start Game in : ${count}s`;
-        if (count == 0){
-            GoToGame(nickname)
-            clearInterval(interval)
-        }
-    },1000)
+    GoToGame(nickname)
+    // const interval = setInterval(()=>{
+    //     count--
+    //     document.getElementById('cont').innerText = `start Game in : ${count}s`;
+    //     if (count == 0){
+    //         GoToGame(nickname)
+    //         clearInterval(interval)
+    //     }
+    // },1000)
 }
 
 function GoToGame(nickname) {
@@ -93,13 +95,14 @@ function GoToGame(nickname) {
     
     const body = document.body;
     render(GamePage(),body)
-    const tileSize = 32;
+    const tileSize = 40;
     const tileMap = new TileMap(tileSize);
-    let game =document.querySelector(".game-canvas")
+    let game =document.getElementById("game")
     
 
     function gameLoop(){
         tileMap.drawGame(game)
+        // requestAnimationFrame(gameLoop);
     }
     gameLoop()
     // setInterval(gameLoop   ,1000/60)
