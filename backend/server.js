@@ -87,7 +87,7 @@ function startGameForPlayer(player, room) {
 
   player.conn.on('close', () => {
     room.removePlayer(player.id);
-    room.broadcast({ type: 'updatePlayers', playerCount: room.players.size });
+    room.broadcast({ type: 'PlayersExits', playerCount: room.players.size });
   });
 }
 

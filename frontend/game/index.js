@@ -9,9 +9,6 @@ const router = new Router({
 });
 router.init()
 function login() {
-    // const body = document.body;
-    // render(LoginPage(),body)
-    
     const but = document.getElementById("NameBut");
     but.addEventListener("click", () => {
         const name = document.getElementById("name").value.trim();
@@ -24,12 +21,14 @@ login()
 function waiting() {
     const div = document.getElementById('input');
     render(jsx('p',{id:'playercount'}),div)
-    let cont = 1;
-    const p = document.getElementById('cont');
-    setInterval(() => {
-        cont++;
-        p.textContent = cont;
-    }, 1000);
+    const contDiv = document.getElementById('cont');
+    const waitingGif = jsx('img', {
+        src: '/img/output-waiting.gif',
+        alt: 'Waiting...',
+        style: ' margin-top: 10px;' // optional styling
+    });
+    render(waitingGif, contDiv);
+
 }
 
 let socket;
@@ -78,17 +77,15 @@ function updatePlayerCount(count) {
    document.getElementById('playercount').innerText = `Players: ${count}/4`;
 }
 function startGame(nickname){
-
-    let count = 1
-    GoToGame(nickname)
-    // const interval = setInterval(()=>{
-    //     count--
-    //     document.getElementById('playercount').innerText = `start Game in : ${count}s`;
-    //     if (count == 0){
-    //         GoToGame(nickname)
-    //         clearInterval(interval)
-    //     }
-    // },1000)
+    let count = 10
+    const interval = setInterval(()=>{
+        count--
+        document.getElementById('cont').innerText = `start Game in : ${count}s`;
+        if (count == 0){
+            GoToGame(nickname)
+            clearInterval(interval)
+        }
+    },1000)
 }
 
 function GoToGame(nickname) {
