@@ -2,6 +2,8 @@ import { LoginPage, GamePage } from '../app/config.js'
 import { jsx } from '../src/framework.js'
 import { render, updateRender } from '../src/vdom.js'
 import { Router } from '../src/router.js';
+// import draw from './draw.js';
+import TileMap from './tileMap.js';
 const router = new Router({
     '/': () => [LoginPage()],
 });
@@ -112,6 +114,16 @@ function GoToGame(nickname, lives, players) {
 
     const body = document.body;
     render(GamePage(), body)
+    ///////////////////
+    const tileSize = 40;
+    const tileMap = new TileMap(tileSize);
+    let game = document.getElementById("game")
+    function gameLoop() {
+        tileMap.drawGame(game)
+    }
+    // gameLoop()
+    requestAnimationFrame(gameLoop);
+    //////////////////
     const livesElement = document.getElementById('lives');
     livesElement.innerHTML = `Lives : ${lives}`;
 
@@ -129,6 +141,7 @@ function GoToGame(nickname, lives, players) {
 
     chat(nickname)
 }
+
 
 function chat(nickname) {
     const sendButton = document.querySelector('.send-button');
