@@ -66,6 +66,15 @@ function handleServerMessages(data) {
             break
         case 'waiting':
             document.getElementById('playercount').innerText = `Wait for the next game`;
+        case 'playersinfo':
+            updatePlayersInfo(data.players)
+            break
+        case 'updateLives':
+            updateLives(data.playerId, data.lives, data.nickname)
+            break
+        case 'playerDied':
+            playerDied(data.playerId, data.nickname)
+            break
         default:
             break;
     }
@@ -97,7 +106,6 @@ function GoToGame(nickname) {
 }
 
 function chat(nickname) {
-    
         const sendButton = document.querySelector('.send-button');        
         sendButton.addEventListener('click', function() {
             sendMessage(nickname);
@@ -135,7 +143,30 @@ function displayMsg(data) {
     messageContainer.appendChild(newMessage);
     messageContainer.scrollTop = messageContainer.scrollHeight;
 }
-
+function updatePlayersInfo(players) {
+    // const playersList = document.querySelector('.connected-players');
+    // playersList.innerHTML = '';
+}
+function updateLives(playerId, lives, nickname) {
+    const playerElement = document.getElementById(playerId);
+    if (playerElement) {
+        playerElement.querySelector('.lives').textContent = lives;
+    }
+    const playerNameElement = document.getElementById(nickname);
+    if (playerNameElement) {
+        playerNameElement.querySelector('.lives').textContent = lives;
+    }
+}
+function playerDied(playerId, nickname) {
+    const playerElement = document.getElementById(playerId);
+    if (playerElement) {
+        playerElement.classList.add('died');
+    }
+    const playerNameElement = document.getElementById(nickname);
+    if (playerNameElement) {
+        playerNameElement.classList.add('died');
+    }
+}
 // function displayMsg(data) {
 //     const messageContainer = document.querySelector('.message-container');
 

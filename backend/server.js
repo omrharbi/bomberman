@@ -16,6 +16,14 @@ class Player {
     this.nickname = nickname;
     this.id = id;
     this.conn = conn;
+    this.lives = 3;  // Set default lives to 3
+  }
+  loseLife() {
+    this.lives -= 1;
+  }
+
+  isAlive() {
+    return this.lives > 0;
   }
 }
 
@@ -67,6 +75,7 @@ function startGameForPlayer(player, room) {
   player.conn.send(JSON.stringify({
     type: 'startGame',
     nickname: player.nickname,
+    lives: player.lives,
   }));
 
   player.conn.on('message', (message) => {
@@ -76,6 +85,25 @@ function startGameForPlayer(player, room) {
     } catch (err) {
       console.error('Invalid message:', err);
       return;
+    }
+
+    if (data.type === 'loseLife') {
+      player.loseLife();  // Decrease lives
+    }
+
+    room.broadcast({
+      type: 'updateLives',
+      playerId: player.id,
+      lives: player.lives,
+      nickname: player.nickname,
+    });
+
+    if (!player.isAlive()) { //add here if pla
+      room.broadcast({
+        type: 'playerDied',
+        playerId: player.id,
+        nickname: player.nickname,
+      });
     }
 
     room.broadcast({
@@ -113,7 +141,7 @@ wss.on('connection', (ws) => {
 
         currentRoom.broadcast({
           type: 'updatePlayers',
-          playerCount: currentRoom.players.size ,
+          playerCount: currentRoom.players.size,
         });
 
         console.log(`Player ${data.nickname} joined Room ${currentRoom.id}`);
@@ -136,7 +164,7 @@ wss.on('connection', (ws) => {
       currentRoom.removePlayer(currentPlayer.id);
       currentRoom.broadcast({
         type: 'updatePlayers',
-        playerCount: currentRoom.players.size ,
+        playerCount: currentRoom.players.size,
       });
     }
   });
