@@ -18,4 +18,5 @@ export default class Player {
         direction: 'up',
         style: new Image().src = "assets/images/playerStyle.png"
     }
+    
 }
