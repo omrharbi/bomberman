@@ -38,29 +38,23 @@ export function GamePage() {
         // Footer
         jsx('div', { className: 'footer' },
             jsx('div', { className: 'footer-content' },
-
                 jsx('div', { className: 'footer-section lives-section' },
-                    jsx('p', {},
-                        'Lives: 3',
-                        jsx('img', { src: '../images/heart.png', alt: 'Heart', className: 'heart-icon' })
+                    jsx('div', { id: 'playerlives' },
+                        jsx('p', { id: 'lives' }),
+                    ),
+                    jsx('div', {id : "hearts"},
+                        jsx('img', { src: '../images/heart.png', alt: 'Heart', className: 'heart-icon' }),
+                        jsx('img', { src: '../images/heart.png', alt: 'Heart', className: 'heart-icon' }),
+                        jsx('img', { src: '../images/heart.png', alt: 'Heart', className: 'heart-icon' }),
                     )
                 ),
+                jsx('div', { className: 'footer-section players-section', id: 'players' },
 
-                jsx('div', { className: 'footer-section players-section' },
-                    jsx('p', {}, 'Players:'),
-                    // hadi 7ta nbadlo 3liha
-                    jsx('ul', { className: 'connected-players' },
-                        jsx('li', {}, 'Player1'),
-                        jsx('li', {}, 'Player2')
-                    )
                 ),
-
                 jsx('div', { className: 'footer-section status-section' },
                     jsx('p', {}, 'Status: Game In Progress')
                 )
             ),
-
-            // jsx('p', { className: 'copyright' }, 'Copyright © 2023 Bomber Man')
         )
 
     );

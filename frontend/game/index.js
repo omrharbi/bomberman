@@ -1,6 +1,6 @@
-import { LoginPage, GamePage} from '../app/config.js'
+import { LoginPage, GamePage } from '../app/config.js'
 import { jsx } from '../src/framework.js'
-import { render,updateRender } from '../src/vdom.js'
+import { render, updateRender } from '../src/vdom.js'
 import { Router } from '../src/router.js';
 const router = new Router({
     '/': () => [LoginPage()],
@@ -9,7 +9,7 @@ router.init()
 function login() {
     // const body = document.body;
     // render(LoginPage(),body)
-    
+
     const but = document.getElementById("NameBut");
     but.addEventListener("click", () => {
         const name = document.getElementById("name").value.trim();
@@ -21,7 +21,7 @@ login()
 
 function waiting() {
     const div = document.getElementById('input');
-    render(jsx('p',{id:'playercount'}),div)
+    render(jsx('p', { id: 'playercount' }), div)
     let cont = 1;
     const p = document.getElementById('cont');
     setInterval(() => {
@@ -33,7 +33,7 @@ function waiting() {
 let socket;
 
 function connectToGameServer(name) {
-    socket = new WebSocket('ws://localhost:8080'); 
+    socket = new WebSocket('ws://localhost:8080');
 
     socket.onopen = () => {
         console.log('Connected to WebSocket server');
@@ -56,10 +56,11 @@ function connectToGameServer(name) {
 function handleServerMessages(data) {
     switch (data.type) {
         case 'updatePlayers':
+            console.log('Received player count:', data.playerCount);
             updatePlayerCount(data.playerCount);
             break;
         case 'startGame':
-            startGame(data.nickname)
+            startGame(data.nickname, data.lives, data.players);
             break
         case 'chatMsg':
             displayMsg(data)
@@ -81,39 +82,54 @@ function handleServerMessages(data) {
 }
 
 function updatePlayerCount(count) {
-   document.getElementById('playercount').innerText = `Players: ${count}/4`;
+    document.getElementById('playercount').innerText = `Players: ${count}/4`;
 }
-function startGame(nickname){
+function startGame(nickname, lives, players) {
+    let count = 3
 
-    let count = 10
-    
-    const interval = setInterval(()=>{
+    const interval = setInterval(() => {
         count--
         document.getElementById('playercount').innerText = `start Game in : ${count}s`;
-        if (count == 0){
-            GoToGame(nickname)
+        if (count == 0) {
+            GoToGame(nickname, lives, players)
             clearInterval(interval)
         }
-    },1000)
+    }, 100)
 }
 
-function GoToGame(nickname) {
+function GoToGame(nickname, lives, players) {
     console.log('Going to game');
-    
+    console.log("lives", lives);
+
     const body = document.body;
-    render(GamePage(),body)
+    render(GamePage(), body)
+    const livesElement = document.getElementById('lives');
+    livesElement.innerHTML = `Lives : ${lives}`;
+
+    const playersElement = document.getElementById('players');
+    
+    const playerList = players.map((player, index) => {
+        return jsx('li', { id: `${index}` }, `${player.nickname} - Lives: ${player.lives}`);
+    });
+    const showPlayersTitle = jsx('p', {}, 'Players:');
+
+    const playerListContainer = jsx('ul', { className: 'connected-players' }, ...playerList);
+    
+    const wrapper = jsx('div', {}, showPlayersTitle, playerListContainer);
+    render(wrapper, playersElement);
+
     chat(nickname)
 }
 
 function chat(nickname) {
-        const sendButton = document.querySelector('.send-button');        
-        sendButton.addEventListener('click', function() {
-            sendMessage(nickname);
+    const sendButton = document.querySelector('.send-button');
+    sendButton.addEventListener('click', function () {
+        sendMessage(nickname);
     })
 }
 function sendMessage(nickname) {
     const messageText = document.querySelector('.chat-input').value.trim();
-    
+
     if (messageText !== '') {
         socket.send(JSON.stringify({
             type: "chatMsg",
@@ -139,7 +155,7 @@ function displayMsg(data) {
 
     newMessage.appendChild(playerName);
     newMessage.appendChild(messageTextElement);
-    
+
     messageContainer.appendChild(newMessage);
     messageContainer.scrollTop = messageContainer.scrollHeight;
 }

@@ -67,15 +67,22 @@ function startRoom(room) {
   console.log(`Starting game in room ${room.id}`);
 
   for (const player of room.players.values()) {
-    startGameForPlayer(player, room);
+    console.log(`Player ${player.nickname} in room ${room.id}`);
+    const players = Array.from(room.players.values()).map(player => ({
+      nickname: player.nickname,
+      lives: player.lives,
+    }));
+    startGameForPlayer(player, room, players);
   }
 }
 
-function startGameForPlayer(player, room) {
+function startGameForPlayer(player, room, players) {
+  
   player.conn.send(JSON.stringify({
     type: 'startGame',
     nickname: player.nickname,
     lives: player.lives,
+    players: players,
   }));
 
   player.conn.on('message', (message) => {
