@@ -98,11 +98,9 @@ function GoToGame(nickname) {
     const tileSize = 40;
     const tileMap = new TileMap(tileSize);
     let game =document.getElementById("game")
-    
-
     function gameLoop(){
         tileMap.drawGame(game)
-        // requestAnimationFrame(gameLoop);
+       requestAnimationFrame(gameLoop);
     }
     gameLoop()
     // setInterval(gameLoop   ,1000/60)

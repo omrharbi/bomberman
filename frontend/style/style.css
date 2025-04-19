@@ -31,7 +31,9 @@ body {
     top: 50%;
     transform: translate(-50%, -50%);
 }
-
+img {
+    width: 38px;
+}
 
 #login h1 {
     color: #ff5722;

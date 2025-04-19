@@ -1,37 +1,65 @@
 export default class TileMap {
   constructor(tileSize) {
     this.tileSize = tileSize;
-
     this.wall = this.#image("wall.png");
     this.grass = this.#image("grass.png");
     this.player = this.#image("player_r00.png");
+    this.map = [
+      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+      [1, 0,0, 0, 0, 3, 3, 3, 3, 3, 0, 3, 2, 0, 3, 0, 1],
+      [1, 0, 4, 0, 4, 0, 4, 3, 4, 3, 4, 0, 4, 0, 4, 0, 1],
+      [1, 3, 0, 0, 0, 0, 3, 3, 0, 3, 0, 3, 0, 0, 0, 0, 1],
+      [1, 0, 4, 3, 4, 0, 4, 0, 4, 0, 4, 0, 4, 0, 4, 3, 1],
+      [1, 3, 0, 3, 0, 3, 0, 2, 0, 2, 0, 3, 0, 3, 3, 3, 1],
+      [1, 0, 4, 0, 4, 3, 4, 3, 4, 3, 4, 3, 4, 0, 4, 0, 1],
+      [1, 3, 3, 3, 0, 3, 3, 0, 3, 3, 0, 3, 0, 3, 0, 3, 1],
+      [1, 0, 4, 3, 4, 0, 4, 3, 4, 3, 4, 0, 4, 3, 4, 0, 1],
+      [1, 3, 0, 3, 0, 3, 3, 0, 3, 3, 0, 3, 0, 3, 0, 3, 1],
+      [1, 0, 4, 0, 4, 0, 4, 3, 4, 0, 4, 0, 4, 0, 4, 0, 1],
+      [1, 0, 0, 0 , 3, 3, 3, 2, 3, 2, 3, 3, 0, 0, 0, 3, 1],
+      [1, 0, 4, 0, 4, 0, 4, 0, 4, 3, 4, 0, 4, 0, 4, 3, 1],
+      [1, 3, 3, 3, 2, 3, 0, 3, 0, 3, 0, 3, 2, 0, 0, 3, 1],
+      [1, 0, 4, 3, 4, 0, 4, 0, 4, 0, 4, 3, 4, 3, 4, 0, 1],
+      [1, 3, 3, 0, 3, 3, 0, 0, 3, 3, 0, 3, 3, 3,3, 3, 1],
+      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    ];
+    
+  const mapData = [2, 3, 0, 3, 0, 3];
+  for (let row = 0; row < this.map.length; row++) {
+    for (let col = 0; col < this.map[row].length; col++) {
+      const positionPlayrs = [
+        [1, 1], //p1
+        [1, 2],
+        [2, 1],
+        [1, 13],// p2
+        [1, 12],
+        [2, 13],
+        [9, 1], // p3
+        [8, 1],
+        [9, 2],
+        [9, 13], //p4
+        [8, 13],
+        [9, 12]
+      ];
+
+      if (positionPlayrs.some(([r, c]) => r === row && c === col)) {
+        this.map[row][col] = 3
+      } 
+      // else if (this.map[row][col] === 0) {
+      //   let random = Math.round(Math.random()  * mapData.length);
+      //   this.map[row][col] = mapData[random]
+      // }
+    }
+  }
   }
   #image(fileName) {
     const img = new Image();
     img.src = `../images/${fileName}`;
     return img;
   }
-  map = [
-    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-    [1, 0, 0, 0, 0, 3, , 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-  ];
+   
   drawGame(canvas) {
-    this.#setCanvasSize(canvas);
+     this.#setCanvasSize(canvas);
     this.#draw(canvas);
   }
   #draw(canvas) {
@@ -39,9 +67,9 @@ export default class TileMap {
     const columns = this.map[0].length;
     const containerWidth = canvas.offsetWidth;
     const containerHeight = canvas.offsetHeight;
-    canvas.innerHTML = "";
-
     const tile = Math.min(containerWidth / columns, containerHeight / rows);
+    
+    canvas.innerHTML = "";
 
     canvas.style.display = "grid";
 
@@ -53,33 +81,29 @@ export default class TileMap {
       for (let column = 0; column < columns; column++) {
         const tile = this.map[row][column];
         const div = document.createElement("div");
+        const img = document.createElement("img");
+         
         div.classList.add("tile");
         div.dataset.row = row;
-        div.dataset.column = column; 
-        div.style.width = `${this.tileSize}px`;
-        div.style.height = `${this.tileSize}px`;
+        div.dataset.column = column;  
         switch (tile) {
           case 1:
-            div.style.backgroundImage = `url(../images/wall.png)`;
-            div.style.backgroundSize = "cover";
-            break;
-          case 0:
-            div.style.backgroundImage = `url(../images/bg.png)`;
-            div.style.backgroundSize = "cover";
-            break;
+            img.src=`../images/wallBlack.png` //wall.png
+             break;
+          case 4:
+             img.src=`../images/wallBlack.png`
+             break;
           case 2:
-            div.style.backgroundImage = `url(../images/tree.png)`;
-            div.style.backgroundSize = "cover";
-            break;
+            img.src=`../images/tree.png`
+             break;
           case 3:
-            div.style.backgroundImage = `url(../images/player_f00.png)`;
-            div.style.backgroundSize = "cover";
+            img.src=`../images/wall.png`
             break;
           default:
-            break;
-        }
-
-        // Add the tile to the container
+            img.src = ""; // Empty space
+            }
+            
+            div.appendChild(img) 
         canvas.appendChild(div);
       }
     }
