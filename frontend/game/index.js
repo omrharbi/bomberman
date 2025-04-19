@@ -57,7 +57,7 @@ function handleServerMessages(data) {
     switch (data.type) {
         case 'updatePlayers':
             console.log('Received player count:', data.playerCount);
-            updatePlayerCount(data.playerCount);
+            updatePlayerCount(data.playerCount, data.playerId);
             break;
         case 'startGame':
             startGame(data.nickname, data.lives, data.players);
@@ -81,8 +81,17 @@ function handleServerMessages(data) {
     }
 }
 
-function updatePlayerCount(count) {
-    document.getElementById('playercount').innerText = `Players: ${count}/4`;
+function updatePlayerCount(count, playerId) {
+    if (document.getElementById('playercount')) {
+        document.getElementById('playercount').innerText = `Players: ${count}/4`;
+    } else {
+        if (count == 1) {
+            alert("you win")
+        } else {
+            console.log(`removing player have id : ${playerId}`);
+            document.getElementById(`${playerId}`).remove()
+        }
+    }
 }
 function startGame(nickname, lives, players) {
     let count = 3
@@ -107,14 +116,14 @@ function GoToGame(nickname, lives, players) {
     livesElement.innerHTML = `Lives : ${lives}`;
 
     const playersElement = document.getElementById('players');
-    
+
     const playerList = players.map((player, index) => {
-        return jsx('li', { id: `${index}` }, `${player.nickname} - Lives: ${player.lives}`);
+        return jsx('li', { id: `${player.playerId}` }, `${player.nickname} - Lives: ${player.lives}`);
     });
     const showPlayersTitle = jsx('p', {}, 'Players:');
 
     const playerListContainer = jsx('ul', { className: 'connected-players' }, ...playerList);
-    
+
     const wrapper = jsx('div', {}, showPlayersTitle, playerListContainer);
     render(wrapper, playersElement);
 

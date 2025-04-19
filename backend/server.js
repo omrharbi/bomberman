@@ -16,7 +16,7 @@ class Player {
     this.nickname = nickname;
     this.id = id;
     this.conn = conn;
-    this.lives = 3;  // Set default lives to 3
+    this.lives = 3;
   }
   loseLife() {
     this.lives -= 1;
@@ -71,6 +71,7 @@ function startRoom(room) {
     const players = Array.from(room.players.values()).map(player => ({
       nickname: player.nickname,
       lives: player.lives,
+      playerId: player.id,
     }));
     startGameForPlayer(player, room, players);
   }
@@ -105,7 +106,7 @@ function startGameForPlayer(player, room, players) {
       nickname: player.nickname,
     });
 
-    if (!player.isAlive()) { //add here if pla
+    if (!player.isAlive()) {
       room.broadcast({
         type: 'playerDied',
         playerId: player.id,
@@ -122,7 +123,7 @@ function startGameForPlayer(player, room, players) {
 
   player.conn.on('close', () => {
     room.removePlayer(player.id);
-    room.broadcast({ type: 'updatePlayers', playerCount: room.players.size });
+    room.broadcast({ type: 'updatePlayers', playerCount: room.players.size, playerId : player.id });
   });
 }
 
