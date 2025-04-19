@@ -1,7 +1,7 @@
-export default class TileMap {
+export default class  {
   constructor(tileSize) {
     this.tileSize = tileSize;
-    this.wall = this.#image("wall.png");
+    this.wall = this.#image("wallBlack.png");
     this.grass = this.#image("grass.png");
     this.player = this.#image("player_r00.png");
     this.map = [
@@ -43,12 +43,12 @@ export default class TileMap {
       ];
 
       if (positionPlayrs.some(([r, c]) => r === row && c === col)) {
-        this.map[row][col] = 3
+        this.map[row][col] = 5
       } 
-      // else if (this.map[row][col] === 0) {
+      // else if (this.map[row][col] === 0) {                       
       //   let random = Math.round(Math.random()  * mapData.length);
-      //   this.map[row][col] = mapData[random]
-      // }
+      //   this.map[row][col] = mapData[random]                     
+      // }                                                           
     }
   }
   }
@@ -99,6 +99,9 @@ export default class TileMap {
           case 3:
             img.src=`../images/wall.png`
             break;
+          case 5:
+              // img.src=`../images/player_r00(1).png`
+              break;
           default:
             img.src = ""; // Empty space
             }

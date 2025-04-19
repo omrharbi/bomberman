@@ -100,9 +100,9 @@ function GoToGame(nickname) {
     let game =document.getElementById("game")
     function gameLoop(){
         tileMap.drawGame(game)
-       requestAnimationFrame(gameLoop);
     }
-    gameLoop()
+    // gameLoop()
+       requestAnimationFrame(gameLoop);
     // setInterval(gameLoop   ,1000/60)
     chat(nickname)
 }
