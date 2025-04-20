@@ -62,7 +62,7 @@ function handleServerMessages(data) {
             updatePlayerCount(data.playerCount, data.playerId);
             break;
         case 'startGame':
-            startGame(data.nickname, data.lives, data.players);
+            startGame(data);
             break
         case 'chatMsg':
             displayMsg(data)
@@ -83,6 +83,7 @@ function handleServerMessages(data) {
     }
 }
 
+
 function updatePlayerCount(count, playerId) {
     if (document.getElementById('playercount')) {
         document.getElementById('playercount').innerText = `Players: ${count}/4`;
@@ -95,157 +96,35 @@ function updatePlayerCount(count, playerId) {
         }
     }
 }
-function startGame(nickname, lives, players) {
+function startGame(data) {
     let count = 3
 
     const interval = setInterval(() => {
         count--
         document.getElementById('playercount').innerText = `start Game in : ${count}s`;
         if (count == 0) {
-            GoToGame(nickname, lives, players)
+            GoToGame(data)
             clearInterval(interval)
         }
     }, 100)
 }
 
-function GoToGame(nickname, lives, players) {
+function GoToGame(data) {
     console.log('Going to game');
-    console.log("lives", lives);
 
     const body = document.body;
     render(GamePage(), body)
     ///////////////////
     const tileSize = 40;
-    const tileMap = new TileMap(tileSize);
-    let game = document.getElementById("game")
-
-    const gameState = {
-        player: {
-            x: 1,
-            y: 1,
-            bombsPlaced: 0,
-            bombPower: 1,
-            positionX: 52,
-            positionY: 0,
-            width: 22,
-            height: 40,
-            lives: lives,
-            speed: 7,
-            isMoving: false,
-            isDead: false,
-            direction: 'down',
-            style: "../images/playerStyle.png", // Just the URL string
-        }
-    };
-
-    function drawPlayer() {
-        const playerElement = document.getElementById('player');
-        const player = gameState.player;
-
-        playerElement.style.position = 'absolute';
-        playerElement.style.width = player.width + 'px';
-        playerElement.style.height = player.height + 'px';
-        playerElement.style.backgroundImage = `url(${player.style})`;
-        playerElement.style.backgroundPositionY = player.positionY + 'px';
-        playerElement.style.backgroundPositionX = player.positionX + 'px';
-        playerElement.style.transform = `translate(${player.x}px, ${player.y}px)`;
-    }
-
-    function setupPlayerControls() {
-        let keysPressed = {};
-        let movementStartTime = null;
-        let lastUpdateTime = Date.now();
-
-        const spriteMap = {
-            up: [ { x: 55, y: 82 }, { x: 28, y: 82 }, { x: 55, y: 82 }, { x: 81, y: 82 } ],
-            right: [ { x: 30, y: 41 }, { x: 55, y: 41 }, { x: 30, y: 41 }, { x: -5, y: 41 } ],
-            down: [ { x: 52, y: 0 }, { x: 27, y: 0 }, { x: 52, y: 0 }, { x: 78, y: 0 } ],
-            left: [ { x: -5, y: 124 }, { x: 30, y: 124 }, { x: -5, y: 124 }, { x: 82, y: 124 } ]
-        };
-
-        addEventListener('keydown', (e) => keysPressed[e.key] = true);
-        addEventListener('keyup', (e) => keysPressed[e.key] = false);
-
-        function updatePlayerMovement() {
-            const now = Date.now();
-            const deltaTime = (now - lastUpdateTime) / 100;
-            lastUpdateTime = now;
-
-            const player = gameState.player;
-            player.isMoving = false;
-
-            if (keysPressed['ArrowUp']) {
-                player.y -= player.speed * deltaTime;
-                player.direction = 'up';
-                player.isMoving = true;
-            }
-            if (keysPressed['ArrowRight']) {
-                player.x += player.speed * deltaTime;
-                player.direction = 'right';
-                player.isMoving = true;
-            }
-            if (keysPressed['ArrowDown']) {
-                player.y += player.speed * deltaTime;
-                player.direction = 'down';
-                player.isMoving = true;
-            }
-            if (keysPressed['ArrowLeft']) {
-                player.x -= player.speed * deltaTime;
-                player.direction = 'left';
-                player.isMoving = true;
-            }
-
-            if (player.isMoving) {
-                if (!movementStartTime) movementStartTime = now;
-                const elapsed = now - movementStartTime;
-                const frameDuration = 200;
-
-                const frames = spriteMap[player.direction];
-                const frameIndex = Math.floor(elapsed / frameDuration) % frames.length;
-
-                player.positionX = frames[frameIndex].x;
-                player.positionY = frames[frameIndex].y;
-            } else {
-                if (movementStartTime) {
-                    const frames = spriteMap[player.direction];
-                    player.positionX = frames[0].x;
-                    player.positionY = frames[0].y;
-                    movementStartTime = null;
-                }
-            }
-
-            drawPlayer();
-            requestAnimationFrame(updatePlayerMovement);
-        }
-
-        updatePlayerMovement();
-    }
-
-    drawPlayer();
-    setupPlayerControls();
-
-    function gameLoop() {
-        tileMap.drawGame(game)
+    const tileMap = new TileMap(tileSize,data);
+    let game =document.getElementById("game")
+    function gameLoop(){
+        tileMap.drawGame(game,data)
     }
     // gameLoop()
-    requestAnimationFrame(gameLoop);
-    //////////////////
-    const livesElement = document.getElementById('lives');
-    livesElement.innerHTML = `Lives : ${lives}`;
-
-    const playersElement = document.getElementById('players');
-
-    const playerList = players.map((player, index) => {
-        return jsx('li', { id: `${player.playerId}` }, `${player.nickname} - Lives: ${player.lives}`);
-    });
-    const showPlayersTitle = jsx('p', {}, 'Players:');
-
-    const playerListContainer = jsx('ul', { className: 'connected-players' }, ...playerList);
-
-    const wrapper = jsx('div', {}, showPlayersTitle, playerListContainer);
-    render(wrapper, playersElement);
-
-    chat(nickname)
+       requestAnimationFrame(gameLoop);
+    // setInterval(gameLoop   ,1000/60)
+    chat(data.nickname)
 }
 
 function chat(nickname) {
