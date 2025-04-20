@@ -31,7 +31,6 @@ class Player {
     this.nickname = nickname;
     this.id = id;
     this.conn = conn;
-
     // Game-related properties
     this.lives = 3;
     this.x = 1;
@@ -123,14 +122,16 @@ function findAvailableRoom() {
 function startRoom(room) {
   room.started = true;
   console.log(`Starting game in room ${room.id}`);
-
   for (const player of room.players.values()) {
+    let count = 1
     console.log(`Player ${player.nickname} in room ${room.id}`);
     const players = Array.from(room.players.values()).map(player => ({
       nickname: player.nickname,
       lives: player.lives,
       playerId: player.id,
+      MapPosition : count++
     }));
+   
     startGameForPlayer(player, room, players);
   }
 }
@@ -142,6 +143,7 @@ function startGameForPlayer(player, room, players) {
     nickname: player.nickname,
     lives: player.lives,
     players: players,
+    MyId: player.id,
   }));
 
   player.conn.on('message', (message) => {
