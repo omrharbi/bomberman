@@ -11,19 +11,74 @@ const wss = new WebSocketServer({ server });
 let nextRoomID = 1;
 const rooms = new Map();
 
+// class Player {
+//   constructor(nickname, id, conn) {
+//     this.nickname = nickname;
+//     this.id = id;
+//     this.conn = conn;
+//     this.lives = 3;
+//   }
+//   loseLife() {
+//     this.lives -= 1;
+//   }
+
+//   isAlive() {
+//     return this.lives > 0;
+//   }
+// }
 class Player {
   constructor(nickname, id, conn) {
     this.nickname = nickname;
     this.id = id;
     this.conn = conn;
+
+    // Game-related properties
     this.lives = 3;
+    this.x = 1;
+    this.y = 1;
+    this.bombsPlaced = 0;
+    this.bombPower = 1;
+    this.positionX = 52;
+    this.positionY = 0;
+    this.width = 22;
+    this.height = 40;
+    this.speed = 7;
+    this.isMoving = false;
+    this.isDead = false;
+    this.direction = 'up';
+    this.style = "assets/images/playerStyle.png"; // Just the URL string
   }
+
   loseLife() {
     this.lives -= 1;
   }
 
   isAlive() {
     return this.lives > 0;
+  }
+
+  move(dx, dy) {
+    this.x += dx;
+    this.y += dy;
+  }
+
+  setDirection(direction) {
+    this.direction = direction;
+  }
+
+  resetPosition(x = 1, y = 1) {
+    this.x = x;
+    this.y = y;
+  }
+
+  placeBomb() {
+    this.bombsPlaced += 1;
+  }
+
+  removeBomb() {
+    if (this.bombsPlaced > 0) {
+      this.bombsPlaced -= 1;
+    }
   }
 }
 
