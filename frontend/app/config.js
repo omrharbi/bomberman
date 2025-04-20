@@ -14,7 +14,8 @@ export function GamePage() {
 
             // Main Game Area
             jsx('main', { className: 'game-area' },
-                jsx('div', { className: 'game-canvas',id:"game" })
+                jsx('div', { className: 'game-canvas',id:"game" }),
+                jsx('div', {id : "player"})
             ),
 
             // Sidebar Chat Area
