@@ -104,6 +104,9 @@ class Room {
       }
     }
   }
+  getAllPlayerIDs() {
+    return [...this.players.keys()];
+  }
 }
 
 function findAvailableRoom() {
@@ -153,27 +156,38 @@ function startGameForPlayer(player, room, players) {
     if (data.type === 'loseLife') {
       player.loseLife();  // Decrease lives
     }
+    // room.broadcast({
+    //   type: 'updateLives',
+    //   playerId: player.id,
+    //   lives: player.lives,
+    //   nickname: player.nickname,
+    // });
 
-    room.broadcast({
-      type: 'updateLives',
-      playerId: player.id,
-      lives: player.lives,
-      nickname: player.nickname,
-    });
-
-    if (!player.isAlive()) {
-      room.broadcast({
-        type: 'playerDied',
-        playerId: player.id,
-        nickname: player.nickname,
-      });
+    // if (!player.isAlive()) {
+    //   room.broadcast({
+    //     type: 'playerDied',
+    //     playerId: player.id,
+    //     nickname: player.nickname,
+    //   });
+    // }
+    switch (data.type) {
+      case "chatMsg":
+        room.broadcast({
+          type: 'chatMsg',
+          nickname: player.nickname,
+          messageText: data.messageText || ''
+        });
+        break;
+      case "playerMove":        
+        room.broadcast({
+          type: 'playerMove',
+          PlayerId: player.id,
+          position: data.position,
+        });
+        break
+      default:
+        break;
     }
-
-    room.broadcast({
-      type: 'chatMsg',
-      nickname: player.nickname,
-      messageText: data.messageText || ''
-    });
   });
 
   player.conn.on('close', () => {
