@@ -116,14 +116,28 @@ function GoToGame(data) {
     render(GamePage(), body)
     ///////////////////
     const tileSize = 40;
-    const tileMap = new TileMap(tileSize,data);
-    let game =document.getElementById("game")
-    function gameLoop(){
-        tileMap.drawGame(game,data)
+    const tileMap = new TileMap(tileSize, data);
+    let game = document.getElementById("game")
+    function gameLoop() {
+        tileMap.drawGame(game, data)
     }
     // gameLoop()
-       requestAnimationFrame(gameLoop);
+    requestAnimationFrame(gameLoop);
     // setInterval(gameLoop   ,1000/60)
+    const livesElement = document.getElementById('lives');
+    livesElement.innerHTML = `Lives : ${data.lives}`;
+
+    const playersElement = document.getElementById('players');
+
+    const playerList = data.players.map((player, index) => {
+        return jsx('li', { id: `${player.playerId}` }, `${player.nickname} - Lives: ${player.lives}`);
+    });
+    const showPlayersTitle = jsx('p', {}, 'Players:');
+
+    const playerListContainer = jsx('ul', { className: 'connected-players' }, ...playerList);
+
+    const wrapper = jsx('div', {}, showPlayersTitle, playerListContainer);
+    render(wrapper, playersElement);
     chat(data.nickname)
 }
 

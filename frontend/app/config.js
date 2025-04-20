@@ -36,7 +36,7 @@ export function GamePage() {
         ),
 
         // Footer
-        jsx('div', { className: 'footer' },
+         jsx('div', { className: 'footer' },
             jsx('div', { className: 'footer-content' },
                 jsx('div', { className: 'footer-section lives-section' },
                     jsx('div', { id: 'playerlives' },
