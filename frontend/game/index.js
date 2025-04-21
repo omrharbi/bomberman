@@ -1,23 +1,22 @@
 import { LoginPage, GamePage } from '../app/config.js'
-import { jsx } from '../src/framework.js'
+import { jsx, createElement } from '../src/framework.js'
 import { render, updateRender } from '../src/vdom.js'
+import { MyEventSystem } from '../src/event.js'
 import { Router } from '../src/router.js';
-// import draw from './draw.js';
 import TileMap from './tileMap.js';
+
 const router = new Router({
     '/': () => [LoginPage()],
 });
 router.init()
 function login() {
-    // const body = document.body;
-    // render(LoginPage(),body)
-
     const but = document.getElementById("NameBut");
-    but.addEventListener("click", () => {
+    MyEventSystem.addEventListener(but, "click", () => {
         const name = document.getElementById("name").value.trim();
         connectToGameServer(name);
         waiting();
     });
+
 }
 login()
 
@@ -36,7 +35,6 @@ let socket;
 
 function connectToGameServer(name) {
     socket = new WebSocket('ws://localhost:8080');
-
     socket.onopen = () => {
         console.log('Connected to WebSocket server');
         socket.send(JSON.stringify({
@@ -44,7 +42,6 @@ function connectToGameServer(name) {
             nickname: name
         }));
     };
-
     socket.onmessage = (message) => {
         const data = JSON.parse(message.data);
         console.log(data);
@@ -58,7 +55,6 @@ function connectToGameServer(name) {
 function handleServerMessages(data) {
     switch (data.type) {
         case 'updatePlayers':
-            console.log('Received player count:', data.playerCount);
             updatePlayerCount(data.playerCount, data.playerId);
             break;
         case 'startGame':
@@ -110,75 +106,66 @@ function startGame(data) {
 }
 
 function GoToGame(data) {
-    console.log('Going to game');
-
     const body = document.body;
     render(GamePage(), body)
-    ///////////////////
     const tileSize = 40;
     const tileMap = new TileMap(tileSize, data);
     let game = document.getElementById("game")
     function gameLoop() {
         tileMap.drawGame(game, data)
     }
-    // gameLoop()
     requestAnimationFrame(gameLoop);
-    // setInterval(gameLoop   ,1000/60)
-    const livesElement = document.getElementById('lives');
-    livesElement.innerHTML = `Lives : ${data.lives}`;
-
-    const playersElement = document.getElementById('players');
-
-    const playerList = data.players.map((player, index) => {
-        return jsx('li', { id: `${player.playerId}` }, `${player.nickname} - Lives: ${player.lives}`);
-    });
-    const showPlayersTitle = jsx('p', {}, 'Players:');
-
-    const playerListContainer = jsx('ul', { className: 'connected-players' }, ...playerList);
-
-    const wrapper = jsx('div', {}, showPlayersTitle, playerListContainer);
-    render(wrapper, playersElement);
     chat(data.nickname)
 }
 
 function chat(nickname) {
     const sendButton = document.querySelector('.send-button');
-    sendButton.addEventListener('click', function () {
+    MyEventSystem.addEventListener(sendButton, 'click', () => {
         sendMessage(nickname);
-    })
+    });
 }
 function sendMessage(nickname) {
     const messageText = document.querySelector('.chat-input').value.trim();
-
     if (messageText !== '') {
         socket.send(JSON.stringify({
             type: "chatMsg",
             nickname: nickname,
             messageText: messageText
         }));
-        document.querySelector('.chat-input').value = ''; // Clear input after sending
+        document.querySelector('.chat-input').value = '';
     }
 }
 
 function displayMsg(data) {
     const messageContainer = document.querySelector('.message-container');
-    const newMessage = document.createElement('div');
-    newMessage.className = 'message';
 
-    const playerName = document.createElement('div');
-    playerName.className = 'player-name';
-    playerName.textContent = data.nickname;
-
-    const messageTextElement = document.createElement('div');
-    messageTextElement.className = 'message-text';
-    messageTextElement.textContent = data.messageText;
-
-    newMessage.appendChild(playerName);
-    newMessage.appendChild(messageTextElement);
-
-    messageContainer.appendChild(newMessage);
+    const newMessage = jsx('div', { className: 'message' },
+        jsx('div', { className: 'player-name' }, data.nickname),
+        jsx('div', { className: 'message-text' }, data.messageText)
+    )
+    messageContainer.appendChild(createElement(newMessage))
     messageContainer.scrollTop = messageContainer.scrollHeight;
 }
+
+// let messages = [];
+// function displayMsg(data) {
+//     messages.push(data);
+//     console.log('msggg', renderMessages());
+//     const messageContainer = document.querySelector('.message-container');
+//     updateRender(renderMessages(), messageContainer);
+//     messageContainer.scrollTop = messageContainer.scrollHeight;
+// }
+// function renderMessages() {
+//     return jsx('div', { className: 'message-container' },
+//         messages.map(msg =>
+//             jsx('div', { className: 'message' },
+//                 jsx('div', { className: 'player-name' }, msg.nickname),
+//                 jsx('div', { className: 'message-text' }, msg.messageText)
+//             )
+//         )
+//     );
+// }
+
 function updatePlayersInfo(players) {
     // const playersList = document.querySelector('.connected-players');
     // playersList.innerHTML = '';
@@ -203,14 +190,4 @@ function playerDied(playerId, nickname) {
         playerNameElement.classList.add('died');
     }
 }
-// function displayMsg(data) {
-//     const messageContainer = document.querySelector('.message-container');
 
-//     const newMessage = jsx('div', { className: 'message' },
-//         jsx('div', { className: 'player-name' }, data.nickname),
-//         jsx('div', { className: 'message-text' }, data.messageText)
-//     );
-
-//     render(newMessage, messageContainer);
-//     messageContainer.scrollTop = messageContainer.scrollHeight;
-// }

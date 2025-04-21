@@ -224,12 +224,12 @@ wss.on('connection', (ws) => {
         });
 
         console.log(`Player ${data.nickname} joined Room ${currentRoom.id}`);
-
         startRoom(currentRoom);
-        setTimeout(() => {
-          if (currentRoom.players.size >= 2 && !currentRoom.started) {
-          }
-        }, 5000);
+        // setTimeout(() => {
+        //   if (currentRoom.players.size >= 2 && !currentRoom.started) {
+        //     startRoom(currentRoom);
+        //   }
+        // }, 5000);
         break;
 
       default:
