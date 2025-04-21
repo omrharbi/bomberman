@@ -58,10 +58,10 @@ export default class Game {
     return img;
   }
 
-  drawGame(canvas) {
+  drawGame(canvas, data) {
     this.canvas = canvas; 
     this.#setCanvasSize(canvas);
-    this.#draw(canvas, players);
+    this.#draw(canvas, data);
     this.#setupPlayerControls();
   }
 
@@ -236,9 +236,7 @@ export default class Game {
     // console.log("col", col)
     // console.log(this.map[row][col]);
     // console.log(this.map);
-    
-    
-    
+        
     if (this.map[row][col] !== 0) return; // check if empty palce and the are problem in the 5 for rist place for player
 
     // const bomb = new Bomb(row, col);
