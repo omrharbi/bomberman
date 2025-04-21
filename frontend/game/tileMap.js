@@ -322,9 +322,9 @@ export default class Game {
 
 #drawExplosion(tileElement, row, col) {
     if (!tileElement) return;
-
-    const explosionDiv = document.createElement("div");
-    explosionDiv.classList.add("damage");
+    
+    // const explosionDiv = document.createElement("div");
+    // explosionDiv.classList.add("damage");
     
     // Correct frame sequence
     const frames = [
@@ -340,7 +340,8 @@ export default class Game {
 
     let currentFrame = 0;
     const frameDuration = 75;
-    explosionDiv.style.backgroundPosition = `${frames[0].x}px ${frames[0].y}px`;
+    const divnode = jsx("div", {className : "damage", style: `background-position : ${frames[0].x}px ${frames[0].y}px`})
+    const explosionDiv = createElement(divnode);
 
     tileElement.appendChild(explosionDiv);
 
