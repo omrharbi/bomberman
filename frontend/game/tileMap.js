@@ -6,8 +6,8 @@ import Player from "./player.js";
 
 export default class Game {
   constructor(tileSize, data) {
-    console.log('++++++++++',data);
-    
+    console.log('++++++++++', data);
+
     this.tileSize = tileSize;
     this.players = data.players.length
     this.wall = this.#image("wallBlack.png");
@@ -62,7 +62,7 @@ export default class Game {
   }
 
   drawGame(canvas, data) {
-    this.canvas = canvas; 
+    this.canvas = canvas;
     this.#setCanvasSize(canvas);
     this.#draw(canvas, data);
     this.#setupPlayerControls();
@@ -71,7 +71,7 @@ export default class Game {
   #draw(canvas, data) {
     const rows = this.map.length;
     const columns = this.map[0].length;
-  
+
     canvas.innerHTML = "";
     canvas.style.display = "grid";
     canvas.style.gridTemplateRows = `repeat(${rows}, ${this.tileSize}px)`;
@@ -87,31 +87,31 @@ export default class Game {
         switch (tile) {
           case 1:
           case 4:
-            imgProps.src="../images/wallBlack.png"
+            imgProps.src = "../images/wallBlack.png"
             break;
           case 2:
-            imgProps.src="../images/tree.png";
+            imgProps.src = "../images/tree.png";
             break;
           case 3:
-            imgProps.src="../images/wall.png";
+            imgProps.src = "../images/wall.png";
             break;
-            case 5:
-              divStyle = "url(../images/playerStyle.png)";
-              divId = `player_${data.players[0].playerId}`;
-              break;
-            case 6:
-              divStyle = "url(../images/playerblue.webp)";
-              divId = `player_${data.players[1].playerId}`;
-              break;
-            case 7:
-              divStyle = "url(../images/playerGreen.webp)";
-              divId = `player_${data.players[2].playerId}`;
-              break;
-            case 8:
-              divStyle = "url(../images/playerStyle.png)";
-              divId = `player_${data.players[3].playerId}`;
-              break;
-            default:
+          case 5:
+            divStyle = "url(../images/playerStyle.png)";
+            divId = `player_${data.players[0].playerId}`;
+            break;
+          case 6:
+            divStyle = "url(../images/playerblue.webp)";
+            divId = `player_${data.players[1].playerId}`;
+            break;
+          case 7:
+            divStyle = "url(../images/playerGreen.webp)";
+            divId = `player_${data.players[2].playerId}`;
+            break;
+          case 8:
+            divStyle = "url(../images/playerStyle.png)";
+            divId = `player_${data.players[3].playerId}`;
+            break;
+          default:
             break;
         }
         const imgnode = imgProps.src ? jsx("img", imgProps) : [];
@@ -123,10 +123,10 @@ export default class Game {
             "data-row": row,
             "data-column": column,
             id: divId || "no_id",
-            style:  `background-image :${divStyle}`,
+            style: `background-image :${divStyle}`,
           },
           imgnode
-        );  
+        );
         const div = createElement(divnode);
         canvas.appendChild(div);
       }
@@ -172,22 +172,22 @@ export default class Game {
       this.player.isMoving = false;
       const playerElement = document.getElementById(`player_${this.MyId}`);
 
-      if (keysPressed["ArrowUp"]) {
+      if (keysPressed["w"]) {
         this.player.y -= this.player.speed * deltaTime;
         this.player.direction = "up";
         this.player.isMoving = true;
       }
-      if (keysPressed["ArrowRight"]) {
+      if (keysPressed["d"]) {
         this.player.x += this.player.speed * deltaTime;
         this.player.direction = "right";
         this.player.isMoving = true;
       }
-      if (keysPressed["ArrowDown"]) {
+      if (keysPressed["s"]) {
         this.player.y += this.player.speed * deltaTime;
         this.player.direction = "down";
         this.player.isMoving = true;
       }
-      if (keysPressed["ArrowLeft"]) {
+      if (keysPressed["a"]) {
         this.player.x -= this.player.speed * deltaTime;
         this.player.direction = "left";
         this.player.isMoving = true;
@@ -220,7 +220,7 @@ export default class Game {
           movementStartTime = null;
         }
       }
-      
+
       if (playerElement) {
         playerElement.style.transform = `translate(${this.player.x}px, ${this.player.y}px)`;
       }
@@ -232,134 +232,168 @@ export default class Game {
   }
 
   placeBomb() {
-    const row = Math.floor((this.player.y +  20 )   / this.tileSize) + 1;
-    const col = Math.floor((this.player.x + 20 ) / this.tileSize) + 1;
-    
+    const row = Math.floor((this.player.y + 20) / this.tileSize) + 1;
+    const col = Math.floor((this.player.x + 20) / this.tileSize) + 1;
+
     // Check if tile is walkable (optional)
     // console.log("this.player.y", this.player.y);
     // console.log("this.player.x", this.player.x);
 
-    
+
     // console.log("row",row);
     // console.log("col", col)
     // console.log(this.map[row][col]);
     // console.log(this.map);
-        
+
     if (this.map[row][col] !== 0) return; // check if empty palce and the are problem in the 5 for rist place for player
 
     // const bomb = new Bomb(row, col);
     // this.bombs.push(bomb); // maby later we can use it 
     this.#drawBomb(row, col);
 
+
     // Remove bomb after 2 seconds
     setTimeout(() => {
       this.#removeBomb(row, col);
+      this.#Destroywall(row, col)
     }, 3000);
+
   }
+
+  #Destroywall(row, col) {
+    const directions = [
+      { dr: -1, dc: 0 },  // Up
+      { dr: 0, dc: 1 },   // Right
+      { dr: 1, dc: 0 },   // Down
+      { dr: 0, dc: -1 }   // Left
+    ];
+
+    directions.forEach(({ dr, dc }) => {
+      const newRow = row + dr;
+      const newCol = col + dc;
+
+      // Check boundaries
+      if (
+        newRow >= 0 &&
+        newRow < this.map.length &&
+        newCol >= 0 &&
+        newCol < this.map[0].length
+      ) {
+        // Check if the tile is a destroyable wall (3)
+        if (this.map[newRow][newCol] === 3) {
+          this.map[newRow][newCol] = 0; // Set to grass/empty
+
+          // Redraw that tile
+          const tileElement = this.canvas.querySelector(
+            `[data-row="${newRow}"][data-column="${newCol}"]`
+          );
+          if (tileElement) {
+            tileElement.innerHTML = "";
+          }
+        }
+      }
+    });
+  }
+
 
 
   #drawBomb(row, col) {
     const tileElement = this.canvas.querySelector(
       `[data-row="${row}"][data-column="${col}"]`
     );
-    
+
     if (tileElement && !tileElement.querySelector('.bomb')) {
       const bombDiv = document.createElement("div");
       bombDiv.classList.add("bomb");
-      
+
       // Use background image for sprite sheet
       bombDiv.style.backgroundImage = "url('../images/bomb.png')"; // add the class bomb style 
       // bombDiv.style.backgroundRepeat = "no-repeat";
       // bombDiv.style.position = "absolute";
       bombDiv.style.width = "38px"; // or frame width
       bombDiv.style.height = "38px"; // or frame height
-      
+
       tileElement.appendChild(bombDiv);
     }
   }
 
   #removeBomb(row, col) {
     const tileElement = this.canvas.querySelector(
-        `[data-row="${row}"][data-column="${col}"]`
+      `[data-row="${row}"][data-column="${col}"]`
     );
     const bombImg = tileElement?.querySelector('.bomb');
     if (bombImg) {
-        bombImg.remove();
-        
-        // Spread explosion in 4 directions (up, right, down, left)
-        const directions = [
-            { dr: -1, dc: 0 },  // up
-            { dr: 0, dc: 1 },   // right
-            { dr: 1, dc: 0 },   // down
-            { dr: 0, dc: -1 }   // left
-        ];
+      bombImg.remove();
 
-        // Create explosions in all directions
-        directions.forEach(({ dr, dc }) => {
-            for (let i = 1; i <= 1; i++) { // 3 tiles range
-                const newRow = row + (dr * i);
-                const newCol = col + (dc * i);
-                
-                // Check if within map bounds
-                if (newRow >= 0 && newRow < this.map.length && 
-                    newCol >= 0 && newCol < this.map[0].length) {
-                    
-                    const targetTile = this.canvas.querySelector(
-                        `[data-row="${newRow}"][data-column="${newCol}"]`
-                    );
-                    
-                    if (targetTile) {
-                        this.#drawExplosion(targetTile, newRow, newCol);
-                    }
-                }
-            }
-        });
+      // Spread explosion in 4 directions (up, right, down, left)
+      const directions = [
+        { dr: -1, dc: 0 },  // up
+        { dr: 0, dc: 1 },   // right
+        { dr: 1, dc: 0 },   // down
+        { dr: 0, dc: -1 }   // left
+      ];
 
-        // Center explosion
-        this.#drawExplosion(tileElement, row, col);
+      // Create explosions in all directions
+      directions.forEach(({ dr, dc }) => {
+        const newRow = row + (dr * 1);
+        const newCol = col + (dc * 1);
+
+        if (this.map[newRow][newCol] === 0) {
+          const targetTile = this.canvas.querySelector(
+            `[data-row="${newRow}"][data-column="${newCol}"]`
+          );
+
+          if (targetTile) {
+            this.#drawExplosion(targetTile, newRow, newCol);
+          }
+        }
+      });
+
+      // Center explosion
+      this.#drawExplosion(tileElement, row, col);
     }
-}
+  }
 
-#drawExplosion(tileElement, row, col) {
+  #drawExplosion(tileElement, row, col) {
     if (!tileElement) return;
-    
+
     // const explosionDiv = document.createElement("div");
     // explosionDiv.classList.add("damage");
-    
+
     // Correct frame sequence
     const frames = [
-        { x: -5, y: 0 },    // Frame 1
-        { x: -40, y: 0 },   // Frame 2
-        { x: -75, y: 0 },   // Frame 3
-        { x: -112, y: 0 },  // Frame 4
-        { x: -146, y: 0 },  // Frame 5
-        { x: -75, y: 36 },  // Frame 6
-        { x: -112, y: 36 }, // Frame 7
-        { x: -146, y: 36 }  // Frame 8
+      { x: -5, y: 0 },    // Frame 1
+      { x: -40, y: 0 },   // Frame 2
+      { x: -75, y: 0 },   // Frame 3
+      { x: -112, y: 0 },  // Frame 4
+      { x: -146, y: 0 },  // Frame 5
+      { x: -75, y: 36 },  // Frame 6
+      { x: -112, y: 36 }, // Frame 7
+      { x: -146, y: 36 }  // Frame 8
     ];
 
     let currentFrame = 0;
     const frameDuration = 75;
-    const divnode = jsx("div", {className : "damage", style: `background-position : ${frames[0].x}px ${frames[0].y}px`})
+    const divnode = jsx("div", { className: "damage", style: `background-position : ${frames[0].x}px ${frames[0].y}px` })
     const explosionDiv = createElement(divnode);
 
     tileElement.appendChild(explosionDiv);
 
     const animate = () => {
-        if (currentFrame >= frames.length) {
-            explosionDiv.remove();
-            return;
-        }
+      if (currentFrame >= frames.length) {
+        explosionDiv.remove();
+        return;
+      }
 
-        explosionDiv.style.backgroundPosition = 
-            `${frames[currentFrame].x}px ${frames[currentFrame].y}px`;
-        currentFrame++;
-        requestAnimationFrame(() => {
-            setTimeout(animate, frameDuration);
-        });
+      explosionDiv.style.backgroundPosition =
+        `${frames[currentFrame].x}px ${frames[currentFrame].y}px`;
+      currentFrame++;
+      requestAnimationFrame(() => {
+        setTimeout(animate, frameDuration);
+      });
     };
 
     animate();
-}
+  }
 
 }
