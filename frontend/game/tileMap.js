@@ -1,10 +1,12 @@
 import Player from "./player.js";
+// import Bomb from "./bombs.js";
 
 export default class Game {
   constructor(tileSize) {
     this.tileSize = tileSize;
     this.wall = this.#image("wallBlack.png");
     this.grass = this.#image("grass.png");
+    this.bombs = [];
 
     this.map = [
       [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
@@ -39,6 +41,7 @@ export default class Game {
 
     // Create a new Player instance at 1,1
     this.player = new Player(1, 1);
+    this.canvas = null;
   }
 
   #image(fileName) {
@@ -48,6 +51,7 @@ export default class Game {
   }
 
   drawGame(canvas) {
+    this.canvas = canvas; 
     this.#setCanvasSize(canvas);
     this.#draw(canvas);
     this.#setupPlayerControls();
@@ -78,22 +82,25 @@ export default class Game {
           case 1:
           case 4:
             img.src = "../images/wallBlack.png";
+            div.appendChild(img);
             break;
           case 2:
             img.src = "../images/tree.png";
+            div.appendChild(img);
             break;
           case 3:
             img.src = "../images/wall.png";
+            div.appendChild(img);
             break;
           case 5:
             div.style.backgroundImage = `url(../images/playerStyle.png)`;
             div.id = "player";
             break;
           default:
-            img.src = "";
-        }
 
-        div.appendChild(img);
+            break;
+        }
+        
         canvas.appendChild(div);
       }
     }
@@ -118,6 +125,11 @@ export default class Game {
 
     window.addEventListener("keydown", (e) => {
       keysPressed[e.key] = true;
+
+      if ((e.key === "b" || e.key === "B") && !e.repeat) {
+        this.placeBomb();
+      }
+
     });
 
     window.addEventListener("keyup", (e) => {
@@ -172,7 +184,6 @@ export default class Game {
         playerElement.style.backgroundPositionY = this.player.positionY + 'px';
         playerElement.style.backgroundPositionX = this.player.positionX + 'px';
         playerElement.style.transform = `translate(${this.player.x}px, ${this.player.y}px)`;
-        
 
       } else {
         if (movementStartTime) {
@@ -182,10 +193,8 @@ export default class Game {
           movementStartTime = null;
         }
       }
-
       
       if (playerElement) {
-        // console.log(`translate(${this.player.x}px, ${this.player.y}px)`);
         playerElement.style.transform = `translate(${this.player.x}px, ${this.player.y}px)`;
       }
 
@@ -194,4 +203,66 @@ export default class Game {
 
     updatePlayerMovement();
   }
+
+  placeBomb() {
+    const row = Math.floor((this.player.y +  20 )   / this.tileSize) + 1;
+    const col = Math.floor((this.player.x + 20 ) / this.tileSize) + 1;
+    
+    // Check if tile is walkable (optional)
+    // console.log("this.player.y", this.player.y);
+    // console.log("this.player.x", this.player.x);
+
+    
+    // console.log("row",row);
+    // console.log("col", col)
+    // console.log(this.map[row][col]);
+    // console.log(this.map);
+    
+    
+    
+    if (this.map[row][col] !== 0) return; // check if empty palce and the are problem in the 5 for rist place for player
+
+    // const bomb = new Bomb(row, col);
+    // this.bombs.push(bomb); // maby later we can use it 
+    this.#drawBomb(row, col);
+
+    // Remove bomb after 2 seconds
+    // setTimeout(() => {
+    //   this.#removeBomb(row, col);
+    // }, 2000);
+  }
+
+
+  #drawBomb(row, col) {
+    const tileElement = this.canvas.querySelector(
+      `[data-row="${row}"][data-column="${col}"]`
+    );
+    
+    if (tileElement && !tileElement.querySelector('.bomb')) {
+      const bombDiv = document.createElement("div");
+      bombDiv.classList.add("bomb");
+      
+      // Use background image for sprite sheet
+      bombDiv.style.backgroundImage = "url('../images/bomb.png')"; // add the class bomb style 
+      // bombDiv.style.backgroundRepeat = "no-repeat";
+      // bombDiv.style.position = "absolute";
+      bombDiv.style.width = "38px"; // or frame width
+      bombDiv.style.height = "38px"; // or frame height
+      
+      // Set which frame to show
+      bombDiv.style.backgroundPositionX = "35px"; // shift to 3rd frame (example)
+      bombDiv.style.backgroundPositionY = "42px"; 
+      
+      tileElement.appendChild(bombDiv);
+    }
+  }
+
+  #removeBomb(row, col) {
+    const tileElement = this.canvas.querySelector(
+      `[data-row="${row}"][data-column="${col}"]`
+    );
+    const bombImg = tileElement?.querySelector('.bomb');
+    if (bombImg) bombImg.remove();
+  }
+
 }

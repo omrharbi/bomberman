@@ -254,6 +254,24 @@ body::before {
     }
 }
 
-/* #player {
+#player {
+    z-index: 1;
+}
 
+.tile {
+    position: relative;
+}
+
+/* .bomb {
+    pointer-events: none;
 } */
+.tile .bomb {
+    background-size: 275%;
+    animation: bomb-sprite 800ms steps(2) infinite;
+}
+
+@keyframes bomb-sprite {
+    0% { background-position:    0  42px; }
+    /* 100% {background-position: 140px 42px } */
+    100%  { background-position: 72px 42px; }
+  }
