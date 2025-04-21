@@ -1,3 +1,6 @@
+import { MyEventSystem } from "../src/event.js";
+import { createElement, jsx } from "../src/framework.js";
+import { updateRender } from "../src/vdom.js";
 import Player from "./player.js";
 // import Bomb from "./bombs.js";
 
@@ -68,7 +71,7 @@ export default class Game {
   #draw(canvas, data) {
     const rows = this.map.length;
     const columns = this.map[0].length;
-
+  
     canvas.innerHTML = "";
     canvas.style.display = "grid";
     canvas.style.gridTemplateRows = `repeat(${rows}, ${this.tileSize}px)`;
@@ -78,48 +81,53 @@ export default class Game {
     for (let row = 0; row < rows; row++) {
       for (let column = 0; column < columns; column++) {
         const tile = this.map[row][column];
-        const div = document.createElement("div");
-        const img = document.createElement("img");
-
-        div.classList.add("tile");
-        div.dataset.row = row;
-        div.dataset.column = column;
-
+        const imgProps = {}
+        let divStyle = ""; // for inline styles
+        let divId = ""
         switch (tile) {
           case 1:
           case 4:
-            img.src = "../images/wallBlack.png";
-            div.appendChild(img);
+            imgProps.src="../images/wallBlack.png"
             break;
           case 2:
-            img.src = "../images/tree.png";
-            div.appendChild(img);
+            imgProps.src="../images/tree.png";
             break;
           case 3:
-            img.src = "../images/wall.png";
-            div.appendChild(img);
+            imgProps.src="../images/wall.png";
             break;
-          case 5:
-            div.style.backgroundImage = `url(../images/playerStyle.png)`;
-            div.id = `player_${data.players[0].playerId}`;
-            break;
-          case 6:
-            div.style.backgroundImage = `url(../images/playerblue.webp)`;
-            div.id =  `player_${data.players[1].playerId}`;
-            break;
-          case 7:
-            div.style.backgroundImage = `url(../images/playerGreen.webp)`;
-            div.id =  `player_${data.players[2].playerId}`;
-            break;
-          case 8:
-            div.style.backgroundImage = `url(../images/playerStyle.png)`;
-            div.id =  `player_${data.players[3].playerId}`;
-            break;
-          default:
-
+            case 5:
+              divStyle = "url(../images/playerStyle.png)";
+              divId = `player_${data.players[0].playerId}`;
+              break;
+            case 6:
+              divStyle = "url(../images/playerblue.webp)";
+              divId = `player_${data.players[1].playerId}`;
+              break;
+            case 7:
+              divStyle = "url(../images/playerGreen.webp)";
+              divId = `player_${data.players[2].playerId}`;
+              break;
+            case 8:
+              divStyle = "url(../images/playerStyle.png)";
+              divId = `player_${data.players[3].playerId}`;
+              break;
+            default:
             break;
         }
-        
+        const imgnode = imgProps.src ? jsx("img", imgProps) : [];
+        // const img = createElement(imgnode)
+        const divnode = jsx(
+          "div",
+          {
+            className: "tile",
+            "data-row": row,
+            "data-column": column,
+            id: divId || "no_id",
+            style:  `background-image :${divStyle}`,
+          },
+          imgnode
+        );  
+        const div = createElement(divnode);
         canvas.appendChild(div);
       }
     }
