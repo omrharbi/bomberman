@@ -109,10 +109,10 @@ function GoToGame(data) {
     const body = document.body;
     render(GamePage(), body)
     const tileSize = 40;
-    const tileMap = new TileMap(tileSize,data);
-    let game =document.getElementById("game")
-    function gameLoop(){
-        tileMap.drawGame(game,data)
+    const tileMap = new TileMap(tileSize, data);
+    let game = document.getElementById("game")
+    function gameLoop() {
+        tileMap.drawGame(game, data)
     }
     requestAnimationFrame(gameLoop);
     chat(data.nickname)
@@ -146,6 +146,25 @@ function displayMsg(data) {
     messageContainer.appendChild(createElement(newMessage))
     messageContainer.scrollTop = messageContainer.scrollHeight;
 }
+
+// let messages = [];
+// function displayMsg(data) {
+//     messages.push(data);
+//     console.log('msggg', renderMessages());
+//     const messageContainer = document.querySelector('.message-container');
+//     updateRender(renderMessages(), messageContainer);
+//     messageContainer.scrollTop = messageContainer.scrollHeight;
+// }
+// function renderMessages() {
+//     return jsx('div', { className: 'message-container' },
+//         messages.map(msg =>
+//             jsx('div', { className: 'message' },
+//                 jsx('div', { className: 'player-name' }, msg.nickname),
+//                 jsx('div', { className: 'message-text' }, msg.messageText)
+//             )
+//         )
+//     );
+// }
 
 function updatePlayersInfo(players) {
     // const playersList = document.querySelector('.connected-players');
