@@ -2,11 +2,11 @@ import { MyEventSystem } from "../src/event.js";
 import { createElement, jsx } from "../src/framework.js";
 import { updateRender } from "../src/vdom.js";
 import Player from "./player.js";
+import {socket} from "./index.js";
 // import Bomb from "./bombs.js";
 
 export default class Game {
   constructor(tileSize, data) {
-    console.log('++++++++++',data);
     
     this.tileSize = tileSize;
     this.players = data.players.length
@@ -39,7 +39,6 @@ export default class Game {
 
     const positionPlayersS = [[1, 1], [14, 13], [1, 15], [12, 1]];
     const positionPlayers = positionPlayersS.slice(0, this.players)
-    console.log(positionPlayers);
 
     for (let row = 0; row < this.map.length; row++) {
       for (let col = 0; col < this.map[row].length; col++) {
@@ -142,6 +141,8 @@ export default class Game {
     let keysPressed = {};
     let movementStartTime = null;
     let lastUpdateTime = Date.now();
+    let lastSendTime = 0; 
+    const updateInterval = 50;
 
     const spriteMap = {
       up: [{ x: 55, y: 82 }, { x: 28, y: 82 }, { x: 55, y: 82 }, { x: 81, y: 82 }],
@@ -168,6 +169,7 @@ export default class Game {
       const now = Date.now();
       const deltaTime = (now - lastUpdateTime) / 100;
       lastUpdateTime = now;
+      const updateInterval = 50;
 
       this.player.isMoving = false;
       const playerElement = document.getElementById(`player_${this.MyId}`);
@@ -192,7 +194,6 @@ export default class Game {
         this.player.direction = "left";
         this.player.isMoving = true;
       }
-
       if (this.player.isMoving) {
         spriteMap[this.player.direction]
         console.log("direction", this.player.direction);
@@ -211,6 +212,23 @@ export default class Game {
         playerElement.style.backgroundPositionY = this.player.positionY + 'px';
         playerElement.style.backgroundPositionX = this.player.positionX + 'px';
         playerElement.style.transform = `translate(${this.player.x}px, ${this.player.y}px)`;
+        
+        if (now - lastSendTime > updateInterval) {
+          if (socket && socket.readyState === WebSocket.OPEN) {
+              socket.send(JSON.stringify({
+                  type: "playerMove",
+                  // Send both actual position AND sprite position
+                  position: { 
+                      x: this.player.x, 
+                      y: this.player.y,
+                      spriteX: this.player.positionX, 
+                      spriteY: this.player.positionY,
+                      direction: this.player.direction
+                  }
+              }));
+              lastSendTime = now;
+          }
+      }
 
       } else {
         if (movementStartTime) {

@@ -31,8 +31,7 @@ function waiting() {
     }, 1000);
 }
 
-let socket;
-
+export let socket;
 function connectToGameServer(name) {
     socket = new WebSocket('ws://localhost:8080');
     socket.onopen = () => {
@@ -74,9 +73,22 @@ function handleServerMessages(data) {
         case 'playerDied':
             playerDied(data.playerId, data.nickname)
             break
+        case 'playerMove':            
+            updateOtherPlayerPosition(data);
+            break;
         default:
             break;
     }
+}
+function updateOtherPlayerPosition(data) {
+    //if (data.PlayerId === this.MyId) return;
+    let playerElement = document.getElementById(`player_${data.PlayerId}`);
+    if (!playerElement) return;
+    
+    playerElement.style.backgroundPositionY = data.position.spriteY + 'px';
+    playerElement.style.backgroundPositionX = data.position.spriteX + 'px';
+    
+    playerElement.style.transform = `translate(${data.position.x}px, ${data.position.y}px)`;
 }
 
 
@@ -160,25 +172,6 @@ function displayMsg(data) {
     messageContainer.appendChild(createElement(newMessage))
     messageContainer.scrollTop = messageContainer.scrollHeight;
 }
-
-// let messages = [];
-// function displayMsg(data) {
-//     messages.push(data);
-//     console.log('msggg', renderMessages());
-//     const messageContainer = document.querySelector('.message-container');
-//     updateRender(renderMessages(), messageContainer);
-//     messageContainer.scrollTop = messageContainer.scrollHeight;
-// }
-// function renderMessages() {
-//     return jsx('div', { className: 'message-container' },
-//         messages.map(msg =>
-//             jsx('div', { className: 'message' },
-//                 jsx('div', { className: 'player-name' }, msg.nickname),
-//                 jsx('div', { className: 'message-text' }, msg.messageText)
-//             )
-//         )
-//     );
-// }
 
 function updatePlayersInfo(players) {
     // const playersList = document.querySelector('.connected-players');

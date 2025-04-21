@@ -129,15 +129,15 @@ function startRoom(room) {
       nickname: player.nickname,
       lives: player.lives,
       playerId: player.id,
-      MapPosition : count++
+      MapPosition: count++
     }));
-   
+
     startGameForPlayer(player, room, players);
   }
 }
 
 function startGameForPlayer(player, room, players) {
-  
+
   player.conn.send(JSON.stringify({
     type: 'startGame',
     nickname: player.nickname,
@@ -180,13 +180,13 @@ function startGameForPlayer(player, room, players) {
           messageText: data.messageText || ''
         });
         break;
-      case "playerMove":        
+      case "playerMove":
         room.broadcast({
           type: 'playerMove',
           PlayerId: player.id,
           position: data.position,
         });
-        break
+        break;
       default:
         break;
     }
@@ -194,7 +194,7 @@ function startGameForPlayer(player, room, players) {
 
   player.conn.on('close', () => {
     room.removePlayer(player.id);
-    room.broadcast({ type: 'updatePlayers', playerCount: room.players.size, playerId : player.id });
+    room.broadcast({ type: 'updatePlayers', playerCount: room.players.size, playerId: player.id });
   });
 }
 
@@ -224,12 +224,12 @@ wss.on('connection', (ws) => {
         });
 
         console.log(`Player ${data.nickname} joined Room ${currentRoom.id}`);
-        startRoom(currentRoom);
-        // setTimeout(() => {
-        //   if (currentRoom.players.size >= 2 && !currentRoom.started) {
-        //     startRoom(currentRoom);
-        //   }
-        // }, 5000);
+        //startRoom(currentRoom);
+        setTimeout(() => {
+          if (currentRoom.players.size >= 2 && !currentRoom.started) {
+            startRoom(currentRoom);
+          }
+        }, 5000);
         break;
 
       default:
