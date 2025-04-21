@@ -87,12 +87,15 @@ export default class Game {
           case 1:
           case 4:
             imgProps.src = "../images/wallBlack.png"
+            divId="wallfix"
             break;
           case 2:
             imgProps.src = "../images/tree.png";
+            divId="WallBreak"
             break;
           case 3:
             imgProps.src = "../images/wall.png";
+            divId="WallBreak"
             break;
           case 5:
             divStyle = "url(../images/playerStyle.png)";
