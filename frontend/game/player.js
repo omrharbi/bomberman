@@ -16,4 +16,4 @@ export default class Player {
       this.style = new Image();
       this.style.src = "assets/images/playerStyle.png";
     }
-  }
+}
