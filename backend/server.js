@@ -11,11 +11,73 @@ const wss = new WebSocketServer({ server });
 let nextRoomID = 1;
 const rooms = new Map();
 
+// class Player {
+//   constructor(nickname, id, conn) {
+//     this.nickname = nickname;
+//     this.id = id;
+//     this.conn = conn;
+//     this.lives = 3;
+//   }
+//   loseLife() {
+//     this.lives -= 1;
+//   }
+
+//   isAlive() {
+//     return this.lives > 0;
+//   }
+// }
 class Player {
   constructor(nickname, id, conn) {
     this.nickname = nickname;
     this.id = id;
     this.conn = conn;
+    // Game-related properties
+    this.lives = 3;
+    this.x = 1;
+    this.y = 1;
+    this.bombsPlaced = 0;
+    this.bombPower = 1;
+    this.positionX = 52;
+    this.positionY = 0;
+    this.width = 22;
+    this.height = 40;
+    this.speed = 7;
+    this.isMoving = false;
+    this.isDead = false;
+    this.direction = 'up';
+    this.style = "assets/images/playerStyle.png"; // Just the URL string
+  }
+
+  loseLife() {
+    this.lives -= 1;
+  }
+
+  isAlive() {
+    return this.lives > 0;
+  }
+
+  move(dx, dy) {
+    this.x += dx;
+    this.y += dy;
+  }
+
+  setDirection(direction) {
+    this.direction = direction;
+  }
+
+  resetPosition(x = 1, y = 1) {
+    this.x = x;
+    this.y = y;
+  }
+
+  placeBomb() {
+    this.bombsPlaced += 1;
+  }
+
+  removeBomb() {
+    if (this.bombsPlaced > 0) {
+      this.bombsPlaced -= 1;
+    }
   }
 }
 
@@ -41,6 +103,9 @@ class Room {
       }
     }
   }
+  getAllPlayerIDs() {
+    return [...this.players.keys()];
+  }
 }
 
 function findAvailableRoom() {
@@ -57,16 +122,28 @@ function findAvailableRoom() {
 function startRoom(room) {
   room.started = true;
   console.log(`Starting game in room ${room.id}`);
-
   for (const player of room.players.values()) {
-    startGameForPlayer(player, room);
+    let count = 1
+    console.log(`Player ${player.nickname} in room ${room.id}`);
+    const players = Array.from(room.players.values()).map(player => ({
+      nickname: player.nickname,
+      lives: player.lives,
+      playerId: player.id,
+      MapPosition : count++
+    }));
+   
+    startGameForPlayer(player, room, players);
   }
 }
 
-function startGameForPlayer(player, room) {
+function startGameForPlayer(player, room, players) {
+  
   player.conn.send(JSON.stringify({
     type: 'startGame',
     nickname: player.nickname,
+    lives: player.lives,
+    players: players,
+    MyId: player.id,
   }));
 
   player.conn.on('message', (message) => {
@@ -78,16 +155,46 @@ function startGameForPlayer(player, room) {
       return;
     }
 
-    room.broadcast({
-      type: 'chatMsg',
-      nickname: player.nickname,
-      messageText: data.messageText || ''
-    });
+    if (data.type === 'loseLife') {
+      player.loseLife();  // Decrease lives
+    }
+    // room.broadcast({
+    //   type: 'updateLives',
+    //   playerId: player.id,
+    //   lives: player.lives,
+    //   nickname: player.nickname,
+    // });
+
+    // if (!player.isAlive()) {
+    //   room.broadcast({
+    //     type: 'playerDied',
+    //     playerId: player.id,
+    //     nickname: player.nickname,
+    //   });
+    // }
+    switch (data.type) {
+      case "chatMsg":
+        room.broadcast({
+          type: 'chatMsg',
+          nickname: player.nickname,
+          messageText: data.messageText || ''
+        });
+        break;
+      case "playerMove":        
+        room.broadcast({
+          type: 'playerMove',
+          PlayerId: player.id,
+          position: data.position,
+        });
+        break
+      default:
+        break;
+    }
   });
 
   player.conn.on('close', () => {
     room.removePlayer(player.id);
-    room.broadcast({ type: 'PlayersExits', playerCount: room.players.size });
+    room.broadcast({ type: 'updatePlayers', playerCount: room.players.size, playerId : player.id });
   });
 }
 
@@ -104,31 +211,31 @@ wss.on('connection', (ws) => {
       return;
     }
 
-    // switch (data.type) {
-    //   case "newPlayer":
-    //     const id = Date.now() + Math.floor(Math.random() * 1000);
-    //     currentPlayer = new Player(data.nickname, id, ws);
-    //     currentRoom = findAvailableRoom();
-    //     currentRoom.addPlayer(currentPlayer);
+    switch (data.type) {
+      case "newPlayer":
+        const id = Date.now() + Math.floor(Math.random() * 1000);
+        currentPlayer = new Player(data.nickname, id, ws);
+        currentRoom = findAvailableRoom();
+        currentRoom.addPlayer(currentPlayer);
 
-    //     currentRoom.broadcast({
-    //       type: 'updatePlayers',
-    //       playerCount: currentRoom.players.size ,
-    //     });
+        currentRoom.broadcast({
+          type: 'updatePlayers',
+          playerCount: currentRoom.players.size,
+        });
 
-    //     console.log(`Player ${data.nickname} joined Room ${currentRoom.id}`);
+        console.log(`Player ${data.nickname} joined Room ${currentRoom.id}`);
 
-    //     // setTimeout(() => {
-    //     //   if (currentRoom.players.size >= 1 && !currentRoom.started) {
-    //         startRoom(currentRoom);
-    //     //   }
-    //     // }, 5000);
-    //     break;
+        setTimeout(() => {
+          if (currentRoom.players.size >= 2 && !currentRoom.started) {
+            startRoom(currentRoom);
+          }
+        }, 5000);
+        break;
 
-    //   default:
-    //     console.log("Unknown message type:", data.type);
-    //      break;
-    // }
+      default:
+        console.log("Unknown message type:", data.type);
+        break;
+    }
   });
 
   ws.on('close', () => {
@@ -136,7 +243,7 @@ wss.on('connection', (ws) => {
       currentRoom.removePlayer(currentPlayer.id);
       currentRoom.broadcast({
         type: 'updatePlayers',
-        playerCount: currentRoom.players.size ,
+        playerCount: currentRoom.players.size,
       });
     }
   });

@@ -1,6 +1,6 @@
-import { LoginPage, GamePage} from '../app/config.js'
+import { LoginPage, GamePage } from '../app/config.js'
 import { jsx } from '../src/framework.js'
-import { render,updateRender } from '../src/vdom.js'
+import { render, updateRender } from '../src/vdom.js'
 import { Router } from '../src/router.js';
 // import draw from './draw.js';
 import TileMap from './tileMap.js';
@@ -9,6 +9,9 @@ const router = new Router({
 });
 router.init()
 function login() {
+    // const body = document.body;
+    // render(LoginPage(),body)
+
     const but = document.getElementById("NameBut");
     but.addEventListener("click", () => {
         const name = document.getElementById("name").value.trim();
@@ -19,23 +22,20 @@ function login() {
 login()
 
 function waiting() {
-    // const div = document.getElementById('input');
-    // render(jsx('p',{id:'playercount'}),div)
-    // const contDiv = document.getElementById('cont');
-    // const waitingGif = jsx('img', {
-    //     src: '/img/output-waiting.gif',
-    //     alt: 'Waiting...',
-    //     style: ' margin-top: 10px;' // optional styling
-    // });
-    // render(waitingGif, contDiv);
-    startGame("TEST")
-
+    const div = document.getElementById('input');
+    render(jsx('p', { id: 'playercount' }), div)
+    let cont = 1;
+    const p = document.getElementById('cont');
+    setInterval(() => {
+        cont++;
+        p.textContent = cont;
+    }, 1000);
 }
 
 let socket;
 
 function connectToGameServer(name) {
-    socket = new WebSocket('ws://localhost:8080'); 
+    socket = new WebSocket('ws://localhost:8080');
 
     socket.onopen = () => {
         console.log('Connected to WebSocket server');
@@ -56,68 +56,86 @@ function connectToGameServer(name) {
     };
 }
 function handleServerMessages(data) {
-    startGame(data.nickname)
-    // switch (data.type) {
-    //     case 'updatePlayers':
-    //         updatePlayerCount(data.playerCount);
-    //         break;
-    //     case 'startGame':
-    //         startGame(data.nickname)
-    //         break
-    //     case 'chatMsg':
-    //         displayMsg(data)
-    //         break
-    //     case 'waiting':
-    //         document.getElementById('playercount').innerText = `Wait for the next game`;
-    //     default:
-    //         break;
-    // }
+    switch (data.type) {
+        case 'updatePlayers':
+            console.log('Received player count:', data.playerCount);
+            updatePlayerCount(data.playerCount, data.playerId);
+            break;
+        case 'startGame':
+            startGame(data);
+            break
+        case 'chatMsg':
+            displayMsg(data)
+            break
+        case 'waiting':
+            document.getElementById('playercount').innerText = `Wait for the next game`;
+        case 'playersinfo':
+            updatePlayersInfo(data.players)
+            break
+        case 'updateLives':
+            updateLives(data.playerId, data.lives, data.nickname)
+            break
+        case 'playerDied':
+            playerDied(data.playerId, data.nickname)
+            break
+        default:
+            break;
+    }
 }
 
-function updatePlayerCount(count) {
-   document.getElementById('playercount').innerText = `Players: ${count}/4`;
+
+function updatePlayerCount(count, playerId) {
+    if (document.getElementById('playercount')) {
+        document.getElementById('playercount').innerText = `Players: ${count}/4`;
+    } else {
+        if (count == 1) {
+            alert("you win")
+        } else {
+            console.log(`removing player have id : ${playerId}`);
+            document.getElementById(`${playerId}`).remove()
+        }
+    }
 }
-function startGame(nickname){
-    let count = 10
-    GoToGame(nickname)
-    // const interval = setInterval(()=>{
-    //     count--
-    //     document.getElementById('cont').innerText = `start Game in : ${count}s`;
-    //     if (count == 0){
-    //         GoToGame(nickname)
-    //         clearInterval(interval)
-    //     }
-    // },1000)
+function startGame(data) {
+    let count = 3
+
+    const interval = setInterval(() => {
+        count--
+        document.getElementById('playercount').innerText = `start Game in : ${count}s`;
+        if (count == 0) {
+            GoToGame(data)
+            clearInterval(interval)
+        }
+    }, 100)
 }
 
-function GoToGame(nickname) {
+function GoToGame(data) {
     console.log('Going to game');
-    
+
     const body = document.body;
-    render(GamePage(),body)
+    render(GamePage(), body)
+    ///////////////////
     const tileSize = 40;
-    const tileMap = new TileMap(tileSize);
+    const tileMap = new TileMap(tileSize,data);
     let game =document.getElementById("game")
     function gameLoop(){
-        tileMap.drawGame(game)
+        tileMap.drawGame(game,data)
     }
     // gameLoop()
        requestAnimationFrame(gameLoop);
     // setInterval(gameLoop   ,1000/60)
-    chat(nickname)
+    chat(data.nickname)
 }
 
-
 function chat(nickname) {
-    
-        const sendButton = document.querySelector('.send-button');        
-        sendButton.addEventListener('click', function() {
-            sendMessage(nickname);
+    const sendButton = document.querySelector('.send-button');
+    sendButton.addEventListener('click', function () {
+        sendMessage(nickname);
     })
 }
 function sendMessage(nickname) {
     const messageText = document.querySelector('.chat-input').value.trim();
-    
+
     if (messageText !== '') {
         socket.send(JSON.stringify({
             type: "chatMsg",
@@ -143,11 +161,34 @@ function displayMsg(data) {
 
     newMessage.appendChild(playerName);
     newMessage.appendChild(messageTextElement);
-    
+
     messageContainer.appendChild(newMessage);
     messageContainer.scrollTop = messageContainer.scrollHeight;
 }
-
+function updatePlayersInfo(players) {
+    // const playersList = document.querySelector('.connected-players');
+    // playersList.innerHTML = '';
+}
+function updateLives(playerId, lives, nickname) {
+    const playerElement = document.getElementById(playerId);
+    if (playerElement) {
+        playerElement.querySelector('.lives').textContent = lives;
+    }
+    const playerNameElement = document.getElementById(nickname);
+    if (playerNameElement) {
+        playerNameElement.querySelector('.lives').textContent = lives;
+    }
+}
+function playerDied(playerId, nickname) {
+    const playerElement = document.getElementById(playerId);
+    if (playerElement) {
+        playerElement.classList.add('died');
+    }
+    const playerNameElement = document.getElementById(nickname);
+    if (playerNameElement) {
+        playerNameElement.classList.add('died');
+    }
+}
 // function displayMsg(data) {
 //     const messageContainer = document.querySelector('.message-container');
 

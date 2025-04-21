@@ -2,11 +2,15 @@ import Player from "./player.js";
 // import Bomb from "./bombs.js";
 
 export default class Game {
-  constructor(tileSize) {
+  constructor(tileSize, data) {
+    console.log('++++++++++',data);
+    
     this.tileSize = tileSize;
+    this.players = data.players.length
     this.wall = this.#image("wallBlack.png");
     this.grass = this.#image("grass.png");
     this.bombs = [];
+    this.MyId = data.MyId
 
     this.map = [
       [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
@@ -29,12 +33,16 @@ export default class Game {
     ];
 
     // Player spawn points
-    const positionPlayers = [[1, 1]];
+
+    const positionPlayersS = [[1, 1], [14, 13], [1, 15], [12, 1]];
+    const positionPlayers = positionPlayersS.slice(0, this.players)
+    console.log(positionPlayers);
 
     for (let row = 0; row < this.map.length; row++) {
       for (let col = 0; col < this.map[row].length; col++) {
-        if (positionPlayers.some(([r, c]) => r === row && c === col)) {
-          this.map[row][col] = 5;
+        const playerIndex = positionPlayers.findIndex(([r, c]) => r === row && c === col);
+        if (playerIndex !== -1) {
+          this.map[row][col] = 5 + playerIndex;
         }
       }
     }
@@ -53,11 +61,11 @@ export default class Game {
   drawGame(canvas) {
     this.canvas = canvas; 
     this.#setCanvasSize(canvas);
-    this.#draw(canvas);
+    this.#draw(canvas, players);
     this.#setupPlayerControls();
   }
 
-  #draw(canvas) {
+  #draw(canvas, data) {
     const rows = this.map.length;
     const columns = this.map[0].length;
 
@@ -67,7 +75,6 @@ export default class Game {
     canvas.style.gridTemplateColumns = `repeat(${columns}, ${this.tileSize}px)`;
     canvas.style.alignContent = "center";
     canvas.style.justifyContent = "center";
-
     for (let row = 0; row < rows; row++) {
       for (let column = 0; column < columns; column++) {
         const tile = this.map[row][column];
@@ -94,7 +101,19 @@ export default class Game {
             break;
           case 5:
             div.style.backgroundImage = `url(../images/playerStyle.png)`;
-            div.id = "player";
+            div.id = `player_${data.players[0].playerId}`;
+            break;
+          case 6:
+            div.style.backgroundImage = `url(../images/playerblue.webp)`;
+            div.id =  `player_${data.players[1].playerId}`;
+            break;
+          case 7:
+            div.style.backgroundImage = `url(../images/playerGreen.webp)`;
+            div.id =  `player_${data.players[2].playerId}`;
+            break;
+          case 8:
+            div.style.backgroundImage = `url(../images/playerStyle.png)`;
+            div.id =  `player_${data.players[3].playerId}`;
             break;
           default:
 
@@ -143,7 +162,7 @@ export default class Game {
       lastUpdateTime = now;
 
       this.player.isMoving = false;
-      const playerElement = document.getElementById("player");
+      const playerElement = document.getElementById(`player_${this.MyId}`);
 
       if (keysPressed["ArrowUp"]) {
         this.player.y -= this.player.speed * deltaTime;
@@ -169,7 +188,7 @@ export default class Game {
       if (this.player.isMoving) {
         spriteMap[this.player.direction]
         console.log("direction", this.player.direction);
-        
+
         if (!movementStartTime) movementStartTime = now;
         const elapsed = now - movementStartTime;
         const frameDuration = 200;

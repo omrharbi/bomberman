@@ -6,7 +6,7 @@ export default class Player {
       this.bombPower = 1;
       this.positionX = 52;
       this.positionY = 0;
-      this.width = 22;
+      this.width = 21;
       this.height = 40;
       this.lives = 3;
       this.speed = 7;

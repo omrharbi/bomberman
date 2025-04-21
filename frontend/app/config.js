@@ -19,7 +19,7 @@ export function GamePage() {
 
             // Sidebar Chat Area
             jsx('aside', { className: 'chat-sidebar' },
-                
+
                 // Message Container
                 jsx('div', { className: 'message-container' }),
 
@@ -33,10 +33,35 @@ export function GamePage() {
                     jsx('button', { className: 'send-button' }, 'Send')
                 )
             )
+        ),
+
+        // Footer
+        jsx('div', { className: 'footer' },
+            jsx('div', { className: 'footer-content' },
+                jsx('div', { className: 'footer-section lives-section' },
+                    jsx('div', { id: 'playerlives' },
+                        jsx('p', { id: 'lives' }),
+                    ),
+                    jsx('div', {id : "hearts"},
+                        jsx('img', { src: '../images/heart.png', alt: 'Heart', className: 'heart-icon' }),
+                        jsx('img', { src: '../images/heart.png', alt: 'Heart', className: 'heart-icon' }),
+                        jsx('img', { src: '../images/heart.png', alt: 'Heart', className: 'heart-icon' }),
+                    )
+                ),
+                jsx('div', { className: 'footer-section players-section', id: 'players' },
+
+                ),
+                jsx('div', { className: 'footer-section status-section' },
+                    jsx('p', {}, 'Status: Game In Progress')
+                )
+            ),
         )
+
     );
 }
- 
+
+
+
 export function LoginPage() {
     return jsx(
         'div', { id: 'login' },
