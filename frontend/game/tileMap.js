@@ -227,9 +227,9 @@ export default class Game {
     this.#drawBomb(row, col);
 
     // Remove bomb after 2 seconds
-    // setTimeout(() => {
-    //   this.#removeBomb(row, col);
-    // }, 2000);
+    setTimeout(() => {
+      this.#removeBomb(row, col);
+    }, 3000);
   }
 
 
@@ -249,20 +249,91 @@ export default class Game {
       bombDiv.style.width = "38px"; // or frame width
       bombDiv.style.height = "38px"; // or frame height
       
-      // Set which frame to show
-      bombDiv.style.backgroundPositionX = "35px"; // shift to 3rd frame (example)
-      bombDiv.style.backgroundPositionY = "42px"; 
-      
       tileElement.appendChild(bombDiv);
     }
   }
 
   #removeBomb(row, col) {
     const tileElement = this.canvas.querySelector(
-      `[data-row="${row}"][data-column="${col}"]`
+        `[data-row="${row}"][data-column="${col}"]`
     );
     const bombImg = tileElement?.querySelector('.bomb');
-    if (bombImg) bombImg.remove();
-  }
+    if (bombImg) {
+        bombImg.remove();
+        
+        // Spread explosion in 4 directions (up, right, down, left)
+        const directions = [
+            { dr: -1, dc: 0 },  // up
+            { dr: 0, dc: 1 },   // right
+            { dr: 1, dc: 0 },   // down
+            { dr: 0, dc: -1 }   // left
+        ];
+
+        // Create explosions in all directions
+        directions.forEach(({ dr, dc }) => {
+            for (let i = 1; i <= 1; i++) { // 3 tiles range
+                const newRow = row + (dr * i);
+                const newCol = col + (dc * i);
+                
+                // Check if within map bounds
+                if (newRow >= 0 && newRow < this.map.length && 
+                    newCol >= 0 && newCol < this.map[0].length) {
+                    
+                    const targetTile = this.canvas.querySelector(
+                        `[data-row="${newRow}"][data-column="${newCol}"]`
+                    );
+                    
+                    if (targetTile) {
+                        this.#drawExplosion(targetTile, newRow, newCol);
+                    }
+                }
+            }
+        });
+
+        // Center explosion
+        this.#drawExplosion(tileElement, row, col);
+    }
+}
+
+#drawExplosion(tileElement, row, col) {
+    if (!tileElement) return;
+
+    const explosionDiv = document.createElement("div");
+    explosionDiv.classList.add("damage");
+    
+    // Correct frame sequence
+    const frames = [
+        { x: -5, y: 0 },    // Frame 1
+        { x: -40, y: 0 },   // Frame 2
+        { x: -75, y: 0 },   // Frame 3
+        { x: -112, y: 0 },  // Frame 4
+        { x: -146, y: 0 },  // Frame 5
+        { x: -75, y: 36 },  // Frame 6
+        { x: -112, y: 36 }, // Frame 7
+        { x: -146, y: 36 }  // Frame 8
+    ];
+
+    let currentFrame = 0;
+    const frameDuration = 75;
+    explosionDiv.style.backgroundPosition = `${frames[0].x}px ${frames[0].y}px`;
+
+    tileElement.appendChild(explosionDiv);
+
+    const animate = () => {
+        if (currentFrame >= frames.length) {
+            explosionDiv.remove();
+            return;
+        }
+
+        explosionDiv.style.backgroundPosition = 
+            `${frames[currentFrame].x}px ${frames[currentFrame].y}px`;
+        currentFrame++;
+        requestAnimationFrame(() => {
+            setTimeout(animate, frameDuration);
+        });
+    };
+
+    animate();
+}
 
 }

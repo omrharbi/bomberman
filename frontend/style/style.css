@@ -275,3 +275,22 @@ body::before {
     /* 100% {background-position: 140px 42px } */
     100%  { background-position: 72px 42px; }
   }
+
+
+
+  .tile .damage {
+    width: 38px;
+    height: 38px;
+    background-image: url('../images/explosion.png');
+
+    /* animation: explosion 1s steps(10) forwards; */
+
+    background-size: 500%;
+
+    /* background-repeat: no-repeat; */
+  }
+  
+  /* @keyframes explosion {
+    from { background-position: 0 0; }
+    to   { background-position: -380px 0; }
+  } */
