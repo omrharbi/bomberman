@@ -212,7 +212,7 @@ export default class Game {
         playerElement.style.backgroundPositionY = this.player.positionY + 'px';
         playerElement.style.backgroundPositionX = this.player.positionX + 'px';
         playerElement.style.transform = `translate(${this.player.x}px, ${this.player.y}px)`;
-        
+
         if (now - lastSendTime > updateInterval) {
           if (socket && socket.readyState === WebSocket.OPEN) {
               socket.send(JSON.stringify({
