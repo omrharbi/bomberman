@@ -2,18 +2,17 @@ import { MyEventSystem } from "../src/event.js";
 import { createElement, jsx } from "../src/framework.js";
 import { updateRender } from "../src/vdom.js";
 import Player from "./player.js";
-import {socket} from "./index.js";
+import { socket } from "./index.js";
 // import Bomb from "./bombs.js";
 
 export default class Game {
   constructor(tileSize, data) {
-    
     this.tileSize = tileSize;
-    this.players = data.players.length
+    this.players = data.players.length;
     this.wall = this.#image("wallBlack.png");
     this.grass = this.#image("grass.png");
     this.bombs = [];
-    this.MyId = data.MyId
+    this.MyId = data.MyId;
 
     this.map = [
       [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
@@ -37,12 +36,19 @@ export default class Game {
 
     // Player spawn points
 
-    const positionPlayersS = [[1, 1], [14, 13], [1, 15], [12, 1]];
-    const positionPlayers = positionPlayersS.slice(0, this.players)
+    const positionPlayersS = [
+      [1, 1],
+      [14, 13],
+      [1, 15],
+      [12, 1],
+    ];
+    const positionPlayers = positionPlayersS.slice(0, this.players);
 
     for (let row = 0; row < this.map.length; row++) {
       for (let col = 0; col < this.map[row].length; col++) {
-        const playerIndex = positionPlayers.findIndex(([r, c]) => r === row && c === col);
+        const playerIndex = positionPlayers.findIndex(
+          ([r, c]) => r === row && c === col
+        );
         if (playerIndex !== -1) {
           this.map[row][col] = 5 + playerIndex;
         }
@@ -80,38 +86,46 @@ export default class Game {
     for (let row = 0; row < rows; row++) {
       for (let column = 0; column < columns; column++) {
         const tile = this.map[row][column];
-        const imgProps = {}
+        const imgProps = {};
         let divStyle = ""; // for inline styles
-        let divId = ""
+        let classname = "";
+        let divId = "";
         switch (tile) {
           case 1:
           case 4:
-            imgProps.src = "../images/wallBlack.png"
-            divId="wallfix"
+            imgProps.src = "../images/wallBlack.png";
+            divId = "wallfix";
+            classname = "tile";
             break;
           case 2:
             imgProps.src = "../images/tree.png";
-            divId="WallBreak"
+            divId = "WallBreak";
+            classname = "tile";
             break;
           case 3:
             imgProps.src = "../images/wall.png";
-            divId="WallBreak"
+            divId = "WallBreak";
+            classname = "tile";
             break;
           case 5:
             divStyle = "url(../images/playerStyle.png)";
             divId = `player_${data.players[0].playerId}`;
+            classname = "player";
             break;
           case 6:
             divStyle = "url(../images/playerblue.webp)";
             divId = `player_${data.players[1].playerId}`;
+            classname = "player";
             break;
           case 7:
             divStyle = "url(../images/playerGreen.webp)";
             divId = `player_${data.players[2].playerId}`;
+            classname = "player";
             break;
           case 8:
             divStyle = "url(../images/playerStyle.png)";
             divId = `player_${data.players[3].playerId}`;
+            classname = "player";
             break;
           default:
             break;
@@ -121,7 +135,7 @@ export default class Game {
         const divnode = jsx(
           "div",
           {
-            className: "tile",
+            className: `${classname}`,
             "data-row": row,
             "data-column": column,
             id: divId || "no_id",
@@ -144,14 +158,34 @@ export default class Game {
     let keysPressed = {};
     let movementStartTime = null;
     let lastUpdateTime = Date.now();
-    let lastSendTime = 0; 
+    let lastSendTime = 0;
     const updateInterval = 50;
 
     const spriteMap = {
-      up: [{ x: 55, y: 82 }, { x: 28, y: 82 }, { x: 55, y: 82 }, { x: 81, y: 82 }],
-      right: [{ x: 30, y: 41 }, { x: 55, y: 41 }, { x: 30, y: 41 }, { x: -5, y: 41 }],
-      down: [{ x: 52, y: 0 }, { x: 27, y: 0 }, { x: 52, y: 0 }, { x: 78, y: 0 }],
-      left: [{ x: -5, y: 124 }, { x: 30, y: 124 }, { x: -5, y: 124 }, { x: 82, y: 124 }],
+      up: [
+        { x: 55, y: 82 },
+        { x: 28, y: 82 },
+        { x: 55, y: 82 },
+        { x: 81, y: 82 },
+      ],
+      right: [
+        { x: 30, y: 41 },
+        { x: 55, y: 41 },
+        { x: 30, y: 41 },
+        { x: -5, y: 41 },
+      ],
+      down: [
+        { x: 52, y: 0 },
+        { x: 27, y: 0 },
+        { x: 52, y: 0 },
+        { x: 78, y: 0 },
+      ],
+      left: [
+        { x: -5, y: 124 },
+        { x: 30, y: 124 },
+        { x: -5, y: 124 },
+        { x: 82, y: 124 },
+      ],
     };
 
     window.addEventListener("keydown", (e) => {
@@ -160,7 +194,6 @@ export default class Game {
       if ((e.key === "b" || e.key === "B") && !e.repeat) {
         this.placeBomb();
       }
-
     });
 
     window.addEventListener("keyup", (e) => {
@@ -168,7 +201,6 @@ export default class Game {
     });
 
     const updatePlayerMovement = () => {
-
       const now = Date.now();
       const deltaTime = (now - lastUpdateTime) / 100;
       lastUpdateTime = now;
@@ -198,7 +230,7 @@ export default class Game {
         this.player.isMoving = true;
       }
       if (this.player.isMoving) {
-        spriteMap[this.player.direction]
+        spriteMap[this.player.direction];
         console.log("direction", this.player.direction);
 
         if (!movementStartTime) movementStartTime = now;
@@ -209,30 +241,31 @@ export default class Game {
         this.player.positionX = frames[frameIndex].x;
         this.player.positionY = frames[frameIndex].y;
 
-        playerElement.style.width = this.player.width + 'px';
-        playerElement.style.height = this.player.height + 'px';
+        playerElement.style.width = this.player.width + "px";
+        playerElement.style.height = this.player.height + "px";
         playerElement.style.backgroundImage = `url(${this.player.style})`;
-        playerElement.style.backgroundPositionY = this.player.positionY + 'px';
-        playerElement.style.backgroundPositionX = this.player.positionX + 'px';
+        playerElement.style.backgroundPositionY = this.player.positionY + "px";
+        playerElement.style.backgroundPositionX = this.player.positionX + "px";
         playerElement.style.transform = `translate(${this.player.x}px, ${this.player.y}px)`;
 
         if (now - lastSendTime > updateInterval) {
           if (socket && socket.readyState === WebSocket.OPEN) {
-              socket.send(JSON.stringify({
-                  type: "playerMove",
-                  // Send both actual position AND sprite position
-                  position: { 
-                      x: this.player.x, 
-                      y: this.player.y,
-                      spriteX: this.player.positionX, 
-                      spriteY: this.player.positionY,
-                      direction: this.player.direction
-                  }
-              }));
-              lastSendTime = now;
+            socket.send(
+              JSON.stringify({
+                type: "playerMove",
+                // Send both actual position AND sprite position
+                position: {
+                  x: this.player.x,
+                  y: this.player.y,
+                  spriteX: this.player.positionX,
+                  spriteY: this.player.positionY,
+                  direction: this.player.direction,
+                },
+              })
+            );
+            lastSendTime = now;
           }
-      }
-
+        }
       } else {
         if (movementStartTime) {
           const frames = spriteMap[this.player.direction];
@@ -260,7 +293,6 @@ export default class Game {
     // console.log("this.player.y", this.player.y);
     // console.log("this.player.x", this.player.x);
 
-
     // console.log("row",row);
     // console.log("col", col)
     // console.log(this.map[row][col]);
@@ -269,24 +301,22 @@ export default class Game {
     if (this.map[row][col] !== 0) return; // check if empty palce and the are problem in the 5 for rist place for player
 
     // const bomb = new Bomb(row, col);
-    // this.bombs.push(bomb); // maby later we can use it 
+    // this.bombs.push(bomb); // maby later we can use it
     this.#drawBomb(row, col);
-
 
     // Remove bomb after 2 seconds
     setTimeout(() => {
       this.#removeBomb(row, col);
-      this.#Destroywall(row, col)
+      this.#Destroywall(row, col);
     }, 3000);
-
   }
 
   #Destroywall(row, col) {
     const directions = [
-      { dr: -1, dc: 0 },  // Up
-      { dr: 0, dc: 1 },   // Right
-      { dr: 1, dc: 0 },   // Down
-      { dr: 0, dc: -1 }   // Left
+      { dr: -1, dc: 0 }, // Up
+      { dr: 0, dc: 1 }, // Right
+      { dr: 1, dc: 0 }, // Down
+      { dr: 0, dc: -1 }, // Left
     ];
 
     directions.forEach(({ dr, dc }) => {
@@ -316,19 +346,17 @@ export default class Game {
     });
   }
 
-
-
   #drawBomb(row, col) {
     const tileElement = this.canvas.querySelector(
       `[data-row="${row}"][data-column="${col}"]`
     );
 
-    if (tileElement && !tileElement.querySelector('.bomb')) {
+    if (tileElement && !tileElement.querySelector(".bomb")) {
       const bombDiv = document.createElement("div");
       bombDiv.classList.add("bomb");
 
       // Use background image for sprite sheet
-      bombDiv.style.backgroundImage = "url('../images/bomb.png')"; // add the class bomb style 
+      bombDiv.style.backgroundImage = "url('../images/bomb.png')"; // add the class bomb style
       // bombDiv.style.backgroundRepeat = "no-repeat";
       // bombDiv.style.position = "absolute";
       bombDiv.style.width = "38px"; // or frame width
@@ -342,22 +370,22 @@ export default class Game {
     const tileElement = this.canvas.querySelector(
       `[data-row="${row}"][data-column="${col}"]`
     );
-    const bombImg = tileElement?.querySelector('.bomb');
+    const bombImg = tileElement?.querySelector(".bomb");
     if (bombImg) {
       bombImg.remove();
 
       // Spread explosion in 4 directions (up, right, down, left)
       const directions = [
-        { dr: -1, dc: 0 },  // up
-        { dr: 0, dc: 1 },   // right
-        { dr: 1, dc: 0 },   // down
-        { dr: 0, dc: -1 }   // left
+        { dr: -1, dc: 0 }, // up
+        { dr: 0, dc: 1 }, // right
+        { dr: 1, dc: 0 }, // down
+        { dr: 0, dc: -1 }, // left
       ];
 
       // Create explosions in all directions
       directions.forEach(({ dr, dc }) => {
-        const newRow = row + (dr * 1);
-        const newCol = col + (dc * 1);
+        const newRow = row + dr * 1;
+        const newCol = col + dc * 1;
 
         if (this.map[newRow][newCol] === 0) {
           const targetTile = this.canvas.querySelector(
@@ -383,19 +411,22 @@ export default class Game {
 
     // Correct frame sequence
     const frames = [
-      { x: -5, y: 0 },    // Frame 1
-      { x: -40, y: 0 },   // Frame 2
-      { x: -75, y: 0 },   // Frame 3
-      { x: -112, y: 0 },  // Frame 4
-      { x: -146, y: 0 },  // Frame 5
-      { x: -75, y: 36 },  // Frame 6
+      { x: -5, y: 0 }, // Frame 1
+      { x: -40, y: 0 }, // Frame 2
+      { x: -75, y: 0 }, // Frame 3
+      { x: -112, y: 0 }, // Frame 4
+      { x: -146, y: 0 }, // Frame 5
+      { x: -75, y: 36 }, // Frame 6
       { x: -112, y: 36 }, // Frame 7
-      { x: -146, y: 36 }  // Frame 8
+      { x: -146, y: 36 }, // Frame 8
     ];
 
     let currentFrame = 0;
     const frameDuration = 75;
-    const divnode = jsx("div", { className: "damage", style: `background-position : ${frames[0].x}px ${frames[0].y}px` })
+    const divnode = jsx("div", {
+      className: "damage",
+      style: `background-position : ${frames[0].x}px ${frames[0].y}px`,
+    });
     const explosionDiv = createElement(divnode);
 
     tileElement.appendChild(explosionDiv);
@@ -406,8 +437,7 @@ export default class Game {
         return;
       }
 
-      explosionDiv.style.backgroundPosition =
-        `${frames[currentFrame].x}px ${frames[currentFrame].y}px`;
+      explosionDiv.style.backgroundPosition = `${frames[currentFrame].x}px ${frames[currentFrame].y}px`;
       currentFrame++;
       requestAnimationFrame(() => {
         setTimeout(animate, frameDuration);
@@ -416,5 +446,4 @@ export default class Game {
 
     animate();
   }
-
 }
