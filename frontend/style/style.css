@@ -355,7 +355,7 @@ body::before {
     position: relative;
 }
 
-.tile .bomb {
+.bomb {
     background-size: 275%;
     animation: bomb-sprite 800ms steps(2) infinite;
 }
@@ -365,7 +365,7 @@ body::before {
     100% { background-position: 72px 42px; }
 }
 
-.tile .damage {
+.damage {
     width: 38px;
     height: 38px;
     background-image: url('../images/explosion.png');

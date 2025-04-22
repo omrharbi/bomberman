@@ -304,43 +304,43 @@ export default class Game {
 
     setTimeout(() => {
       this.#removeBomb(row, col);
-      this.#Destroywall(row, col);
+      // this.#Destroywall(row, col);
     }, 3000);
   }
 
-  #Destroywall(row, col) {
-    console.log("Destroywall", row, col);
-    const directions = [
-      { dr: -1, dc: 0 }, // Up
-      { dr: 0, dc: 1 }, // Right
-      { dr: 1, dc: 0 }, // Down
-      { dr: 0, dc: -1 }, // Left
-    ];
+  // #Destroywall(row, col) {
+  //   console.log("Destroywall", row, col);
+  //   const directions = [
+  //     { dr: -1, dc: 0 }, // Up
+  //     { dr: 0, dc: 1 }, // Right
+  //     { dr: 1, dc: 0 }, // Down
+  //     { dr: 0, dc: -1 }, // Left
+  //   ];
 
-    directions.forEach(({ dr, dc }) => {
-      const newRow = row + dr;
-      const newCol = col + dc;
+  //   directions.forEach(({ dr, dc }) => {
+  //     const newRow = row + dr;
+  //     const newCol = col + dc;
 
-      // Check boundaries
-      if (
-        newRow >= 0 &&
-        newRow < this.map.length &&
-        newCol >= 0 &&
-        newCol < this.map[0].length
-      ) {
-        // Check if the tile is a destroyable wall (3)
-        if (this.map[newRow][newCol] === 3) {
-          this.map[newRow][newCol] = 0; 
-          const tileElement = this.canvas.querySelector(
-            `[data-row="${newRow}"][data-column="${newCol}"]`
-          );
-          if (tileElement) {
-            tileElement.innerHTML = "";
-          }
-        }
-      }
-    });
-  }
+  //     // Check boundaries
+  //     if (
+  //       newRow >= 0 &&
+  //       newRow < this.map.length &&
+  //       newCol >= 0 &&
+  //       newCol < this.map[0].length
+  //     ) {
+  //       // Check if the tile is a destroyable wall (3)
+  //       if (this.map[newRow][newCol] === 3) {
+  //         this.map[newRow][newCol] = 0; 
+  //         const tileElement = this.canvas.querySelector(
+  //           `[data-row="${newRow}"][data-column="${newCol}"]`
+  //         );
+  //         if (tileElement) {
+  //           tileElement.innerHTML = "";
+  //         }
+  //       }
+  //     }
+  //   });
+  // }
 
   #drawBomb(row, col) {
     const tileElement = this.canvas.querySelector(
@@ -372,7 +372,6 @@ export default class Game {
     if (bombImg) {
       bombImg.remove();
 
-      // Spread explosion in 4 directions (up, right, down, left)
       const directions = [
         { dr: -1, dc: 0 }, // up
         { dr: 0, dc: 1 }, // right
@@ -380,11 +379,10 @@ export default class Game {
         { dr: 0, dc: -1 }, // left
       ];
 
-      // Create explosions in all directions
       directions.forEach(({ dr, dc }) => {
         const newRow = row + dr * 1;
         const newCol = col + dc * 1;
-
+        // this.map[newRow][newCol]
         if (this.map[newRow][newCol] === 0) {
           const targetTile = this.canvas.querySelector(
             `[data-row="${newRow}"][data-column="${newCol}"]`
@@ -392,6 +390,15 @@ export default class Game {
 
           if (targetTile) {
             this.#drawExplosion(targetTile, newRow, newCol);
+          }
+        } else if (this.map[newRow][newCol] === 3) {
+          this.map[newRow][newCol] = 0; 
+          const tileElement = this.canvas.querySelector(
+            `[data-row="${newRow}"][data-column="${newCol}"]`
+          );
+          if (tileElement) {
+            tileElement.innerHTML = "";
+            this.#drawExplosion(tileElement, newRow, newCol);
           }
         }
       });
@@ -404,10 +411,6 @@ export default class Game {
   #drawExplosion(tileElement, row, col) {
     if (!tileElement) return;
 
-    // const explosionDiv = document.createElement("div");
-    // explosionDiv.classList.add("damage");
-
-    // Correct frame sequence
     const frames = [
       { x: -5, y: 0 }, // Frame 1
       { x: -40, y: 0 }, // Frame 2
