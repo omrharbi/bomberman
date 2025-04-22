@@ -10,7 +10,6 @@ export default class Game {
     this.tileSize = tileSize;
     this.players = data.players.length;
     this.wall = this.#image("wallBlack.png");
-    this.grass = this.#image("grass.png");
     this.bombs = [];
     this.MyId = data.MyId;
 
@@ -111,31 +110,25 @@ export default class Game {
             classname = "tile";
             break;
           case 0:
-            imgProps.src = "../images/grass.png"; // FIX: Always show grass for empty tiles
             classname = "tile";
             break;
           case 5:
-            imgProps.src = "../images/grass.png"; // FIX: Add background under player
             divId = `player_${data.players[0].playerId}_tile`;
             classname = "tile";
             break;
           case 6:
-            imgProps.src = "../images/grass.png"; // FIX: Add background under player
             divId = `player_${data.players[1].playerId}_tile`;
             classname = "tile";
             break;
           case 7:
-            imgProps.src = "../images/grass.png"; // FIX: Add background under player
             divId = `player_${data.players[2].playerId}_tile`;
             classname = "tile";
             break;
           case 8:
-            imgProps.src = "../images/grass.png"; // FIX: Add background under player
             divId = `player_${data.players[3].playerId}_tile`;
             classname = "tile";
             break;
           default:
-            imgProps.src = "../images/grass.png";
             classname = "tile";
             break;
         }
@@ -157,6 +150,12 @@ export default class Game {
         
         const div = createElement(divnode);
         canvas.appendChild(div);
+
+        // const playerElement = document.getElementById(`player_${this.MyId}`);
+        // if (playerElement) {
+        //   console.log(playerElement);
+        // }
+        
         
         // Create player sprites separately to allow independent movement
         if (tile >= 5 && tile <= 8) {
@@ -192,7 +191,12 @@ export default class Game {
         }
       }
     }
+        const playerElement = document.getElementById(`player_${this.MyId}`);
+        if (playerElement) {
+          console.log(playerElement);
+        }
   }
+  
 
   #setCanvasSize(canvas) {
     canvas.style.height = `${this.map.length * this.tileSize}px`;
@@ -359,9 +363,9 @@ export default class Game {
         playerElement.style.width = this.player.width;
         playerElement.style.height = this.player.height;
         playerElement.style.backgroundImage = `url(${this.player.style || '../images/playerStyle.png'})`;
-        playerElement.style.backgroundPositionX = this.player.positionX + "px";
-        playerElement.style.backgroundPositionY = this.player.positionY + "px";
-        playerElement.style.transform = `translate(${this.player.x}px, ${this.player.y}px)`;
+        // playerElement.style.backgroundPositionX = this.player.positionX + "px";
+        // playerElement.style.backgroundPositionY = this.player.positionY + "px";
+        // playerElement.style.transform = `translate(${this.player.x}px, ${this.player.y}px)`;
         playerElement.style.position = "absolute";
         playerElement.style.zIndex = "10";
       }
@@ -376,22 +380,19 @@ export default class Game {
   // Improved collision detection method
   #checkCollision() {
     // FIX: Add a small buffer to make collision detection more forgiving
-    // const buffer = 4;
-    // const playerWidth = this.player.width - buffer * 2;
-    // const playerHeight = this.player.height - buffer * 2;
-
-    // console.log("playerWidth", playerWidth);
-    // console.log("playerHeight", playerHeight);
+    const buffer = 4;
+    const playerWidth = this.player.width - buffer * 2;
+    const playerHeight = this.player.height - buffer * 2;
     
     // Center point of player for more accurate collision
     const playerCenterX = this.player.x + (this.player.width / 2);
     const playerCenterY = this.player.y + (this.player.height / 2);
     
     // Calculate player's bounding box with buffer
-    const playerLeft = this.player.x;
-    const playerTop = this.player.y;
-    const playerRight = this.player.x + this.player.width;
-    const playerBottom = this.player.y + this.player.height;
+    const playerLeft = this.player.x + buffer;
+    const playerTop = this.player.y + buffer;
+    const playerRight = this.player.x + playerWidth;
+    const playerBottom = this.player.y + playerHeight;
     
     // Get the player's current position in tiles
     const playerTileX = Math.floor(playerCenterX / this.tileSize);
@@ -488,7 +489,6 @@ export default class Game {
             tileElement.innerHTML = "";
             // FIX: Add grass background after wall is destroyed
             const img = document.createElement("img");
-            img.src = "../images/grass.png";
             tileElement.appendChild(img);
             this.#drawExplosion(tileElement, newRow, newCol);
           }
