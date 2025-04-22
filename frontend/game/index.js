@@ -207,15 +207,7 @@ function playerDied(playerId, nickname) {
 }
 
 
-// function DestroyWall(data) {
-//     // this.map[data.position.y][data.position.x] = 0; 
-//     const tileElement = this.canvas.querySelector(
-//         `[data-row="${data.position.y}"][data-column="${data.position.x}"]`
-//     );
-//     if (tileElement) {
-//         tileElement.innerHTML = "";
-//     }
-// }
+
 
 function Placingbombinmap(data,tileMap) {
     console.log("tileMap", tileMap);

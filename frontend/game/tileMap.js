@@ -303,43 +303,9 @@ export default class Game {
 
     setTimeout(() => {
       this.#removeBomb(row, col);
-      // this.#Destroywall(row, col);
     }, 3000);
   }
 
-  // #Destroywall(row, col) {
-  //   console.log("Destroywall", row, col);
-  //   const directions = [
-  //     { dr: -1, dc: 0 }, // Up
-  //     { dr: 0, dc: 1 }, // Right
-  //     { dr: 1, dc: 0 }, // Down
-  //     { dr: 0, dc: -1 }, // Left
-  //   ];
-
-  //   directions.forEach(({ dr, dc }) => {
-  //     const newRow = row + dr;
-  //     const newCol = col + dc;
-
-  //     // Check boundaries
-  //     if (
-  //       newRow >= 0 &&
-  //       newRow < this.map.length &&
-  //       newCol >= 0 &&
-  //       newCol < this.map[0].length
-  //     ) {
-  //       // Check if the tile is a destroyable wall (3)
-  //       if (this.map[newRow][newCol] === 3) {
-  //         this.map[newRow][newCol] = 0; 
-  //         const tileElement = this.canvas.querySelector(
-  //           `[data-row="${newRow}"][data-column="${newCol}"]`
-  //         );
-  //         if (tileElement) {
-  //           tileElement.innerHTML = "";
-  //         }
-  //       }
-  //     }
-  //   });
-  // }
 
   #drawBomb(row, col) {
     const tileElement = this.canvas.querySelector(
@@ -361,15 +327,75 @@ export default class Game {
     }
   }
 
+  // #removeBomb(row, col) {
+  //   console.log("removeBomb", row, col);
+
+  //   const tileElement = this.canvas.querySelector(
+  //     `[data-row="${row}"][data-column="${col}"]`
+  //   );
+  //   const bombImg = tileElement?.querySelector(".bomb");
+  //   if (bombImg) {
+  //     bombImg.remove();
+
+  //     const directions = [
+  //       { dr: -1, dc: 0 }, // up
+  //       { dr: 0, dc: 1 }, // right
+  //       { dr: 1, dc: 0 }, // down
+  //       { dr: 0, dc: -1 }, // left
+  //     ];
+  //     // search for player 
+  //     //select all player in the map
+  //     //we need to know wich player is affected by the bomb
+  //     const player = this.canvas.querySelectorAll(".player");
+  //     // const player = this.canvas.querySelectorall(".player");
+  //     console.log("player", player);
+
+
+  //     directions.forEach(({ dr, dc }) => {
+  //       const newRow = row + dr * 1;
+  //       const newCol = col + dc * 1;
+  //       // this.map[newRow][newCol]
+  //       if (this.map[newRow][newCol] === 0) {
+  //         const targetTile = this.canvas.querySelector(
+  //           `[data-row="${newRow}"][data-column="${newCol}"]`
+  //         );
+
+  //         if (targetTile) {
+  //           this.#drawExplosion(targetTile, newRow, newCol);
+  //         }
+  //       } else if (this.map[newRow][newCol] === 3) {
+  //         this.map[newRow][newCol] = 0; 
+  //         const tileElement = this.canvas.querySelector(
+  //           `[data-row="${newRow}"][data-column="${newCol}"]`
+  //         );
+  //         if (tileElement) {
+  //           tileElement.innerHTML = "";
+  //           this.#drawExplosion(tileElement, newRow, newCol);
+  //         }
+  //       }
+  //     });
+
+  //     this.#drawExplosion(tileElement);
+  //   }
+  // }
   #removeBomb(row, col) {
     console.log("removeBomb", row, col);
-    
+
     const tileElement = this.canvas.querySelector(
       `[data-row="${row}"][data-column="${col}"]`
     );
     const bombImg = tileElement?.querySelector(".bomb");
+
     if (bombImg) {
       bombImg.remove();
+
+      // Check center (bomb tile) for player
+      const centerHit = this.#checkPlayerHit(row, col);
+      if (centerHit) {
+        console.log("💥 Player hit at bomb center!", centerHit.id);
+        centerHit.classList.add("hit");
+        setTimeout(() => centerHit.classList.remove("hit"), 500);
+      }
 
       const directions = [
         { dr: -1, dc: 0 }, // up
@@ -379,25 +405,30 @@ export default class Game {
       ];
 
       directions.forEach(({ dr, dc }) => {
-        const newRow = row + dr * 1;
-        const newCol = col + dc * 1;
-        // this.map[newRow][newCol]
-        if (this.map[newRow][newCol] === 0) {
+        const newRow = row + dr;
+        const newCol = col + dc;
+
+        if (this.map[newRow][newCol] === 0 || this.map[newRow][newCol] === 3) {
           const targetTile = this.canvas.querySelector(
             `[data-row="${newRow}"][data-column="${newCol}"]`
           );
 
+          if (this.map[newRow][newCol] === 3) {
+            this.map[newRow][newCol] = 0;
+            if (targetTile) targetTile.innerHTML = "";
+          }
+
           if (targetTile) {
             this.#drawExplosion(targetTile, newRow, newCol);
-          }
-        } else if (this.map[newRow][newCol] === 3) {
-          this.map[newRow][newCol] = 0; 
-          const tileElement = this.canvas.querySelector(
-            `[data-row="${newRow}"][data-column="${newCol}"]`
-          );
-          if (tileElement) {
-            tileElement.innerHTML = "";
-            this.#drawExplosion(tileElement, newRow, newCol);
+
+            const hitPlayer = this.#checkPlayerHit(newRow, newCol);
+            console.log("hitPlayer", hitPlayer);
+            
+            if (hitPlayer) {
+              console.log("💥 Player hit by explosion!", hitPlayer.id);
+              hitPlayer.classList.add("hit");
+              setTimeout(() => hitPlayer.classList.remove("hit"), 500);
+            }
           }
         }
       });
@@ -405,6 +436,7 @@ export default class Game {
       this.#drawExplosion(tileElement);
     }
   }
+
 
   #drawExplosion(tileElement) {
     if (!tileElement) return;
@@ -445,4 +477,13 @@ export default class Game {
 
     animate();
   }
+
+  #checkPlayerHit(row, col) {
+    console.log("checkPlayerHit", row, col);
+    
+    return this.canvas.querySelector(
+      `.player[data-row="${row}"][data-column="${col}"]`
+    );
+  }
+
 }
