@@ -44,7 +44,6 @@ function connectToGameServer(name) {
     };
     socket.onmessage = (message) => {
         const data = JSON.parse(message.data);
-        console.log(data);
         handleServerMessages(data);
     };
 
@@ -220,5 +219,5 @@ function playerDied(playerId, nickname) {
 function Placingbombinmap(data,tileMap) {
     console.log("tileMap", tileMap);
     
-    tileMap.placeBomb(data.position.row, data.position.col);
+    tileMap.placeBomb(data.position.row, data.position.col, data.gift, data.index);
 }

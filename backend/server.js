@@ -56,29 +56,10 @@ class Player {
     return this.lives > 0;
   }
 
-  move(dx, dy) {
-    this.x += dx;
-    this.y += dy;
-  }
-
   setDirection(direction) {
     this.direction = direction;
   }
 
-  resetPosition(x = 1, y = 1) {
-    this.x = x;
-    this.y = y;
-  }
-
-  placeBomb() {
-    this.bombsPlaced += 1;
-  }
-
-  removeBomb() {
-    if (this.bombsPlaced > 0) {
-      this.bombsPlaced -= 1;
-    }
-  }
 }
 
 class Room {
@@ -191,6 +172,8 @@ function startGameForPlayer(player, room, players) {
         room.broadcast({
           type: 'placeBomb',
           position: data.position,
+          gift : Math.random() < 0.3,
+          index: Math.floor(Math.random() * 3),
         });
         break;
       default:

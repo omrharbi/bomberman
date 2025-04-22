@@ -243,8 +243,6 @@ export default class Game {
       }
       if (this.player.isMoving) {
         spriteMap[this.player.direction];
-        console.log("direction", this.player.direction);
-
         if (!movementStartTime) movementStartTime = now;
         const elapsed = now - movementStartTime;
         const frameDuration = 200;
@@ -297,12 +295,12 @@ export default class Game {
     updatePlayerMovement();
   }
 
-  placeBomb(row, col) {
+  placeBomb(row, col, gift,index) {
     if (this.map[row][col] !== 0) return; // check if empty palce and the are problem in the 5 for rist place for player
     this.#drawBomb(row, col);
 
     setTimeout(() => {
-      this.#removeBomb(row, col);
+      this.#removeBomb(row, col, gift,index);
       // this.#Destroywall(row, col);
     }, 3000);
   }
@@ -361,7 +359,7 @@ export default class Game {
     }
   }
 
-  #removeBomb(row, col) {
+  #removeBomb(row, col, gift,index) {
     console.log("removeBomb", row, col);
     
     const tileElement = this.canvas.querySelector(
@@ -395,9 +393,20 @@ export default class Game {
           const tileElement = this.canvas.querySelector(
             `[data-row="${newRow}"][data-column="${newCol}"]`
           );
-          if (tileElement) {
-            tileElement.innerHTML = "";
-            this.#drawExplosion(tileElement, newRow, newCol);
+         
+          if (gift){
+           const  power = ['../images/bombing.webp','../images/speed.webp','../images/spoil_tileset.webp']
+            if (tileElement) {
+              tileElement.innerHTML = '<img src="'+power[index]+'" style="width: 38px; height: 38px; position: absolute; top: 0; left: 0;">';               
+              this.#drawExplosion(tileElement, newRow, newCol);
+              gift = false;
+            }
+          }else {
+            this.map[newRow][newCol] = 0; 
+            if (tileElement) {
+              tileElement.innerHTML = "";
+              this.#drawExplosion(tileElement, newRow, newCol);
+            }
           }
         }
       });
