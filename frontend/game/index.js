@@ -51,13 +51,18 @@ function connectToGameServer(name) {
         console.log('Disconnected from WebSocket server');
     };
 }
+let tileMap ;
 function handleServerMessages(data) {
+    const tileSize = 40;
+    if (data.type == 'startGame') {
+        tileMap = new TileMap(tileSize, data);
+    }
     switch (data.type) {
         case 'updatePlayers':
             updatePlayerCount(data.playerCount, data.playerId);
             break;
         case 'startGame':
-            startGame(data);
+            startGame(data, tileMap);
             break
         case 'chatMsg':
             displayMsg(data)
@@ -73,9 +78,11 @@ function handleServerMessages(data) {
         case 'playerDied':
             playerDied(data.playerId, data.nickname)
             break
-        case 'playerMove':            
+        case 'playerMove':
             updateOtherPlayerPosition(data);
             break;
+        case 'placeBomb':
+            Placingbombinmap(data,tileMap);
         default:
             break;
     }
@@ -84,10 +91,10 @@ function updateOtherPlayerPosition(data) {
     //if (data.PlayerId === this.MyId) return;
     let playerElement = document.getElementById(`player_${data.PlayerId}`);
     if (!playerElement) return;
-    
+
     playerElement.style.backgroundPositionY = data.position.spriteY + 'px';
     playerElement.style.backgroundPositionX = data.position.spriteX + 'px';
-    
+
     playerElement.style.transform = `translate(${data.position.x}px, ${data.position.y}px)`;
 }
 
@@ -103,25 +110,25 @@ function updatePlayerCount(count, playerId) {
             document.getElementById(`${playerId}`).remove()
         }
     }
-}
-function startGame(data) {
+} G
+function startGame(data, tileMap) {
     let count = 3
 
     const interval = setInterval(() => {
         count--
         document.getElementById('playercount').innerText = `start Game in : ${count}s`;
         if (count == 0) {
-            GoToGame(data)
+            GoToGame(data, tileMap)
             clearInterval(interval)
         }
     }, 100)
 }
 
-function GoToGame(data) {
+function GoToGame(data, tileMap) {
     const body = document.body;
     render(GamePage(), body)
-    const tileSize = 40;
-    const tileMap = new TileMap(tileSize, data);
+    // const tileSize = 40;
+    // const tileMap = new TileMap(tileSize, data);
     let game = document.getElementById("game")
     function gameLoop() {
         tileMap.drawGame(game, data)
@@ -198,3 +205,19 @@ function playerDied(playerId, nickname) {
     }
 }
 
+
+// function DestroyWall(data) {
+//     // this.map[data.position.y][data.position.x] = 0; 
+//     const tileElement = this.canvas.querySelector(
+//         `[data-row="${data.position.y}"][data-column="${data.position.x}"]`
+//     );
+//     if (tileElement) {
+//         tileElement.innerHTML = "";
+//     }
+// }
+
+function Placingbombinmap(data,tileMap) {
+    console.log("tileMap", tileMap);
+    
+    tileMap.placeBomb(data.position.row, data.position.col);
+}

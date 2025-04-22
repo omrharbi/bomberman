@@ -192,7 +192,20 @@ export default class Game {
       keysPressed[e.key] = true;
 
       if ((e.key === "b" || e.key === "B") && !e.repeat) {
-        this.placeBomb();
+        const row = Math.floor((this.player.y + 20) / this.tileSize) + 1;
+        const col = Math.floor((this.player.x + 20) / this.tileSize) + 1;
+        if (socket && socket.readyState === WebSocket.OPEN) {
+          socket.send(
+            JSON.stringify({
+              type: "placeBomb",
+              position: {
+                row: row,
+                col: col,
+              },
+            })
+          );
+        }
+        // this.placeBomb();
       }
     });
 
@@ -285,26 +298,10 @@ export default class Game {
     updatePlayerMovement();
   }
 
-  placeBomb() {
-    const row = Math.floor((this.player.y + 20) / this.tileSize) + 1;
-    const col = Math.floor((this.player.x + 20) / this.tileSize) + 1;
-
-    // Check if tile is walkable (optional)
-    // console.log("this.player.y", this.player.y);
-    // console.log("this.player.x", this.player.x);
-
-    // console.log("row",row);
-    // console.log("col", col)
-    // console.log(this.map[row][col]);
-    // console.log(this.map);
-
+  placeBomb(row, col) {
     if (this.map[row][col] !== 0) return; // check if empty palce and the are problem in the 5 for rist place for player
-
-    // const bomb = new Bomb(row, col);
-    // this.bombs.push(bomb); // maby later we can use it
     this.#drawBomb(row, col);
 
-    // Remove bomb after 2 seconds
     setTimeout(() => {
       this.#removeBomb(row, col);
       this.#Destroywall(row, col);
@@ -312,6 +309,7 @@ export default class Game {
   }
 
   #Destroywall(row, col) {
+    console.log("Destroywall", row, col);
     const directions = [
       { dr: -1, dc: 0 }, // Up
       { dr: 0, dc: 1 }, // Right
@@ -332,9 +330,7 @@ export default class Game {
       ) {
         // Check if the tile is a destroyable wall (3)
         if (this.map[newRow][newCol] === 3) {
-          this.map[newRow][newCol] = 0; // Set to grass/empty
-
-          // Redraw that tile
+          this.map[newRow][newCol] = 0; 
           const tileElement = this.canvas.querySelector(
             `[data-row="${newRow}"][data-column="${newCol}"]`
           );
@@ -367,6 +363,8 @@ export default class Game {
   }
 
   #removeBomb(row, col) {
+    console.log("removeBomb", row, col);
+    
     const tileElement = this.canvas.querySelector(
       `[data-row="${row}"][data-column="${col}"]`
     );

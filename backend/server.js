@@ -187,6 +187,12 @@ function startGameForPlayer(player, room, players) {
           position: data.position,
         });
         break;
+      case "placeBomb":
+        room.broadcast({
+          type: 'placeBomb',
+          position: data.position,
+        });
+        break;
       default:
         break;
     }
