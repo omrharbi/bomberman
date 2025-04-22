@@ -91,6 +91,8 @@ export default class Game {
         let divStyle = ""; // for inline styles
         let classname = "";
         let divId = "";
+        let initialX = 0;
+        let initialY = 0;
         
         switch (tile) {
           case 1:
@@ -115,18 +117,34 @@ export default class Game {
           case 5:
             divId = `player_${data.players[0].playerId}_tile`;
             classname = "tile";
+            console.log("column", column);
+            console.log("row", row);
+            initialX = column * this.tileSize
+            initialY = row * this.tileSize
+            console.log("initialX", initialX);
+            console.log("initialY", initialY);
             break;
           case 6:
             divId = `player_${data.players[1].playerId}_tile`;
             classname = "tile";
+            console.log("column", column);
+            console.log("row", row);
+            initialX = column * this.tileSize
+            initialY = row * this.tileSize
+            console.log("initialX", initialX);
+            console.log("initialY", initialY);
             break;
           case 7:
             divId = `player_${data.players[2].playerId}_tile`;
             classname = "tile";
+            initialX = column * this.tileSize
+            initialY = row * this.tileSize
             break;
           case 8:
             divId = `player_${data.players[3].playerId}_tile`;
             classname = "tile";
+            initialX = column * this.tileSize
+            initialY = row * this.tileSize
             break;
           default:
             classname = "tile";
@@ -136,6 +154,7 @@ export default class Game {
         // Create tile with background image
         const imgnode = imgProps.src ? jsx("img", imgProps) : [];
         
+        
         const divnode = jsx(
           "div",
           {
@@ -144,6 +163,8 @@ export default class Game {
             "data-column": column,
             id: divId || `tile_${row}_${column}`,
             style: divStyle ? `background-image: ${divStyle}` : "",
+            "data-initial-x": initialX, // Change to data attributes
+            "data-initial-y": initialY  // Change to data attributes
           },
           imgnode
         );
@@ -191,10 +212,19 @@ export default class Game {
         }
       }
     }
-        const playerElement = document.getElementById(`player_${this.MyId}`);
-        if (playerElement) {
-          console.log(playerElement);
-        }
+
+    const playerElement = document.getElementById(`player_${this.MyId}_tile`);
+    if (playerElement) {
+      const x = playerElement.getAttribute("data-initial-x"); // Use data-initial-x
+      const y = playerElement.getAttribute("data-initial-y"); // Use data-initial-y
+      console.log("x", x);
+      console.log("y", y);
+    
+      // Convert to numbers
+      this.player.x = parseInt(x, 10);
+      this.player.y = parseInt(y, 10);
+    }
+
   }
   
 

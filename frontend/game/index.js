@@ -43,7 +43,7 @@ function connectToGameServer(name) {
     };
     socket.onmessage = (message) => {
         const data = JSON.parse(message.data);
-        console.log(data);
+        // console.log(data);
         handleServerMessages(data);
     };
 
