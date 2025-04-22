@@ -205,7 +205,6 @@ export default class Game {
             })
           );
         }
-        // this.placeBomb();
       }
     });
 
