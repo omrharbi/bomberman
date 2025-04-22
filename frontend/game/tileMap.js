@@ -403,12 +403,11 @@ export default class Game {
         }
       });
 
-      // Center explosion
-      this.#drawExplosion(tileElement, row, col);
+      this.#drawExplosion(tileElement);
     }
   }
 
-  #drawExplosion(tileElement, row, col) {
+  #drawExplosion(tileElement) {
     if (!tileElement) return;
 
     const frames = [
