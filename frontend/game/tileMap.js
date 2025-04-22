@@ -51,12 +51,12 @@ export default class Game {
         );
         if (playerIndex !== -1) {
           this.map[row][col] = 5 + playerIndex;
+          this.player = new Player(row, col);          
         }
       }
     }
-
+    
     // Create a new Player instance at 1,1
-    this.player = new Player(1, 1);
     this.canvas = null;
   }
 
@@ -243,7 +243,6 @@ export default class Game {
       }
       if (this.player.isMoving) {
         spriteMap[this.player.direction];
-        console.log("direction", this.player.direction);
 
         if (!movementStartTime) movementStartTime = now;
         const elapsed = now - movementStartTime;
@@ -316,10 +315,7 @@ export default class Game {
       const bombDiv = document.createElement("div");
       bombDiv.classList.add("bomb");
 
-      // Use background image for sprite sheet
       bombDiv.style.backgroundImage = "url('../images/bomb.png')"; // add the class bomb style
-      // bombDiv.style.backgroundRepeat = "no-repeat";
-      // bombDiv.style.position = "absolute";
       bombDiv.style.width = "38px"; // or frame width
       bombDiv.style.height = "38px"; // or frame height
 
@@ -327,57 +323,6 @@ export default class Game {
     }
   }
 
-  // #removeBomb(row, col) {
-  //   console.log("removeBomb", row, col);
-
-  //   const tileElement = this.canvas.querySelector(
-  //     `[data-row="${row}"][data-column="${col}"]`
-  //   );
-  //   const bombImg = tileElement?.querySelector(".bomb");
-  //   if (bombImg) {
-  //     bombImg.remove();
-
-  //     const directions = [
-  //       { dr: -1, dc: 0 }, // up
-  //       { dr: 0, dc: 1 }, // right
-  //       { dr: 1, dc: 0 }, // down
-  //       { dr: 0, dc: -1 }, // left
-  //     ];
-  //     // search for player 
-  //     //select all player in the map
-  //     //we need to know wich player is affected by the bomb
-  //     const player = this.canvas.querySelectorAll(".player");
-  //     // const player = this.canvas.querySelectorall(".player");
-  //     console.log("player", player);
-
-
-  //     directions.forEach(({ dr, dc }) => {
-  //       const newRow = row + dr * 1;
-  //       const newCol = col + dc * 1;
-  //       // this.map[newRow][newCol]
-  //       if (this.map[newRow][newCol] === 0) {
-  //         const targetTile = this.canvas.querySelector(
-  //           `[data-row="${newRow}"][data-column="${newCol}"]`
-  //         );
-
-  //         if (targetTile) {
-  //           this.#drawExplosion(targetTile, newRow, newCol);
-  //         }
-  //       } else if (this.map[newRow][newCol] === 3) {
-  //         this.map[newRow][newCol] = 0; 
-  //         const tileElement = this.canvas.querySelector(
-  //           `[data-row="${newRow}"][data-column="${newCol}"]`
-  //         );
-  //         if (tileElement) {
-  //           tileElement.innerHTML = "";
-  //           this.#drawExplosion(tileElement, newRow, newCol);
-  //         }
-  //       }
-  //     });
-
-  //     this.#drawExplosion(tileElement);
-  //   }
-  // }
   #removeBomb(row, col) {
     console.log("removeBomb", row, col);
 
@@ -388,15 +333,6 @@ export default class Game {
 
     if (bombImg) {
       bombImg.remove();
-
-      // Check center (bomb tile) for player
-      const centerHit = this.#checkPlayerHit(row, col);
-      if (centerHit) {
-        console.log("💥 Player hit at bomb center!", centerHit.id);
-        centerHit.classList.add("hit");
-        setTimeout(() => centerHit.classList.remove("hit"), 500);
-      }
-
       const directions = [
         { dr: -1, dc: 0 }, // up
         { dr: 0, dc: 1 }, // right
@@ -420,15 +356,6 @@ export default class Game {
 
           if (targetTile) {
             this.#drawExplosion(targetTile, newRow, newCol);
-
-            const hitPlayer = this.#checkPlayerHit(newRow, newCol);
-            console.log("hitPlayer", hitPlayer);
-            
-            if (hitPlayer) {
-              console.log("💥 Player hit by explosion!", hitPlayer.id);
-              hitPlayer.classList.add("hit");
-              setTimeout(() => hitPlayer.classList.remove("hit"), 500);
-            }
           }
         }
       });
@@ -476,14 +403,6 @@ export default class Game {
     };
 
     animate();
-  }
-
-  #checkPlayerHit(row, col) {
-    console.log("checkPlayerHit", row, col);
-    
-    return this.canvas.querySelector(
-      `.player[data-row="${row}"][data-column="${col}"]`
-    );
   }
 
 }

@@ -2,6 +2,8 @@ export default class Player {
     constructor(x, y) {
       this.x = x;
       this.y = y;
+      this.row = x;
+      this.col = y;
       this.bombsPlaced = 0;
       this.bombPower = 1;
       this.positionX = 52;

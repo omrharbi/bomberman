@@ -44,7 +44,6 @@ function connectToGameServer(name) {
     };
     socket.onmessage = (message) => {
         const data = JSON.parse(message.data);
-        console.log(data);
         handleServerMessages(data);
     };
 
@@ -89,7 +88,6 @@ function handleServerMessages(data) {
     }
 }
 function updateOtherPlayerPosition(data) {
-    //if (data.PlayerId === this.MyId) return;
     let playerElement = document.getElementById(`player_${data.PlayerId}`);
     if (!playerElement) return;
 
@@ -111,7 +109,8 @@ function updatePlayerCount(count, playerId) {
             document.getElementById(`${playerId}`).remove()
         }
     }
-} G
+}
+
 function startGame(data, tileMap) {
     let count = 3
 
@@ -128,8 +127,7 @@ function startGame(data, tileMap) {
 function GoToGame(data, tileMap) {
     const body = document.body;
     render(GamePage(), body)
-    // const tileSize = 40;
-    // const tileMap = new TileMap(tileSize, data);
+
     let game = document.getElementById("game")
     function gameLoop() {
         tileMap.drawGame(game, data)
