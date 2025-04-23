@@ -23,12 +23,14 @@ login()
 function waiting() {
     const div = document.getElementById('input');
     render(jsx('p', { id: 'playercount' }), div)
-    let cont = 1;
-    const p = document.getElementById('cont');
-    setInterval(() => {
-        cont++;
-        p.textContent = cont;
-    }, 1000);
+    const contDiv = document.getElementById('cont');
+    const waitingGif = jsx('div', {}, jsx('img', {
+        src: '/images/bomberman3d.gif',
+        alt: 'Waiting...',
+        style: ' margin-top: 10px;' 
+    }), jsx('p', {}, ' Looking for a match...'));
+    render(waitingGif, contDiv);
+
 }
 
 export let socket;
