@@ -141,7 +141,7 @@ export default class Game {
           playerDiv.style.width = "27px;";  // FIX: Set explicit sizes
           playerDiv.style.height = "40px";
           playerDiv.style.position = "absolute";
-          playerDiv.style.zIndex = "10";
+          playerDiv.style.zIndex = "10"
           
           // FIX: Initially position player at their spawn tile
           const initialX = column * this.tileSize;
@@ -268,14 +268,11 @@ export default class Game {
         this.player.isMoving = true;
       }
 
-      // Basic collision detection
-      if (this.#checkCollision()) {
-        this.player.x = prevX;
-        this.player.y = prevY;
-      }
-
-      // Check if player is moving
       if (this.player.isMoving) {
+        if (this.#checkCollision()) {
+          this.player.x = prevX;
+          this.player.y = prevY;
+        }
         const currentSprite = spriteMap[this.player.direction];
         if (!currentSprite) {
           console.error("Invalid direction:", this.player.direction);
@@ -341,60 +338,47 @@ export default class Game {
     updatePlayerMovement();
   }
 
-  // Improved collision detection method
   #checkCollision() {
-    // FIX: Add a small buffer to make collision detection more forgiving
-    const buffer = 4;
-    const playerWidth = this.player.width - buffer * 2;
-    const playerHeight = this.player.height - buffer * 2;
-    
-    // Center point of player for more accurate collision
+    const playerLeft = this.player.x;
+    const playerTop = this.player.y;
+    const playerRight = this.player.x + this.player.width;
+    const playerBottom = this.player.y + this.player.height;
+  
     const playerCenterX = this.player.x + (this.player.width / 2);
     const playerCenterY = this.player.y + (this.player.height / 2);
-    
-    // Calculate player's bounding box with buffer
-    const playerLeft = this.player.x + buffer;
-    const playerTop = this.player.y + buffer;
-    const playerRight = this.player.x + playerWidth;
-    const playerBottom = this.player.y + playerHeight;
-    
-    // Get the player's current position in tiles
+  
     const playerTileX = Math.floor(playerCenterX / this.tileSize);
     const playerTileY = Math.floor(playerCenterY / this.tileSize);
-    
-    // Check surrounding tiles (3x3 grid)
+  
     for (let y = playerTileY - 1; y <= playerTileY + 1; y++) {
       for (let x = playerTileX - 1; x <= playerTileX + 1; x++) {
-        // Check if tile is within map bounds
         if (
           y >= 0 && y < this.map.length &&
           x >= 0 && x < this.map[0].length
         ) {
-          // Check if the tile is a wall (1, 2, 3, 4)
           const tileType = this.map[y][x];
+  
           if (tileType === 1 || tileType === 2 || tileType === 3 || tileType === 4) {
-            // Calculate tile bounds
             const tileLeft = x * this.tileSize;
             const tileTop = y * this.tileSize;
             const tileRight = tileLeft + this.tileSize;
             const tileBottom = tileTop + this.tileSize;
-            
-            // Check for rectangle collision
+  
             if (
-              playerLeft < tileRight &&
-              playerRight > tileLeft &&
-              playerTop < tileBottom &&
+              playerLeft < tileRight - 6 &&
+              playerRight > tileLeft - 4 &&
+              playerTop < tileBottom - 16 &&
               playerBottom > tileTop
             ) {
-              return true; // Collision detected
+              return true;
             }
           }
         }
       }
     }
-    
-    return false; // No collision
+    return false;
   }
+  
 
   placeBomb(row, col, gift , index) {
     // Check if position is valid and not already occupied by a wall
