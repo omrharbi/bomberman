@@ -1,7 +1,9 @@
 export default class Player {
-    constructor(x, y) {
+    constructor(row, col, x, y) {
       this.x = x;
       this.y = y;
+      this.row = row;
+      this.col = col;
       this.bombsPlaced = 0;
       this.bombPower = 1;
       this.positionX = 52;

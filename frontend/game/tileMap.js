@@ -12,49 +12,9 @@ export default class Game {
     this.wall = this.#image("wallBlack.png");
     this.bombs = [];
     this.MyId = data.MyId;
-
-    this.map = [
-      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-      [1, 0, 0, 0, 0, 3, 3, 3, 3, 3, 0, 3, 2, 0, 3, 0, 1],
-      [1, 0, 4, 0, 4, 0, 4, 3, 4, 3, 4, 0, 4, 0, 4, 0, 1],
-      [1, 3, 0, 0, 0, 0, 3, 3, 0, 3, 0, 3, 0, 0, 0, 0, 1],
-      [1, 0, 4, 3, 4, 0, 4, 0, 4, 0, 4, 0, 4, 0, 4, 3, 1],
-      [1, 3, 0, 3, 0, 3, 0, 2, 0, 2, 0, 3, 0, 3, 3, 3, 1],
-      [1, 0, 4, 0, 4, 3, 4, 3, 4, 3, 4, 3, 4, 0, 4, 0, 1],
-      [1, 3, 3, 3, 0, 3, 3, 0, 3, 3, 0, 3, 0, 3, 0, 3, 1],
-      [1, 0, 4, 3, 4, 0, 4, 3, 4, 3, 4, 0, 4, 3, 4, 0, 1],
-      [1, 3, 0, 3, 0, 3, 3, 0, 3, 3, 0, 3, 0, 3, 0, 3, 1],
-      [1, 0, 4, 0, 4, 0, 4, 3, 4, 0, 4, 0, 4, 0, 4, 0, 1],
-      [1, 0, 0, 0, 3, 3, 3, 2, 3, 2, 3, 3, 0, 0, 0, 3, 1],
-      [1, 0, 4, 0, 4, 0, 4, 0, 4, 3, 4, 0, 4, 0, 4, 3, 1],
-      [1, 3, 3, 3, 2, 3, 0, 3, 0, 3, 0, 3, 2, 0, 0, 3, 1],
-      [1, 0, 4, 3, 4, 0, 4, 0, 4, 0, 4, 3, 4, 3, 4, 0, 1],
-      [1, 3, 3, 0, 3, 3, 0, 0, 3, 3, 0, 3, 3, 3, 3, 3, 1],
-      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-    ];
-
-    // Player spawn points
-    const positionPlayersS = [
-      [1, 1],
-      [14, 13],
-      [1, 15],
-      [12, 1],
-    ];
-    const positionPlayers = positionPlayersS.slice(0, this.players);
-
-    for (let row = 0; row < this.map.length; row++) {
-      for (let col = 0; col < this.map[row].length; col++) {
-        const playerIndex = positionPlayers.findIndex(
-          ([r, c]) => r === row && c === col
-        );
-        if (playerIndex !== -1) {
-          this.map[row][col] = 5 + playerIndex;
-        }
-      }
-    }
-
-    // Create a new Player instance and position them at their pixel position
-    // FIX: Updated to use tileSize to calculate pixel position
+    console.log(data.map);
+    this.map = data.map;
+    
     this.player = new Player(1 * this.tileSize, 1 * this.tileSize);
     this.canvas = null;
   }

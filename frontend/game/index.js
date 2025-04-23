@@ -23,15 +23,14 @@ login()
 function waiting() {
     const div = document.getElementById('input');
     render(jsx('p', { id: 'playercount' }), div)
-    const contDiv = document.getElementById('cont');
-    const waitingGif = jsx('div', {}, jsx('img', {
-        src: '/images/bomberman3d.gif',
-        alt: 'Waiting...',
-        style: ' margin-top: 10px;' 
-    }), jsx('p', {}, ' Looking for a match...'));
-    render(waitingGif, contDiv);
-
+    let cont = 1;
+    const p = document.getElementById('cont');
+    setInterval(() => {
+        cont++;
+        p.textContent = cont;
+    }, 1000);
 }
+
 export let socket;
 function connectToGameServer(name) {
     socket = new WebSocket('ws://localhost:8080');
@@ -44,6 +43,7 @@ function connectToGameServer(name) {
     };
     socket.onmessage = (message) => {
         const data = JSON.parse(message.data);
+        // console.log(data);
         handleServerMessages(data);
     };
 
