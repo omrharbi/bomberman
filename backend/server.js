@@ -123,36 +123,68 @@ function startRoom(room) {
   room.started = true;
   console.log(`Starting game in room ${room.id}`);
 
-  const positionPlayers = [
-    [1, 1],
-    [14, 13],
-    [1, 15],
-    [12, 1],
+  let map = [
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 0, 0, 0, 0, 3, 3, 3, 3, 3, 0, 3, 2, 0, 3, 0, 1],
+    [1, 0, 4, 0, 4, 0, 4, 3, 4, 3, 4, 0, 4, 0, 4, 0, 1],
+    [1, 3, 0, 0, 0, 0, 3, 3, 0, 3, 0, 3, 0, 0, 0, 0, 1],
+    [1, 0, 4, 3, 4, 0, 4, 0, 4, 0, 4, 0, 4, 0, 4, 3, 1],
+    [1, 3, 0, 3, 0, 3, 0, 2, 0, 2, 0, 3, 0, 3, 3, 3, 1],
+    [1, 0, 4, 0, 4, 3, 4, 3, 4, 3, 4, 3, 4, 0, 4, 0, 1],
+    [1, 3, 3, 3, 0, 3, 3, 0, 3, 3, 0, 3, 0, 3, 0, 3, 1],
+    [1, 0, 4, 3, 4, 0, 4, 3, 4, 3, 4, 0, 4, 3, 4, 0, 1],
+    [1, 3, 0, 3, 0, 3, 3, 0, 3, 3, 0, 3, 0, 3, 0, 3, 1],
+    [1, 0, 4, 0, 4, 0, 4, 3, 4, 0, 4, 0, 4, 0, 4, 0, 1],
+    [1, 0, 0, 0, 3, 3, 3, 2, 3, 2, 3, 3, 0, 0, 0, 3, 1],
+    [1, 0, 4, 0, 4, 0, 4, 0, 4, 3, 4, 0, 4, 0, 4, 3, 1],
+    [1, 3, 3, 3, 2, 3, 0, 3, 0, 3, 0, 3, 2, 0, 0, 3, 1],
+    [1, 0, 4, 3, 4, 0, 4, 0, 4, 0, 4, 3, 4, 3, 4, 0, 1],
+    [1, 3, 3, 0, 3, 3, 0, 0, 3, 3, 0, 3, 3, 3, 3, 3, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
   ];
 
-  let count = 0;
-  const players = Array.from(room.players.values()).map(player => {
-    const pos = positionPlayers[count] || [0, 0]; // Fallback position if more than 4 players
-    const result = {
+  const positionPlayers = [
+    [1, 1],   // Player 1
+    [14, 13], // Player 2
+    [1, 15],  // Player 3
+    [12, 1],  // Player 4
+  ];
+
+  const playersArray = Array.from(room.players.values());
+
+  // Place players directly in the map with values 5, 6, 7, 8
+  for (let i = 0; i < playersArray.length; i++) {
+    const pos = positionPlayers[i];
+    if (pos) {
+      const [row, col] = pos;
+      map[row][col] = 5 + i; // Set player number on map
+    }
+  }
+
+  // Prepare player data with the shared map
+  const players = playersArray.map((player, index) => {
+    const pos = positionPlayers[index] || [1, 1]; // fallback if needed
+    return {
       nickname: player.nickname,
       lives: player.lives,
       playerId: player.id,
-      playerIndex: count,
+      playerIndex: index,
       row: pos[0],
       col: pos[1],
     };
-    count++;
-    return result;
   });
 
-  for (const player of room.players.values()) {
+  // Start game for all players
+  for (const player of playersArray) {
     console.log(`Player ${player.nickname} in room ${room.id}`);
-    startGameForPlayer(player, room, players);
+    startGameForPlayer(player, room, players,map);
   }
 }
 
 
-function startGameForPlayer(player, room, players) {
+
+
+function startGameForPlayer(player, room, players,map) {
 
   player.conn.send(JSON.stringify({
     type: 'startGame',
@@ -160,6 +192,7 @@ function startGameForPlayer(player, room, players) {
     lives: player.lives,
     players: players,
     MyId: player.id,
+    map : map,
   }));
 
   player.conn.on('message', (message) => {

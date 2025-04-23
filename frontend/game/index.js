@@ -23,15 +23,14 @@ login()
 function waiting() {
     const div = document.getElementById('input');
     render(jsx('p', { id: 'playercount' }), div)
-    const contDiv = document.getElementById('cont');
-    const waitingGif = jsx('div', {}, jsx('img', {
-        src: '/images/bomberman3d.gif',
-        alt: 'Waiting...',
-        style: ' margin-top: 10px;' 
-    }), jsx('p', {}, ' Looking for a match...'));
-    render(waitingGif, contDiv);
-
+    let cont = 1;
+    const p = document.getElementById('cont');
+    setInterval(() => {
+        cont++;
+        p.textContent = cont;
+    }, 1000);
 }
+
 export let socket;
 function connectToGameServer(name) {
     socket = new WebSocket('ws://localhost:8080');
@@ -44,6 +43,7 @@ function connectToGameServer(name) {
     };
     socket.onmessage = (message) => {
         const data = JSON.parse(message.data);
+        // console.log(data);
         handleServerMessages(data);
     };
 
@@ -88,16 +88,12 @@ function handleServerMessages(data) {
     }
 }
 function updateOtherPlayerPosition(data) {
-
-    
+    //if (data.PlayerId === this.MyId) return;
     let playerElement = document.getElementById(`player_${data.PlayerId}`);
     if (!playerElement) return;
 
     playerElement.style.backgroundPositionY = data.position.spriteY + 'px';
     playerElement.style.backgroundPositionX = data.position.spriteX + 'px';
-
-    playerElement.dataset.row = data.position.row;
-    playerElement.dataset.column = data.position.col;
 
     playerElement.style.transform = `translate(${data.position.x}px, ${data.position.y}px)`;
 }
@@ -115,7 +111,6 @@ function updatePlayerCount(count, playerId) {
         }
     }
 }
-
 function startGame(data, tileMap) {
     let count = 3
 
@@ -132,7 +127,8 @@ function startGame(data, tileMap) {
 function GoToGame(data, tileMap) {
     const body = document.body;
     render(GamePage(), body)
-
+    // const tileSize = 40;
+    // const tileMap = new TileMap(tileSize, data);
     let game = document.getElementById("game")
     function gameLoop() {
         tileMap.drawGame(game, data)
@@ -210,7 +206,15 @@ function playerDied(playerId, nickname) {
 }
 
 
-
+// function DestroyWall(data) {
+//     // this.map[data.position.y][data.position.x] = 0; 
+//     const tileElement = this.canvas.querySelector(
+//         `[data-row="${data.position.y}"][data-column="${data.position.x}"]`
+//     );
+//     if (tileElement) {
+//         tileElement.innerHTML = "";
+//     }
+// }
 
 function Placingbombinmap(data,tileMap) {
     console.log("tileMap", tileMap);
