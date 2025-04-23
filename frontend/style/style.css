@@ -39,7 +39,6 @@ body {
 
 img {
     width: 38px;
-    filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.4));
 }
 
 #login h1 {
@@ -47,17 +46,10 @@ img {
     margin-bottom: 1.5rem;
     text-transform: uppercase;
     letter-spacing: 2px;
-    text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.7);
     background-image: linear-gradient(to right, #ff4b1f, #ff9068);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
-    animation: titleGlow 3s infinite alternate;
-}
-
-@keyframes titleGlow {
-    0% { text-shadow: 0 0 5px rgba(255, 75, 31, 0.7); }
-    100% { text-shadow: 0 0 20px rgba(255, 144, 104, 0.9); }
 }
 
 #cont {
