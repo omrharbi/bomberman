@@ -12,7 +12,6 @@ export default class Game {
     this.wall = this.#image("wallBlack.png");
     this.bombs = [];
     this.MyId = data.MyId;
-    console.log(data.map);
     this.map = data.map;
     
     this.player = new Player(1 * this.tileSize, 1 * this.tileSize);
@@ -409,6 +408,7 @@ export default class Game {
       { dr: 0, dc: -1 }, // Left
     ];
 
+
     // Center explosion
     this.#drawExplosion(
       this.canvas.querySelector(`[data-row="${row}"][data-column="${col}"]`),
@@ -420,6 +420,16 @@ export default class Game {
       const newRow = row + dr;
       const newCol = col + dc;
 
+      if (this.#isPlayerHitByExplosion(newRow, newCol)) {
+        this.player.loseLife();
+        console.log("💥 Player hit by explosion!");
+        if (!this.player.isAlive()) {
+          this.player.isDead = true;
+          alert("your player is dead!");
+        }
+        // You can handle death, respawn, health loss, etc. here
+      }
+      
       // Check boundaries
       if (
         newRow >= 0 &&
@@ -454,7 +464,16 @@ export default class Game {
       }
     });
   }
-
+  #isPlayerHitByExplosion(row, col) {
+    const playerCenterX = this.player.x + this.player.width / 2;
+    const playerCenterY = this.player.y + this.player.height / 2;
+  
+    const playerTileRow = Math.floor(playerCenterY / this.tileSize);
+    const playerTileCol = Math.floor(playerCenterX / this.tileSize);
+  
+    return row === playerTileRow && col === playerTileCol;
+  }
+  
   #drawBomb(row, col) {
     const tileElement = this.canvas.querySelector(
       `[data-row="${row}"][data-column="${col}"]`
