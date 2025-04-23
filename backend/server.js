@@ -122,19 +122,35 @@ function findAvailableRoom() {
 function startRoom(room) {
   room.started = true;
   console.log(`Starting game in room ${room.id}`);
-  for (const player of room.players.values()) {
-    let count = 1
-    console.log(`Player ${player.nickname} in room ${room.id}`);
-    const players = Array.from(room.players.values()).map(player => ({
+
+  const positionPlayers = [
+    [1, 1],
+    [14, 13],
+    [1, 15],
+    [12, 1],
+  ];
+
+  let count = 0;
+  const players = Array.from(room.players.values()).map(player => {
+    const pos = positionPlayers[count] || [0, 0]; // Fallback position if more than 4 players
+    const result = {
       nickname: player.nickname,
       lives: player.lives,
       playerId: player.id,
-      MapPosition: count++
-    }));
+      playerIndex: count,
+      row: pos[0],
+      col: pos[1],
+    };
+    count++;
+    return result;
+  });
 
+  for (const player of room.players.values()) {
+    console.log(`Player ${player.nickname} in room ${room.id}`);
     startGameForPlayer(player, room, players);
   }
 }
+
 
 function startGameForPlayer(player, room, players) {
 

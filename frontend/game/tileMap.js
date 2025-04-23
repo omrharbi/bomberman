@@ -7,6 +7,8 @@ import { socket } from "./index.js";
 
 export default class Game {
   constructor(tileSize, data) {
+    console.log(data);
+    
     this.tileSize = tileSize;
     this.players = data.players.length;
     this.wall = this.#image("wallBlack.png");
@@ -33,30 +35,37 @@ export default class Game {
       [1, 3, 3, 0, 3, 3, 0, 0, 3, 3, 0, 3, 3, 3, 3, 3, 1],
       [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
     ];
+    this.playersList = []; // Holds instances of the Player class
 
-    // Player spawn points
 
-    const positionPlayersS = [
-      [1, 1],
-      [14, 13],
-      [1, 15],
-      [12, 1],
-    ];
-    const positionPlayers = positionPlayersS.slice(0, this.players);
+    data.players.forEach(playerData => {
+      const { row, col, playerIndex, playerId } = playerData;
 
-    for (let row = 0; row < this.map.length; row++) {
-      for (let col = 0; col < this.map[row].length; col++) {
-        const playerIndex = positionPlayers.findIndex(
-          ([r, c]) => r === row && c === col
-        );
-        if (playerIndex !== -1) {
-          this.map[row][col] = 5 + playerIndex;
-          this.player = new Player(row, col);          
-        }
-      }
-    }
+      const x = (col - 1) * this.tileSize - 20;
+      const y = (row - 1) * this.tileSize - 20;
+      const newPlayer = new Player(row, col, x, y);
+      newPlayer.lives = playerData.lives;
+      newPlayer.playerId = playerId;
+      newPlayer.playerIndex = playerIndex;
+      
+      this.playersList.push(newPlayer);
     
-    // Create a new Player instance at 1,1
+      if (playerId === this.MyId) {
+        this.player = newPlayer;
+      }
+    
+      // Modifier cette partie pour correctement placer les joueurs sur la carte
+      if (
+        row >= 0 && row < this.map.length &&
+        col >= 0 && col < this.map[row].length &&
+        (this.map[row][col] === 0 || this.map[row][col] === 3)
+      ) {
+        // Utiliser playerIndex + 5 pour les tuiles des joueurs (5, 6, 7, 8)
+        this.map[row][col] = playerIndex + 5;
+      }
+    });
+    
+    
     this.canvas = null;
   }
 
@@ -192,15 +201,13 @@ export default class Game {
       keysPressed[e.key] = true;
 
       if ((e.key === "b" || e.key === "B") && !e.repeat) {
-        const row = Math.floor((this.player.y + 20) / this.tileSize) + 1;
-        const col = Math.floor((this.player.x + 20) / this.tileSize) + 1;
         if (socket && socket.readyState === WebSocket.OPEN) {
           socket.send(
             JSON.stringify({
               type: "placeBomb",
               position: {
-                row: row,
-                col: col,
+                row: this.player.row,
+                col: this.player.col,
               },
             })
           );
@@ -251,6 +258,14 @@ export default class Game {
         const frameIndex = Math.floor(elapsed / frameDuration) % frames.length;
         this.player.positionX = frames[frameIndex].x;
         this.player.positionY = frames[frameIndex].y;
+        //update the player row and col
+        const row = Math.floor((this.player.y + 20) / this.tileSize) + 1;
+        const col = Math.floor((this.player.x + 20) / this.tileSize) + 1;
+        this.player.row = row;
+        this.player.col = col;
+        console.log(this.player.row, this.player.col);
+        
+        /////////////////////////////////
 
         playerElement.style.width = this.player.width + "px";
         playerElement.style.height = this.player.height + "px";
@@ -271,6 +286,8 @@ export default class Game {
                   spriteX: this.player.positionX,
                   spriteY: this.player.positionY,
                   direction: this.player.direction,
+                  row : Math.floor((this.player.y + 20) / this.tileSize) + 1,
+                  col : Math.floor((this.player.x + 20) / this.tileSize) + 1,
                 },
               })
             );
@@ -297,6 +314,9 @@ export default class Game {
   }
 
   placeBomb(row, col) {
+    console.log("placeBomb", row, col);
+    console.log(this.map[row][col]);
+    
     if (this.map[row][col] !== 0) return; // check if empty palce and the are problem in the 5 for rist place for player
     this.#drawBomb(row, col);
 
@@ -310,6 +330,8 @@ export default class Game {
     const tileElement = this.canvas.querySelector(
       `[data-row="${row}"][data-column="${col}"]`
     );
+    console.log("drawBomb", row, col, tileElement);
+    
 
     if (tileElement && !tileElement.querySelector(".bomb")) {
       const bombDiv = document.createElement("div");

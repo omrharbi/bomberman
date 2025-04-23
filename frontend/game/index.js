@@ -88,11 +88,16 @@ function handleServerMessages(data) {
     }
 }
 function updateOtherPlayerPosition(data) {
+
+    
     let playerElement = document.getElementById(`player_${data.PlayerId}`);
     if (!playerElement) return;
 
     playerElement.style.backgroundPositionY = data.position.spriteY + 'px';
     playerElement.style.backgroundPositionX = data.position.spriteX + 'px';
+
+    playerElement.dataset.row = data.position.row;
+    playerElement.dataset.column = data.position.col;
 
     playerElement.style.transform = `translate(${data.position.x}px, ${data.position.y}px)`;
 }
