@@ -17,5 +17,7 @@ export default class Player {
       this.direction = 'up';
       this.style = new Image();
       this.style.src = "assets/images/playerStyle.png";
+      this.playerelem
+      this.playerID
     }
 }

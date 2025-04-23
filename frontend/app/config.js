@@ -1,5 +1,5 @@
 import { jsx } from '../src/framework.js';
-
+import { connectToGameServer,waiting } from '../game/index.js';
 export function GamePage() {
     return jsx(
    'div', {},
@@ -53,18 +53,41 @@ export function GamePage() {
     );
    }
    
-   export function LoginPage() {
-   return jsx(
-   'div', { id: 'login' },
-   jsx('h1', {}, 'bomberMane'),
-   jsx('p', { id: 'cont' }),
-   jsx('div', { id: 'input' },
-   jsx('input', {
-   type: 'text',
-   id: 'name',
-   placeholder: 'Enter your Name'
-    }),
-   jsx('button', { id: 'NameBut' }, 'Go')
-    )
+// Game state variable
+let gameState = {
+    name: ""
+};
+
+// LoginPage component
+export function LoginPage() {
+    function handleNameInput(event) {
+        gameState.name = event.target.value;
+    }
+
+    function handleLogin(event) {
+        
+        if (gameState.name.trim()) {
+            connectToGameServer(gameState.name);
+            waiting(event.target.parentNode)
+        }
+    }
+
+    return jsx(
+        'div', { id: 'login' },
+        jsx('h1', {}, 'bomberMane'),
+        jsx('p', { id: 'cont' }),
+        jsx('div', { id: 'input' },
+            jsx('input', {
+                type: 'text',
+                id: 'name',
+                placeholder: 'Enter your Name',
+                onInput: handleNameInput
+            }),
+            jsx("button", {
+                id: "NameBut",
+                onClick: handleLogin,
+                className: "login-button"
+            }, "Join Game")
+        )
     );
-   }
+}

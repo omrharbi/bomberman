@@ -1,40 +1,38 @@
-import { LoginPage, GamePage } from '../app/config.js'
+import { LoginPage ,GamePage } from '../app/config.js'
 import { jsx, createElement } from '../src/framework.js'
 import { render, updateRender } from '../src/vdom.js'
 import { MyEventSystem } from '../src/event.js'
 import { Router } from '../src/router.js';
 import TileMap from './tileMap.js';
 
+
+
 const router = new Router({
     '/': () => [LoginPage()],
 });
-router.init()
-function login() {
-    const but = document.getElementById("NameBut");
-    MyEventSystem.addEventListener(but, "click", () => {
-        const name = document.getElementById("name").value.trim();
-        connectToGameServer(name);
-        waiting();
-    });
 
-}
-login()
+router.init();
 
-function waiting() {
-    const div = document.getElementById('input');
-    render(jsx('p', { id: 'playercount' }), div)
-    const contDiv = document.getElementById('cont');
-    const waitingGif = jsx('div', {}, jsx('img', {
-        src: '/images/bomberman3d.gif',
-        alt: 'Waiting...',
-        style: ' margin-top: 10px;' 
-    }), jsx('p', {}, ' Looking for a match...'));
-    render(waitingGif, contDiv);
 
-}
+
+export function waiting(element) {
+    const waitingContent = jsx('div', {},
+      jsx('p', { id: 'playercount' }),
+      jsx('div', { className: 'waiting-animation' },
+        jsx('img', {
+          src: '/images/bomberman3d.gif',
+          alt: 'Waiting...',
+          style: 'margin-top: 10px;'
+        }),
+        jsx('p', {}, 'Looking for a match...')
+      )
+    );
+    
+    render(waitingContent, element);
+  }
 
 export let socket;
-function connectToGameServer(name) {
+export function connectToGameServer(name) {
     socket = new WebSocket('ws://localhost:8080');
     socket.onopen = () => {
         console.log('Connected to WebSocket server');
@@ -53,7 +51,7 @@ function connectToGameServer(name) {
         console.log('Disconnected from WebSocket server');
     };
 }
-let tileMap ;
+let tileMap;
 function handleServerMessages(data) {
     const tileSize = 40;
     if (data.type == 'startGame') {
@@ -69,8 +67,6 @@ function handleServerMessages(data) {
         case 'chatMsg':
             displayMsg(data)
             break
-        case 'waiting':
-            document.getElementById('playercount').innerText = `Wait for the next game`;
         case 'playersinfo':
             updatePlayersInfo(data.players)
             break
@@ -84,7 +80,7 @@ function handleServerMessages(data) {
             updateOtherPlayerPosition(data);
             break;
         case 'placeBomb':
-            Placingbombinmap(data,tileMap);
+            Placingbombinmap(data, tileMap);
         default:
             break;
     }
@@ -218,8 +214,8 @@ function playerDied(playerId, nickname) {
 //     }
 // }
 
-function Placingbombinmap(data,tileMap) {
+function Placingbombinmap(data, tileMap) {
     console.log("tileMap", tileMap);
-    
+
     tileMap.placeBomb(data.position.row, data.position.col, data.gift, data.index);
 }

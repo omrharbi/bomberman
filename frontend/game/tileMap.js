@@ -12,10 +12,7 @@ export default class Game {
     this.wall = this.#image("wallBlack.png");
     this.bombs = [];
     this.MyId = data.MyId;
-    console.log(data.map);
     this.map = data.map;
-    
-    this.player = new Player(1 * this.tileSize, 1 * this.tileSize);
     this.canvas = null;
   }
 
@@ -142,12 +139,14 @@ export default class Game {
           playerDiv.style.height = "40px";
           playerDiv.style.position = "absolute";
           playerDiv.style.zIndex = "10";
+          this.playerelem = playerDiv;
           
           // FIX: Initially position player at their spawn tile
           const initialX = column * this.tileSize;
           const initialY = row * this.tileSize;
           
           if (data.players[playerIndex].playerId === this.MyId) {
+            this.player = new Player();
             this.player.x = initialX;
             this.player.y = initialY;
           }
@@ -327,9 +326,9 @@ export default class Game {
         playerElement.style.width = this.player.width;
         playerElement.style.height = this.player.height;
         playerElement.style.backgroundImage = `url(${this.player.style || '../images/playerStyle.png'})`;
-        // playerElement.style.backgroundPositionX = this.player.positionX + "px";
-        // playerElement.style.backgroundPositionY = this.player.positionY + "px";
-        // playerElement.style.transform = `translate(${this.player.x}px, ${this.player.y}px)`;
+        playerElement.style.backgroundPositionX = this.player.positionX + "px";
+        playerElement.style.backgroundPositionY = this.player.positionY + "px";
+        playerElement.style.transform = `translate(${this.player.x}px, ${this.player.y}px)`;
         playerElement.style.position = "absolute";
         playerElement.style.zIndex = "10";
       }

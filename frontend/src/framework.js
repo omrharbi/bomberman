@@ -1,5 +1,5 @@
 import { MyEventSystem } from "./event.js";
-
+import {render,updateRender } from './vdom.js'
 const Framework = (function () {
   const state = [];
   let stateIndex = 0;
@@ -54,31 +54,16 @@ const Framework = (function () {
   let rootContainer = null;
   let App = null;
 
-  function rerender() {
-    if (rootContainer && App) {
-      stateIndex = 0;
-      rootContainer.innerHTML = "";
-      const vnode = App;
-      const dom = createElement(vnode);
-      rootContainer.appendChild(dom);
-    }
-  }
-
-  function render(component, container) {
-    App = component;
-    rootContainer = container;
-    rerender();
-  }
+ 
 
   return {
     jsx,
     createElement,
     useState,
-    render,
     setApp: function (app) {
       App = app;
     },
   };
 })();
 
-export const { useState, useEffect, jsx, createElement, render, setApp } = Framework;
+export const { useState, useEffect, jsx, createElement, setApp } = Framework;
