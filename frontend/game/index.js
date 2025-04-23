@@ -110,7 +110,7 @@ function updatePlayerCount(count, playerId) {
             document.getElementById(`${playerId}`).remove()
         }
     }
-} G
+}
 function startGame(data, tileMap) {
     let count = 3
 

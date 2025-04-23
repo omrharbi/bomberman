@@ -371,3 +371,45 @@ body::before {
     background-image: url('../images/explosion.png');
     background-size: 500%;
 }
+
+.game-container {
+    width: 700px;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* transform: scale(0.8); Adjust scaling as needed */
+    transform-origin: center center;
+}
+
+/* Make it responsive at different screen sizes */
+@media (max-width: 768px) {
+    .game-container {
+        transform: scale(0.7);
+    }
+}
+
+@media (max-width: 480px) {
+    .game-container {
+        transform: scale(0.6);
+    }
+
+
+}
+@media (max-width: 430px) {
+    .game-container {
+        transform: scale(0.5);
+    }
+}
+
+@media (max-width: 430px) {
+    .game-container {
+        transform: scale(0.4);
+    }
+}
+
+@media (max-width: 290px) {
+    .game-container {
+        transform: scale(0.3);
+    }
+}
