@@ -54,8 +54,9 @@ export function GamePage() {
    }
    
 // Game state variable
-let gameState = {
-    name: ""
+export let gameState = {
+    name: "",
+    playerCount: 0,
 };
 
 // LoginPage component

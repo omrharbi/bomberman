@@ -35,6 +35,8 @@ export default class Player {
 
   UpdatePlayerElement(data, room) {
     this.playerElement = data.playerElement;
+    console.log("playerElement", data.playerElement);
+    
   }
 
   Updatemove(data, room) {
@@ -125,6 +127,7 @@ export default class Player {
           direction: this.direction,
         },
         Id: this.id,
+        element : this.playerElement
       };
 
       room.broadcast(Data);

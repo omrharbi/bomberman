@@ -1,10 +1,10 @@
-import { LoginPage ,GamePage } from '../app/config.js'
+import { LoginPage ,GamePage,gameState } from '../app/config.js'
 import { jsx, createElement } from '../src/framework.js'
 import { render, updateRender } from '../src/vdom.js'
 import { MyEventSystem } from '../src/event.js'
 import { Router } from '../src/router.js';
 import TileMap from './tileMap.js';
-
+import { playersElement} from './tileMap.js'
 
 
 const router = new Router({
@@ -13,11 +13,13 @@ const router = new Router({
 
 router.init();
 
+let waitingContainer = null;
 
 
-export function waiting(element) {
+  export function waiting(element) {
+    waitingContainer = element; 
     const waitingContent = jsx('div', {},
-      jsx('p', { id: 'playercount' }),
+      jsx('p', { id: 'playercount' }, `Players: ${gameState.playerCount}/4`),
       jsx('div', { className: 'waiting-animation' },
         jsx('img', {
           src: '/images/bomberman3d.gif',
@@ -87,21 +89,13 @@ function handleServerMessages(data) {
     }
 }
 function updateOtherPlayerPosition(data) {
-
-    let playerElement = document.getElementById(`player_${data.Id}`);
-    // console.log("playerElement",playerElement);
-
+    let playerElement = playersElement.get(data.Id)
     if (!playerElement) {
         console.log("player not found", data.Id);
         return;
     }
-
     playerElement.style.backgroundPositionY = data.position.spriteY + 'px';
     playerElement.style.backgroundPositionX = data.position.spriteX + 'px';
-    // console.log("data.position.x", data.position.x);
-    // console.log("data.position.y", data.position.y);
-
-
     playerElement.style.transform = `translate(${data.position.x}px, ${data.position.y}px)`;
 }
 
@@ -118,6 +112,7 @@ function updatePlayerCount(count, playerId) {
         }
     }
 }
+
 function startGame(data, tileMap) {
     let count = 3
 
