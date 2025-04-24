@@ -28,7 +28,6 @@ export default class Game {
   }
 
   #draw(canvas, data) {
-    console.log("Drawing game with data:", data);
 
     const rows = this.map.length;
     const columns = this.map[0].length;
@@ -142,7 +141,6 @@ export default class Game {
             })
           );
           playersElement.set(data.players[playerIndex].id, playerDiv);
-
           canvas.appendChild(playerDiv);
         }
       }

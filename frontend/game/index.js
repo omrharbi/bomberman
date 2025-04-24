@@ -1,4 +1,4 @@
-import { LoginPage ,GamePage,gameState } from '../app/config.js'
+import { LoginPage ,GamePage,gameState , Ref} from '../app/config.js'
 import { jsx, createElement } from '../src/framework.js'
 import { render, updateRender } from '../src/vdom.js'
 import { MyEventSystem } from '../src/event.js'
@@ -69,15 +69,6 @@ function handleServerMessages(data) {
         case 'chatMsg':
             displayMsg(data)
             break
-        case 'playersinfo':
-            updatePlayersInfo(data.players)
-            break
-        case 'updateLives':
-            updateLives(data.playerId, data.lives, data.nickname)
-            break
-        case 'playerDied':
-            playerDied(data.playerId, data.nickname)
-            break
         case 'playerMove':
             updateOtherPlayerPosition(data);
             break;
@@ -145,53 +136,62 @@ function updatePlayerCount(count, playerId) {
     // }
   }
 /**** */
-function updatePlayersSection() {
-    const playersSection = jsx('div', { className: 'footer-section players-section', id: 'players' },
-      Array.from(gameState.players.entries()).map(([id, player]) => 
-        jsx('div', { className: 'player-info', key: id },
-          jsx('span', {}, player.nickname),
-          jsx('span', { className: 'lives' }, `Lives: ${player.lives}`)
-        )
-      )
-    );
+// function updatePlayersSection() {
+//     const playersSection = jsx('div', { className: 'footer-section players-section', id: 'players' },
+//       Array.from(gameState.players.entries()).map(([id, player]) => 
+//         jsx('div', { className: 'player-info', key: id },
+//           jsx('span', {}, player.nickname),
+//           jsx('span', { className: 'lives' }, `Lives: ${player.lives}`)
+//         )
+//       )
+//     );
     
-    // Find the players section container
-    const footerContent = document.querySelector('.footer-content');
-    if (footerContent) {
-      const playersContainer = footerContent.querySelector('.players-section');
-      if (playersContainer) {
-        updateRender(playersSection, playersContainer);
-      }
-    }
-  }
+//     // Find the players section container
+//     const footerContent = document.querySelector('.footer-content');
+//     if (footerContent) {
+//       const playersContainer = footerContent.querySelector('.players-section');
+//       if (playersContainer) {
+//         updateRender(playersSection, playersContainer);
+//       }
+//     }
+//   }
 /*** */
 function startGame(data, tileMap) {
     let count = 3
-    gameContainer = document.getElementById('game')
     const interval = setInterval(() => {
         count--
-        document.getElementById('playercount').innerText = `start Game in : ${count}s`;
+        const updatedWaitingContent = jsx('div', {},
+            jsx('p', { id: 'playercount' }, `start Game in : ${count}s`),
+            jsx('div', { className: 'waiting-animation' },
+              jsx('img', {
+                src: '/images/bomberman3d.gif',
+                alt: 'Waiting...',
+                style: 'margin-top: 10px;'
+              }),
+              jsx('p', {}, 'Looking for a match...')
+            )
+          );
+          
+          updateRender(updatedWaitingContent, waitingContainer);
         if (count == 0) {
             GoToGame(data, tileMap)
             clearInterval(interval)
         }
-    }, 100)
+    }, 1000)
 }
 
 function GoToGame(data, tileMap) {
     const body = document.body;
-    render(GamePage(), body)
-    // const tileSize = 40;
-    // const tileMap = new TileMap(tileSize, data);
-    let game = document.getElementById("game")
+    render(GamePage(), body)    
+    let game = Ref.gameCanvasRef.current
     function gameLoop() {
         tileMap.drawGame(game, data)
     }
     requestAnimationFrame(gameLoop);
-    const livesElement = document.getElementById('lives');
+    const livesElement = Ref.livesRef.current
     livesElement.innerHTML = `Lives : ${data.lives}`;
 
-    const playersElement = document.getElementById('players');
+    const playersElement = Ref.playersRef.current
 
     const playerList = data.players.map((player, index) => {
         return jsx('li', { id: `${player.playerId}` }, `${player.nickname} - Lives: ${player.lives}`);
@@ -206,26 +206,26 @@ function GoToGame(data, tileMap) {
 }
 
 function chat(nickname) {
-    const sendButton = document.querySelector('.send-button');
+    const sendButton = Ref.buttonRef.current    
     MyEventSystem.addEventListener(sendButton, 'click', () => {
         sendMessage(nickname);
     });
 }
-function sendMessage(nickname) {
-    const messageText = document.querySelector('.chat-input').value.trim();
+export function sendMessage(nickname) {
+    const messageText = Ref.chatRef.current.value.trim();
     if (messageText !== '') {
         socket.send(JSON.stringify({
             type: "chatMsg",
             nickname: nickname,
             messageText: messageText
         }));
-        document.querySelector('.chat-input').value = '';
+        Ref.chatRef.current.value = '';
     }
 }
 
 
 function displayMsg(data) {
-    const messageContainer = document.querySelector('.message-container');
+    const messageContainer = Ref.messagesRef.current
 
     const newMessage = jsx('div', { className: 'message' },
         jsx('div', { className: 'player-name' }, data.nickname),
@@ -235,34 +235,7 @@ function displayMsg(data) {
     messageContainer.scrollTop = messageContainer.scrollHeight;
 }
 
-function updatePlayersInfo(players) {
-    // const playersList = document.querySelector('.connected-players');
-    // playersList.innerHTML = '';
-}
-function updateLives(playerId, lives, nickname) {
-    const playerElement = document.getElementById(playerId);
-    if (playerElement) {
-        playerElement.querySelector('.lives').textContent = lives;
-    }
-    const playerNameElement = document.getElementById(nickname);
-    if (playerNameElement) {
-        playerNameElement.querySelector('.lives').textContent = lives;
-    }
-}
-function playerDied(playerId, nickname) {
-    const playerElement = document.getElementById(playerId);
-    if (playerElement) {
-        playerElement.classList.add('died');
-    }
-    const playerNameElement = document.getElementById(nickname);
-    if (playerNameElement) {
-        playerNameElement.classList.add('died');
-    }
-}
-
 
 function Placingbombinmap(data, tileMap) {
-    console.log("tileMap", tileMap);
-
     tileMap.placeBomb(data.position.row, data.position.col, data.gift, data.index);
 }
