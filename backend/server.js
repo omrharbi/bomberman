@@ -165,9 +165,6 @@ wss.on('connection', (ws) => {
       case "playerMove":
         currentPlayer.Updatemove(data, currentRoom)
         break;
-      case "PlayerElement":
-        currentPlayer.UpdatePlayerElement(data,currentRoom)
-        break;
       case "placeBomb":
         currentPlayer.placebomb(currentRoom)
         break;

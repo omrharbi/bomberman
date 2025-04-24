@@ -6,7 +6,6 @@ export default class Player {
     // this.col ;
     this.nickname = nickname;
     this.id = id;
-    this.playerElement = null;
     this.conn = conn;
     this.bombsPlaced = 0;
     this.bombPower = 1;
@@ -15,7 +14,7 @@ export default class Player {
     this.width = 21;
     this.height = 40;
     this.lives = 3;
-    this.speed = 30;
+    this.speed = 25;
     this.isMoving = false;
     this.isDead = false;
     this.direction = "up";
@@ -33,9 +32,7 @@ export default class Player {
     return this.lives > 0;
   }
 
-  UpdatePlayerElement(data, room) {
-    this.playerElement = data.playerElement;
-  }
+
 
   Updatemove(data, room) {
     let movementStartTime = null;
@@ -125,6 +122,7 @@ export default class Player {
           direction: this.direction,
         },
         Id: this.id,
+        element : this.playerElement
       };
 
       room.broadcast(Data);
@@ -298,6 +296,12 @@ export default class Player {
       console.log("💥 Player hit by explosion!");
       if (!this.isAlive()) {
         this.isDead = true;
+
+        room.broadcast({
+          type: "playerDead",
+          Id: this.id
+        });
+
         console.log("💀 Player is dead!");
       }
     }

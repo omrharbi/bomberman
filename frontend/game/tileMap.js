@@ -1,8 +1,8 @@
 import { MyEventSystem } from "../src/event.js";
 import { createElement, jsx } from "../src/framework.js";
-import { updateRender } from "../src/vdom.js";
 import { socket } from "./index.js";
 
+export const playersElement = new Map();
 export default class Game {
   constructor(tileSize, data) {
     this.tileSize = tileSize;
@@ -28,7 +28,6 @@ export default class Game {
   }
 
   #draw(canvas, data) {
-    console.log("Drawing game with data:", data);
 
     const rows = this.map.length;
     const columns = this.map[0].length;
@@ -128,23 +127,11 @@ export default class Game {
           playerDiv.style.height = "40px";
           playerDiv.style.position = "absolute";
           playerDiv.style.zIndex = "10";
-
-          // FIX: Initially position player at their spawn tile
           const initialX = column * this.tileSize;
           const initialY = row * this.tileSize;
-          console.log("Initial position:", initialX, initialY);
 
           playerDiv.style.transform = `translate(${initialX}px, ${initialY}px)`;
-          // if (data.players[playerIndex].playerId === this.MyId) {
-          socket.send(
-            JSON.stringify({
-              type: "PlayerElement",
-              playerElement: playerDiv,
-            })
-          );
-          // }
-          console.log(`this.map[${row}][${column}]`, this.map[row][column]);
-
+          playersElement.set(data.players[playerIndex].id, playerDiv);
           canvas.appendChild(playerDiv);
         }
       }
