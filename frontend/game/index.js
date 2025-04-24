@@ -305,21 +305,12 @@ function drawBomb(row, col) {
     const canvas = Ref.gameCanvasRef.current
     const tileElement = Selectbyrowcol(canvas, row, col);
     if (tileElement && !hasclass(tileElement,"bomb")) {
-        const bombDiv = document.createElement("div");
-        bombDiv.classList.add("bomb");
-
-        // Use background image for sprite sheet
-        bombDiv.style.backgroundImage = "url('../images/bomb.png')";
-        bombDiv.style.width = "38px";
-        bombDiv.style.height = "38px";
-    
-        bombDiv.style.zIndex = "5";
-
-        // Center the bomb in the tile
-        bombDiv.style.left = "50%";
-        bombDiv.style.top = "50%";
-    
-        tileElement.appendChild(bombDiv);
+        const bombDiv = jsx("div", {
+            className: "bomb",
+            style: "background-image: url('../images/bomb.png'); width: 38px; height: 38px; z-index: 5; left: 50%; top: 50%;"
+        });
+        const bombElement = createElement(bombDiv);
+        tileElement.appendChild(bombElement);
     }
 }
 
@@ -362,28 +353,29 @@ function drawExplosion(row, col, frames) {
     let currentFrame = 0;
     const frameDuration = 75;
 
-    const explosionDiv = document.createElement("div");
-    explosionDiv.className = "damage";
-    explosionDiv.style.backgroundPosition = `${frames[0].x}px ${frames[0].y}px`;
-    explosionDiv.style.backgroundImage = "url('../images/explosion.png')";
-    // explosionDiv.style.position = "absolute";
-    explosionDiv.style.width = "38px";
-    explosionDiv.style.height = "38px";
-    explosionDiv.style.zIndex = "6";
+    const explosionDiv = jsx("div", {
+        className: "damage",
+        style: 
+          `background-position: ${frames[0].x}px ${frames[0].y}px;
+          background-image: url('../images/explosion.png');
+          width: 38px;
+          height: 38px;
+          z-index: 6;
+          left: 50%;
+          top: 50%;`
+        
+      });
 
-    // Center the explosion in the tile
-    explosionDiv.style.left = "50%";
-    explosionDiv.style.top = "50%";
-
-    tileElement.appendChild(explosionDiv);
+      const explosionElement = createElement(explosionDiv);
+      tileElement.appendChild(explosionElement);
 
     const animate = () => {
         if (currentFrame >= frames.length) {
-            explosionDiv.remove();
+            explosionElement.remove();
             return;
         }
 
-        explosionDiv.style.backgroundPosition = `${frames[currentFrame].x}px ${frames[currentFrame].y}px`;
+        explosionElement.style.backgroundPosition = `${frames[currentFrame].x}px ${frames[currentFrame].y}px`;
         currentFrame++;
 
         setTimeout(animate, frameDuration);
