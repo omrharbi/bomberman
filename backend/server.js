@@ -98,7 +98,8 @@ function startGameForPlayer(player, room, playersArray, map) {
     map: map,
 
   }));
-  player.setMapData(map, 40);  // Assuming tileSize is 40
+  room.setMapData(map,40)
+  // player.setMapData(map, 40);  // Assuming tileSize is 40
 
 
   player.conn.on('message', (message) => {
@@ -121,15 +122,6 @@ function startGameForPlayer(player, room, playersArray, map) {
           nickname: player.nickname,
           messageText: data.messageText || ''
         });
-        break;
-
-        // case "placeBomb":
-        //   room.broadcast({
-        //     type: 'placeBomb',
-        //     position: data.position,
-        //     gift: Math.random() < 0.3,
-        //     index: Math.floor(Math.random() * 3),
-        //   });
         break;
       default:
         break;
@@ -189,6 +181,8 @@ wss.on('connection', (ws) => {
       case "loselife":
         currentPlayer.isPlayerHitByExplosion(data);
         break;
+      case "destroywall":
+        currentRoom.destroy(data)
       default:
         console.log("Unknown message type:", data.type);
         break;

@@ -21,8 +21,8 @@ export default class Player {
     this.direction = "up";
     this.movementStartTime = null;
 
-    this.map = null; // Add this line
-    this.tileSize = 40;
+    // this.map = null; // Add this line
+    // this.tileSize = 40;
   }
 
   loseLife() {
@@ -38,7 +38,7 @@ export default class Player {
     console.log(this.x, this.y, this.nickname);
   }
 
-  Updatemove(data, room, currentPlayer) {
+  Updatemove(data, room) {
     let movementStartTime = null;
     let lastSendTime = 0;
     const updateInterval = 50;
@@ -102,7 +102,7 @@ export default class Player {
     };
 
 
-    if (this.#checkCollision()) {
+    if (this.#checkCollision(room)) {
       this.x = prevX;
       this.y = prevY;
     }
@@ -145,7 +145,7 @@ export default class Player {
     }
   }
 
-  #checkCollision() {
+  #checkCollision(room) {
 
     const playerLeft = this.x;
     const playerTop = this.y;
@@ -155,13 +155,13 @@ export default class Player {
     const playerCenterX = this.x + this.width / 2;
     const playerCenterY = this.y + this.height / 2;
 
-    const playerTileX = Math.floor(playerCenterX / this.tileSize);
-    const playerTileY = Math.floor(playerCenterY / this.tileSize);
+    const playerTileX = Math.floor(playerCenterX / room.tileSize);
+    const playerTileY = Math.floor(playerCenterY / room.tileSize);
 
     for (let y = playerTileY - 1; y <= playerTileY + 1; y++) {
       for (let x = playerTileX - 1; x <= playerTileX + 1; x++) {
-        if (y >= 0 && y < this.map.length && x >= 0 && x < this.map[0].length) {
-          const tileType = this.map[y][x];
+        if (y >= 0 && y < room.map.length && x >= 0 && x < room.map[0].length) {
+          const tileType = room.map[y][x];
 
           if (
             tileType === 1 ||
@@ -169,10 +169,10 @@ export default class Player {
             tileType === 3 ||
             tileType === 4
           ) {
-            const tileLeft = x * this.tileSize;
-            const tileTop = y * this.tileSize;
-            const tileRight = tileLeft + this.tileSize;
-            const tileBottom = tileTop + this.tileSize;
+            const tileLeft = x * room.tileSize;
+            const tileTop = y * room.tileSize;
+            const tileRight = tileLeft + room.tileSize;
+            const tileBottom = tileTop + room.tileSize;
 
             if (
               playerLeft < tileRight - 6 &&
@@ -189,8 +189,8 @@ export default class Player {
     return false;
   }
   placebomb(room) {
-    const row = Math.floor((this.y + 20) / this.tileSize);
-    const col = Math.floor((this.x + 20) / this.tileSize);
+    const row = Math.floor((this.y + 20) / room.tileSize);
+    const col = Math.floor((this.x + 20) / room.tileSize);
 
     room.broadcast({
       type: "placeBomb",
@@ -203,10 +203,10 @@ export default class Player {
     });
   }
 
-  setMapData(map, tileSize) {
-    this.map = map;
-    this.tileSize = tileSize;
-  }
+//   setMapData(map, tileSize) {
+//     this.map = map;
+//     this.tileSize = tileSize;
+//   }
 
   isPlayerHitByExplosion(data) {
     const playerCenterX = this.x + this.width / 2;

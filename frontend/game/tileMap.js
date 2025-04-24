@@ -311,7 +311,7 @@ export default class Game {
       const newRow = row + dr;
       const newCol = col + dc;
 
-      // if (this.#isPlayerHitByExplosion(newRow, newCol)) {
+   
         if (socket && socket.readyState === WebSocket.OPEN) {
           socket.send(
             JSON.stringify({
@@ -321,16 +321,6 @@ export default class Game {
             })
           );
         }
-        // this.player.loseLife();
-        // console.log("💥 Player hit by explosion!");
-        // if (!this.player.isAlive()) {
-        //   // this.player.isDead = true;
-
-        //   alert("your player is dead!");
-        // }
-
-        // You can handle death, respawn, health loss, etc. here
-      // }
       
       // Check boundaries
       if (
@@ -341,7 +331,16 @@ export default class Game {
       ) {
         // Check if the tile is a destroyable wall (3)
         if (this.map[newRow][newCol] === 3) {
-          this.map[newRow][newCol] = 0; 
+          if (socket && socket.readyState === WebSocket.OPEN) {
+            socket.send(
+              JSON.stringify({
+                type: "destroywall",
+                row: newRow,
+                col: newCol,
+              })
+            );
+          }
+          this.map[newRow][newCol] = 0;
           const tileElement = this.canvas.querySelector(
             `[data-row="${newRow}"][data-column="${newCol}"]`
           );
@@ -366,15 +365,6 @@ export default class Game {
       }
     });
   }
-  // #isPlayerHitByExplosion(row, col) {
-  //   const playerCenterX = this.player.x + this.player.width / 2;
-  //   const playerCenterY = this.player.y + this.player.height / 2;
-  
-  //   const playerTileRow = Math.floor(playerCenterY / this.tileSize);
-  //   const playerTileCol = Math.floor(playerCenterX / this.tileSize);
-  
-  //   return row === playerTileRow && col === playerTileCol;
-  // }
   
   #drawBomb(row, col) {
     const tileElement = this.canvas.querySelector(
