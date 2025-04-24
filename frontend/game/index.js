@@ -85,15 +85,16 @@ function handleServerMessages(data) {
             break;
         case 'placeBomb':
             Placingbombinmap(data, tileMap);
+            break;
         default:
             break;
     }
 }
 function updateOtherPlayerPosition(data) {
-    
+
     let playerElement = document.getElementById(`player_${data.Id}`);
     // console.log("playerElement",playerElement);
-    
+
     if (!playerElement) {
         console.log("player not found", data.Id);
         return;
@@ -103,8 +104,8 @@ function updateOtherPlayerPosition(data) {
     playerElement.style.backgroundPositionX = data.position.spriteX + 'px';
     // console.log("data.position.x", data.position.x);
     // console.log("data.position.y", data.position.y);
-    
-    
+
+
     playerElement.style.transform = `translate(${data.position.x}px, ${data.position.y}px)`;
 }
 
@@ -179,6 +180,7 @@ function sendMessage(nickname) {
     }
 }
 
+
 function displayMsg(data) {
     const messageContainer = document.querySelector('.message-container');
 
@@ -215,16 +217,6 @@ function playerDied(playerId, nickname) {
     }
 }
 
-
-// function DestroyWall(data) {
-//     // this.map[data.position.y][data.position.x] = 0; 
-//     const tileElement = this.canvas.querySelector(
-//         `[data-row="${data.position.y}"][data-column="${data.position.x}"]`
-//     );
-//     if (tileElement) {
-//         tileElement.innerHTML = "";
-//     }
-// }
 
 function Placingbombinmap(data, tileMap) {
     console.log("tileMap", tileMap);

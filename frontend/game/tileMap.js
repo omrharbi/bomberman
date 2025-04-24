@@ -172,21 +172,17 @@ export default class Game {
       keysPressed[e.key] = true;
 
       if ((e.key === "b" || e.key === "B") && !e.repeat) {
-        const tileSize = this.tileSize;
+        // const tileSize = this.tileSize;
         // const row = Math.floor((data.player.y + 20) / tileSize);
         // const col = Math.floor((data.player.x + 20) / tileSize);
         
-        // if (socket && socket.readyState === WebSocket.OPEN) {
-        //   socket.send(
-        //     JSON.stringify({
-        //       type: "placeBomb",
-        //       position: {
-        //         row: row,
-        //         col: col,
-        //       },
-        //     })
-        //   );
-        // }
+        if (socket && socket.readyState === WebSocket.OPEN) {
+          socket.send(
+            JSON.stringify({
+              type: "placeBomb"
+            })
+          );
+        }
       }
     });
 
@@ -231,7 +227,7 @@ export default class Game {
 
     updatePlayerMovement();
   }
-}
+
   // #checkCollision() {
   //   const playerLeft = this.player.x;
   //   const playerTop = this.player.y;
@@ -274,91 +270,102 @@ export default class Game {
   // }
   
 
-  // placeBomb(row, col, gift , index) {
-  //   // Check if position is valid and not already occupied by a wall
-  //   if (row < 0 || row >= this.map.length || col < 0 || col >= this.map[0].length) {
-  //     console.log("Invalid bomb position:", row, col);
-  //     return;
-  //   }
+  placeBomb(row, col, gift , index) {
+    // Check if position is valid and not already occupied by a wall
+    if (row < 0 || row >= this.map.length || col < 0 || col >= this.map[0].length) {
+      console.log("Invalid bomb position:", row, col);
+      return;
+    }
     
-  //   if (this.map[row][col] !== 0 && this.map[row][col] < 5) {
-  //     console.log("Cannot place bomb on wall or obstacle:", row, col);
-  //     return;
-  //   }
+    if (this.map[row][col] !== 0 && this.map[row][col] < 5) {
+      console.log("Cannot place bomb on wall or obstacle:", row, col);
+      return;
+    }
     
-  //   this.#drawBomb(row, col);
+    this.#drawBomb(row, col);
 
-  //   setTimeout(() => {
-  //     this.#removeBomb(row, col);
-  //     this.#destroyWall(row, col,gift , index);
-  //   }, 3000);
-  // }
+    setTimeout(() => {
+      this.#removeBomb(row, col);
+      this.#destroyWall(row, col,gift , index);
+    }, 3000);
+  }
 
-  // #destroyWall(row, col,gift , index) {
-  //   console.log("Destroying walls at:", row, col);
-  //   const directions = [
-  //     { dr: -1, dc: 0 }, // Up
-  //     { dr: 0, dc: 1 },  // Right
-  //     { dr: 1, dc: 0 },  // Down
-  //     { dr: 0, dc: -1 }, // Left
-  //   ];
+  #destroyWall(row, col,gift , index) {
+    console.log("Destroying walls at:", row, col);
+    const directions = [
+      { dr: -1, dc: 0 }, // Up
+      { dr: 0, dc: 1 },  // Right
+      { dr: 1, dc: 0 },  // Down
+      { dr: 0, dc: -1 }, // Left
+    ];
 
 
-  //   // Center explosion
-  //   this.#drawExplosion(
-  //     this.canvas.querySelector(`[data-row="${row}"][data-column="${col}"]`),
-  //     row, 
-  //     col
-  //   );
+    // Center explosion
+    this.#drawExplosion(
+      this.canvas.querySelector(`[data-row="${row}"][data-column="${col}"]`),
+      row, 
+      col
+    );
 
-  //   directions.forEach(({ dr, dc }) => {
-  //     const newRow = row + dr;
-  //     const newCol = col + dc;
+    directions.forEach(({ dr, dc }) => {
+      const newRow = row + dr;
+      const newCol = col + dc;
 
-  //     if (this.#isPlayerHitByExplosion(newRow, newCol)) {
-  //       this.player.loseLife();
-  //       console.log("💥 Player hit by explosion!");
-  //       if (!this.player.isAlive()) {
-  //         this.player.isDead = true;
-  //         alert("your player is dead!");
-  //       }
-  //       // You can handle death, respawn, health loss, etc. here
-  //     }
+      // if (this.#isPlayerHitByExplosion(newRow, newCol)) {
+        if (socket && socket.readyState === WebSocket.OPEN) {
+          socket.send(
+            JSON.stringify({
+              type: "loselife",
+              row: newRow,
+              col: newCol,
+            })
+          );
+        }
+        // this.player.loseLife();
+        // console.log("💥 Player hit by explosion!");
+        // if (!this.player.isAlive()) {
+        //   // this.player.isDead = true;
+
+        //   alert("your player is dead!");
+        // }
+
+        // You can handle death, respawn, health loss, etc. here
+      // }
       
-  //     // Check boundaries
-  //     if (
-  //       newRow >= 0 &&
-  //       newRow < this.map.length &&
-  //       newCol >= 0 &&
-  //       newCol < this.map[0].length
-  //     ) {
-  //       // Check if the tile is a destroyable wall (3)
-  //       if (this.map[newRow][newCol] === 3) {
-  //         this.map[newRow][newCol] = 0; 
-  //         const tileElement = this.canvas.querySelector(
-  //           `[data-row="${newRow}"][data-column="${newCol}"]`
-  //         );
-  //         if (tileElement) {
-  //           if (gift) {
-  //             const  power = ['../images/bombing.webp','../images/speed.webp','../images/spoil_tileset.webp']
-  //             tileElement.innerHTML = '<img src="'+power[index]+'" style="width: 38px; height: 38px; position: absolute; top: 0; left: 0;">';
-  //             gift = false              
-  //           } else {
-  //           tileElement.innerHTML = "";;
-  //           this.#drawExplosion(tileElement, newRow, newCol);
-  //           }
-  //         }
-  //       } else if (this.map[newRow][newCol] === 0) {
-  //         const tileElement = this.canvas.querySelector(
-  //           `[data-row="${newRow}"][data-column="${newCol}"]`
-  //         );
-  //         if (tileElement) {
-  //           this.#drawExplosion(tileElement, newRow, newCol);
-  //         }
-  //       }
-  //     }
-  //   });
-  // }
+      // Check boundaries
+      if (
+        newRow >= 0 &&
+        newRow < this.map.length &&
+        newCol >= 0 &&
+        newCol < this.map[0].length
+      ) {
+        // Check if the tile is a destroyable wall (3)
+        if (this.map[newRow][newCol] === 3) {
+          this.map[newRow][newCol] = 0; 
+          const tileElement = this.canvas.querySelector(
+            `[data-row="${newRow}"][data-column="${newCol}"]`
+          );
+          if (tileElement) {
+            if (gift) {
+              const  power = ['../images/bombing.webp','../images/speed.webp','../images/spoil_tileset.webp']
+              tileElement.innerHTML = '<img src="'+power[index]+'" style="width: 38px; height: 38px; position: absolute; top: 0; left: 0;">';
+              gift = false              
+            } else {
+            tileElement.innerHTML = "";;
+            this.#drawExplosion(tileElement, newRow, newCol);
+            }
+          }
+        } else if (this.map[newRow][newCol] === 0) {
+          const tileElement = this.canvas.querySelector(
+            `[data-row="${newRow}"][data-column="${newCol}"]`
+          );
+          if (tileElement) {
+            this.#drawExplosion(tileElement, newRow, newCol);
+          }
+        }
+      }
+    });
+  }
   // #isPlayerHitByExplosion(row, col) {
   //   const playerCenterX = this.player.x + this.player.width / 2;
   //   const playerCenterY = this.player.y + this.player.height / 2;
@@ -369,92 +376,92 @@ export default class Game {
   //   return row === playerTileRow && col === playerTileCol;
   // }
   
-  // #drawBomb(row, col) {
-  //   const tileElement = this.canvas.querySelector(
-  //     `[data-row="${row}"][data-column="${col}"]`
-  //   );
+  #drawBomb(row, col) {
+    const tileElement = this.canvas.querySelector(
+      `[data-row="${row}"][data-column="${col}"]`
+    );
 
-  //   if (tileElement && !tileElement.querySelector(".bomb")) {
-  //     const bombDiv = document.createElement("div");
-  //     bombDiv.classList.add("bomb");
+    if (tileElement && !tileElement.querySelector(".bomb")) {
+      const bombDiv = document.createElement("div");
+      bombDiv.classList.add("bomb");
 
-  //     // Use background image for sprite sheet
-  //     bombDiv.style.backgroundImage = "url('../images/bomb.png')";
-  //     bombDiv.style.width = "38px";
-  //     bombDiv.style.height = "38px";
-  //     bombDiv.style.position = "absolute";
-  //     bombDiv.style.zIndex = "5";
+      // Use background image for sprite sheet
+      bombDiv.style.backgroundImage = "url('../images/bomb.png')";
+      bombDiv.style.width = "38px";
+      bombDiv.style.height = "38px";
+      bombDiv.style.position = "absolute";
+      bombDiv.style.zIndex = "5";
       
-  //     // Center the bomb in the tile
-  //     bombDiv.style.left = "50%";
-  //     bombDiv.style.top = "50%";
-  //     bombDiv.style.transform = "translate(-50%, -50%)";
+      // Center the bomb in the tile
+      bombDiv.style.left = "50%";
+      bombDiv.style.top = "50%";
+      bombDiv.style.transform = "translate(-50%, -50%)";
 
-  //     tileElement.appendChild(bombDiv)
-  //   }
-  // }
+      tileElement.appendChild(bombDiv)
+    }
+  }
 
-  // #removeBomb(row, col) {
-  //   console.log("Removing bomb at:", row, col);
+  #removeBomb(row, col) {
+    console.log("Removing bomb at:", row, col);
     
-  //   const tileElement = this.canvas.querySelector(
-  //     `[data-row="${row}"][data-column="${col}"]`
-  //   );
-  //   const bombImg = tileElement?.querySelector(".bomb");
+    const tileElement = this.canvas.querySelector(
+      `[data-row="${row}"][data-column="${col}"]`
+    );
+    const bombImg = tileElement?.querySelector(".bomb");
     
-  //   if (bombImg) {
-  //     bombImg.remove();
-  //   }
-  // }
+    if (bombImg) {
+      bombImg.remove();
+    }
+  }
 
-  // #drawExplosion(tileElement, row, col) {
-  //   if (!tileElement) {
-  //     console.error("Cannot draw explosion - tile element not found at:", row, col);
-  //     return;
-  //   }
+  #drawExplosion(tileElement, row, col) {
+    if (!tileElement) {
+      console.error("Cannot draw explosion - tile element not found at:", row, col);
+      return;
+    }
 
-  //   const frames = [
-  //     { x: -5, y: 0 },    // Frame 1
-  //     { x: -40, y: 0 },   // Frame 2
-  //     { x: -75, y: 0 },   // Frame 3
-  //     { x: -112, y: 0 },  // Frame 4
-  //     { x: -146, y: 0 },  // Frame 5
-  //     { x: -75, y: 36 },  // Frame 6
-  //     { x: -112, y: 36 }, // Frame 7
-  //     { x: -146, y: 36 }, // Frame 8
-  //   ];
+    const frames = [
+      { x: -5, y: 0 },    // Frame 1
+      { x: -40, y: 0 },   // Frame 2
+      { x: -75, y: 0 },   // Frame 3
+      { x: -112, y: 0 },  // Frame 4
+      { x: -146, y: 0 },  // Frame 5
+      { x: -75, y: 36 },  // Frame 6
+      { x: -112, y: 36 }, // Frame 7
+      { x: -146, y: 36 }, // Frame 8
+    ];
 
-  //   let currentFrame = 0;
-  //   const frameDuration = 75;
+    let currentFrame = 0;
+    const frameDuration = 75;
     
-  //   const explosionDiv = document.createElement("div");
-  //   explosionDiv.className = "damage";
-  //   explosionDiv.style.backgroundPosition = `${frames[0].x}px ${frames[0].y}px`;
-  //   explosionDiv.style.backgroundImage = "url('../images/explosion.png')";
-  //   explosionDiv.style.position = "absolute";
-  //   explosionDiv.style.width = "38px";
-  //   explosionDiv.style.height = "38px";
-  //   explosionDiv.style.zIndex = "6";
+    const explosionDiv = document.createElement("div");
+    explosionDiv.className = "damage";
+    explosionDiv.style.backgroundPosition = `${frames[0].x}px ${frames[0].y}px`;
+    explosionDiv.style.backgroundImage = "url('../images/explosion.png')";
+    explosionDiv.style.position = "absolute";
+    explosionDiv.style.width = "38px";
+    explosionDiv.style.height = "38px";
+    explosionDiv.style.zIndex = "6";
     
-  //   // Center the explosion in the tile
-  //   explosionDiv.style.left = "50%";
-  //   explosionDiv.style.top = "50%";
-  //   explosionDiv.style.transform = "translate(-50%, -50%)";
+    // Center the explosion in the tile
+    explosionDiv.style.left = "50%";
+    explosionDiv.style.top = "50%";
+    explosionDiv.style.transform = "translate(-50%, -50%)";
     
-  //   tileElement.appendChild(explosionDiv);
+    tileElement.appendChild(explosionDiv);
 
-  //   const animate = () => {
-  //     if (currentFrame >= frames.length) {
-  //       explosionDiv.remove();
-  //       return;
-  //     }
+    const animate = () => {
+      if (currentFrame >= frames.length) {
+        explosionDiv.remove();
+        return;
+      }
 
-  //     explosionDiv.style.backgroundPosition = `${frames[currentFrame].x}px ${frames[currentFrame].y}px`;
-  //     currentFrame++;
+      explosionDiv.style.backgroundPosition = `${frames[currentFrame].x}px ${frames[currentFrame].y}px`;
+      currentFrame++;
       
-  //     setTimeout(animate, frameDuration);
-  //   };
+      setTimeout(animate, frameDuration);
+    };
 
-  //   animate();
-  // }
-// }
+    animate();
+  }
+}

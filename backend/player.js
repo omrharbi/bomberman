@@ -19,9 +19,10 @@ export default class Player {
         this.isMoving = false;
         this.isDead = false;
         this.direction = 'up';
-        // Add this to the constructor
         this.movementStartTime = null;
 
+        this.map = null;         // Add this line
+        this.tileSize = 40;
     }
 
     loseLife() {
@@ -33,31 +34,17 @@ export default class Player {
     }
 
     UpdatePlayerElement(data) {
-        console.log("im inside update player element", data.initialX, data.initialY);
-
         this.playerElement = data.playerElement;
-        // this.x = data.initialX;
-        // this.y = data.initialY;
-
         console.log(this.x, this.y, this.nickname);
-
     }
 
     Updatemove(data, room, currentPlayer) {
-
-        // console.log("im inside room",room);
-
         let movementStartTime = null;
-        // let lastUpdateTime = Date.now();
         let lastSendTime = 0;
         const updateInterval = 50;
         const now = Date.now();
-        // const deltaTime = (now - lastUpdateTime) / 100;
         const deltaTime = data.deltaTime
-
         const moveSpeed = this.speed * deltaTime;
-
-        // console.log("moveSpeed", moveSpeed);
 
 
         switch (data.direction) {
@@ -84,8 +71,7 @@ export default class Player {
             default:
                 break;
         }
-        // console.log("this.x", this.x);
-        // console.log("this.y", this.y);
+
         const spriteMap = {
             up: [
                 { x: 55, y: 82 },
@@ -113,39 +99,16 @@ export default class Player {
             ],
         };
 
-
-
-        // this.isMoving = false;
-        const playerElement = this.playerElement//document.getElementById(`player_${this.MyId}`);
-        // if (!playerElement) {
-        //   console.log("Player element not found:", this.MyId);
-        //   requestAnimationFrame(updatePlayerMovement);
-        //   return; // Skip if player element doesn't exist yet
-        // }
-
-
-
-        // Store previous position for collision detection
         const prevX = this.x;
         const prevY = this.y;
-
-        // FIX: Slow down movement speed slightly to make it more controllable
-        // const moveSpeed = this.speed * deltaTime;
-
-
 
 
         if (this.isMoving) {
             // if (this.#checkCollision()) {
-            //   player.x = prevX;
-            //   player.y = prevY;
+            //   this.x = prevX;
+            //   this.y = prevY;
             // }
             const currentSprite = spriteMap[this.direction];
-            // if (!currentSprite) {
-            //   console.error("Invalid direction:", this.direction);
-            //   requestAnimationFrame(updatePlayerMovement);
-            //   return;
-            // }
 
             if (!this.movementStartTime) this.movementStartTime = Date.now();
             const elapsed = Date.now() - this.movementStartTime;
@@ -182,21 +145,87 @@ export default class Player {
 
             }
         }
-
-        // FIX: Debug the player element and position
-        // console.log("Player position:", this.player.x, this.player.y);
-        // console.log("Player element:", playerElement ? "found" : "not found");
-
-        // if (playerElement) {
-        //   // FIX: Set explicit positioning and apply transformation for movement
-        //   playerElement.style.width = this.player.width;
-        //   playerElement.style.height = this.player.height;
-        //   playerElement.style.backgroundImage = `url(${this.player.style || '../images/playerStyle.png'})`;
-        //   playerElement.style.backgroundPositionX = this.player.positionX + "px";
-        //   playerElement.style.backgroundPositionY = this.player.positionY + "px";
-        //   playerElement.style.transform = `translate(${this.player.x}px, ${this.player.y}px)`;
-        //   playerElement.style.position = "absolute";
-        //   playerElement.style.zIndex = "10";
-        // }
     };
+
+
+    #checkCollision() {
+        const playerLeft = this.x;
+        const playerTop = this.y;
+        const playerRight = this.x + this.width;
+        const playerBottom = this.y + this.height;
+
+        const playerCenterX = this.x + (this.width / 2);
+        const playerCenterY = this.y + (this.height / 2);
+
+        const playerTileX = Math.floor(playerCenterX / this.tileSize);
+        const playerTileY = Math.floor(playerCenterY / this.tileSize);
+
+        for (let y = playerTileY - 1; y <= playerTileY + 1; y++) {
+            for (let x = playerTileX - 1; x <= playerTileX + 1; x++) {
+                if (
+                    y >= 0 && y < this.map.length &&
+                    x >= 0 && x < this.map[0].length
+                ) {
+                    const tileType = this.map[y][x];
+
+                    if (tileType === 1 || tileType === 2 || tileType === 3 || tileType === 4) {
+                        const tileLeft = x * this.tileSize;
+                        const tileTop = y * this.tileSize;
+                        const tileRight = tileLeft + this.tileSize;
+                        const tileBottom = tileTop + this.tileSize;
+
+                        if (
+                            playerLeft < tileRight - 6 &&
+                            playerRight > tileLeft - 4 &&
+                            playerTop < tileBottom - 16 &&
+                            playerBottom > tileTop
+                        ) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+    placebomb(room) {
+        const row = Math.floor((this.y + 20) / this.tileSize);
+        const col = Math.floor((this.x + 20) / this.tileSize);
+
+        room.broadcast({
+            type: 'placeBomb',
+            position: {
+                row: row,
+                col: col,
+            },
+            gift: Math.random() < 0.3,
+            index: Math.floor(Math.random() * 3),
+        });
+    }
+
+
+    setMapData(map, tileSize) {
+        this.map = map;
+        this.tileSize = tileSize;
+    }
+
+
+
+    isPlayerHitByExplosion(data) {
+        const playerCenterX = this.x + this.width / 2;
+        const playerCenterY = this.y + this.height / 2;
+
+        const playerTileRow = Math.floor(playerCenterY / this.tileSize);
+        const playerTileCol = Math.floor(playerCenterX / this.tileSize);
+
+        if (data.row === playerTileRow && data.col === playerTileCol) {
+            this.loseLife();
+            console.log("💥 Player hit by explosion!");
+            if (!this.isAlive()) {
+                this.isDead = true;
+                console.log("💀 Player is dead!");
+            }
+        }
+    }
+
 }

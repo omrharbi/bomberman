@@ -57,7 +57,7 @@ function startRoom(room) {
   ];
 
   const playersArray = Array.from(room.players.values());
-  
+
   // Place players directly in the map with values 5, 6, 7, 8
   for (let i = 0; i < playersArray.length; i++) {
     const pos = positionPlayers[i];
@@ -68,8 +68,8 @@ function startRoom(room) {
       player.x = col * 40;
       player.y = row * 40;
     }
-  
   }
+
 
   // const players = playersArray.map((player, index) => {
   //   return {
@@ -98,6 +98,8 @@ function startGameForPlayer(player, room, playersArray, map) {
     map: map,
 
   }));
+  player.setMapData(map, 40);  // Assuming tileSize is 40
+
 
   player.conn.on('message', (message) => {
     let data;
@@ -121,13 +123,13 @@ function startGameForPlayer(player, room, playersArray, map) {
         });
         break;
 
-      case "placeBomb":
-        room.broadcast({
-          type: 'placeBomb',
-          position: data.position,
-          gift: Math.random() < 0.3,
-          index: Math.floor(Math.random() * 3),
-        });
+        // case "placeBomb":
+        //   room.broadcast({
+        //     type: 'placeBomb',
+        //     position: data.position,
+        //     gift: Math.random() < 0.3,
+        //     index: Math.floor(Math.random() * 3),
+        //   });
         break;
       default:
         break;
@@ -180,6 +182,12 @@ wss.on('connection', (ws) => {
         break;
       case "PlayerElement":
         currentPlayer.UpdatePlayerElement(data)
+        break;
+      case "placeBomb":
+        currentPlayer.placebomb(currentRoom)
+        break;
+      case "loselife":
+        currentPlayer.isPlayerHitByExplosion(data);
         break;
       default:
         console.log("Unknown message type:", data.type);
