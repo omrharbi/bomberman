@@ -91,7 +91,6 @@ export default class Game {
             break;
         }
 
-        // Create tile with background image
         const imgnode = imgProps.src ? jsx("img", imgProps) : [];
         const divnode = jsx(
           "div",
@@ -101,8 +100,8 @@ export default class Game {
             "data-column": column,
             id: divId || `tile_${row}_${column}`,
             style: divStyle ? `background-image: ${divStyle}` : "",
-            "data-initial-x": initialX, // Change to data attributes
-            "data-initial-y": initialY, // Change to data attributes
+            "data-initial-x": initialX, 
+            "data-initial-y": initialY, 
           },
           imgnode
         );
@@ -118,19 +117,22 @@ export default class Game {
             "url('../images/playerGreen.webp')",
             "url('../images/playerStyle.png')",
           ];
-
-          const playerDiv = document.createElement("div");
-          playerDiv.className = "player";
-          playerDiv.id = `player_${data.players[playerIndex].id}`;
-          playerDiv.style.backgroundImage = playerStyles[playerIndex];
-          playerDiv.style.width = "27px;"; // FIX: Set explicit sizes
-          playerDiv.style.height = "40px";
-          playerDiv.style.position = "absolute";
-          playerDiv.style.zIndex = "10";
-          const initialX = column * this.tileSize;
-          const initialY = row * this.tileSize;
-
-          playerDiv.style.transform = `translate(${initialX}px, ${initialY}px)`;
+          const playerVNode = jsx(
+            "div",
+            {
+              className: "player",
+              id: `player_${data.players[playerIndex].id}`,
+              style: `
+                background-image: ${playerStyles[playerIndex]};
+                width: 27px;
+                height: 40px;
+                position: absolute;
+                z-index: 10;
+                transform: translate(${initialX}px, ${initialY}px);
+              `
+            }
+          );          
+          const playerDiv = createElement(playerVNode);
           playersElement.set(data.players[playerIndex].id, playerDiv);
           canvas.appendChild(playerDiv);
         }
@@ -148,17 +150,10 @@ export default class Game {
     let lastUpdateTime = Date.now();
     let lastSendTime = 0;
     const updateInterval = 50;
-
-    window.addEventListener("keydown", (e) => {
+    MyEventSystem.addEventListener(window, "keydown", (e) => {
       keysPressed[e.key] = true;
 
       if ((e.key === "b" || e.key === "B") && !e.repeat) {
-        console.log("Placing bomb");
-        
-        // const tileSize = this.tileSize;
-        // const row = Math.floor((data.player.y + 20) / tileSize);
-        // const col = Math.floor((data.player.x + 20) / tileSize);
-
         if (socket && socket.readyState === WebSocket.OPEN) {
           socket.send(
             JSON.stringify({
@@ -169,7 +164,7 @@ export default class Game {
       }
     });
 
-    window.addEventListener("keyup", (e) => {
+    MyEventSystem.addEventListener(window,"keyup", (e) => {
       keysPressed[e.key] = false;
     });
 
