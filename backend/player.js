@@ -286,6 +286,14 @@ export default class Player {
     if (row === playerTileRow && col === playerTileCol) {
       this.loseLife();
       console.log("💥 Player hit by explosion!");
+
+      this.conn.send(JSON.stringify({
+        type: "hearts",
+        Id: this.id,
+        hearts: this.lives
+      }));
+      
+
       if (!this.isAlive()) {
         this.isDead = true;
 
