@@ -92,6 +92,7 @@ function animationPlayerDead(data) {
         return;
     }
 
+
     const deathFrames = [
         { x: -17, y: 1 },   // Frame 1
         { x: -55, y: 1 },   // Frame 2
@@ -107,9 +108,10 @@ function animationPlayerDead(data) {
       
       const animateDeath = () => {
         if (currentFrame >= deathFrames.length) {
+            playerElement.remove()
           return;
         }
-        
+
         playerElement.style.backgroundPositionX = `${deathFrames[currentFrame].x}px`;
         playerElement.style.backgroundPositionY = `${deathFrames[currentFrame].y}px`;
         currentFrame++;

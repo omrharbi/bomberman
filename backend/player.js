@@ -1,3 +1,5 @@
+import { log } from "console";
+
 export default class Player {
   constructor(nickname, id, conn) {
     this.x = 0;
@@ -40,6 +42,7 @@ export default class Player {
   }
 
   Updatemove(data, room) {
+    if (!this.isAlive()) { return }
     let movementStartTime = null;
     let lastSendTime = 0;
     const updateInterval = 50;
@@ -189,6 +192,10 @@ export default class Player {
     return false;
   }
   placebomb(room) {
+    if (!this.isAlive()) {
+      return;
+    }
+
     const row = Math.floor((this.y + 20) / room.tileSize);
     const col = Math.floor((this.x + 20) / room.tileSize);
 
