@@ -291,11 +291,9 @@ function displayMsg(data) {
 ////////////////////////////////////////////////////bombs
 
 function drawBomb(row, col) {
-    const canvas = document.getElementById("game")
-    const tileElement = canvas.querySelector(
-        `[data-row="${row}"][data-column="${col}"]`
-    );
-    if (tileElement && !tileElement.querySelector(".bomb")) {
+    const canvas = Ref.gameCanvasRef.current
+    const tileElement = Selectbyrowcol(canvas, row, col);
+    if (tileElement && !hasclass(tileElement,"bomb")) {
         const bombDiv = document.createElement("div");
         bombDiv.classList.add("bomb");
 
@@ -314,24 +312,19 @@ function drawBomb(row, col) {
     }
 }
 
-function removeBomb(row, col) {
-    console.log("Removing bomb at:", row, col);
-    const canvas = document.getElementById("game")
-    const tileElement = canvas.querySelector(
-        `[data-row="${row}"][data-column="${col}"]`
-    );
-    const bombImg = tileElement?.querySelector(".bomb");
 
+function removeBomb(row, col) {
+    const canvas = Ref.gameCanvasRef.current
+    const tileElement = Selectbyrowcol(canvas, row, col);
+    const bombImg = hasclass(tileElement,"bomb");
     if (bombImg) {
-        bombImg.remove();
+        tileElement.innerHTML = ""; // Remove the bomb div
     }
 }
 
 function destroyWall(row, col, gift, index, frames) {
-    const canvas = document.getElementById("game")
-    const tileElement = canvas.querySelector(
-        `[data-row="${row}"][data-column="${col}"]`
-    );
+    const canvas = Ref.gameCanvasRef.current
+    const tileElement = Selectbyrowcol(canvas, row, col);
     if (tileElement) {
         if (gift) {
             const power = [
@@ -352,18 +345,8 @@ function destroyWall(row, col, gift, index, frames) {
 }
 
 function drawExplosion(row, col, frames) {
-    const canvas = document.getElementById("game")
-    const tileElement = canvas.querySelector(
-        `[data-row="${row}"][data-column="${col}"]`
-    );
-    // if (!tileElement) {
-    //   console.error(
-    //     "Cannot draw explosion - tile element not found at:",
-    //     row,
-    //     col
-    //   );
-    //   return;
-    // }
+    const canvas = Ref.gameCanvasRef.current
+    const tileElement = Selectbyrowcol(canvas, row, col);
 
     let currentFrame = 0;
     const frameDuration = 75;
@@ -397,3 +380,33 @@ function drawExplosion(row, col, frames) {
 
     animate();
 }
+
+
+
+// Helper function to check if a child has a .bomb div
+function hasclass(tile, className) {
+    for (let i = 0; i < tile.children.length; i++) {
+        if (tile.children[i].classList.contains(className)) {
+            return true;
+        }
+    }
+    return false;
+}
+function Selectbyrowcol(canvas,row, col) {
+    let tileElement = null;
+    for (let i = 0; i < canvas.children.length; i++) {
+        const child = canvas.children[i];
+
+        // Make sure dataset exists and compare row/column
+        if (
+            child.dataset &&
+            child.dataset.row === String(row) &&
+            child.dataset.column === String(col)
+        ) {
+            tileElement = child;
+            break;
+        }
+    }
+    return tileElement;
+}
+////////////////////////////////////////////////////////
