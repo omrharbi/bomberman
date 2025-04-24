@@ -218,6 +218,12 @@ export default class Player {
       console.log("💥 Player hit by explosion!");
       if (!this.isAlive()) {
         this.isDead = true;
+
+        room.broadcast({
+          type: "playerDead",
+          Id: this.id
+        });
+
         console.log("💀 Player is dead!");
       }
     }
