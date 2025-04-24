@@ -92,8 +92,6 @@ function startGameForPlayer(player, room, playersArray, map) {
 
   }));
   room.setMapData(map,40)
-  // player.setMapData(map, 40);  // Assuming tileSize is 40
-
 
   player.conn.on('message', (message) => {
     let data;
@@ -145,7 +143,6 @@ wss.on('connection', (ws) => {
       case "newPlayer":
         const id = Date.now() + Math.floor(Math.random() * 1000);
         currentPlayer = new Player(data.nickname, id, ws);
-        // currentPlayer.playerElement = currentPlayer;
         currentRoom = findAvailableRoom();
         currentRoom.addPlayer(currentPlayer);
 
@@ -155,7 +152,6 @@ wss.on('connection', (ws) => {
         });
 
         console.log(`Player ${data.nickname} joined Room ${currentRoom.id}`);
-        //startRoom(currentRoom);
         setTimeout(() => {
           if (currentRoom.players.size >= 2 && !currentRoom.started) {
             startRoom(currentRoom);
@@ -168,11 +164,6 @@ wss.on('connection', (ws) => {
       case "placeBomb":
         currentPlayer.placebomb(currentRoom)
         break;
-      // case "loselife":
-      //   currentPlayer.isPlayerHitByExplosion(data,currentRoom);
-      //   break;
-      // case "destroywall":
-      //   currentRoom.destroy(data)
       default:
         console.log("Unknown message type:", data.type);
         break;

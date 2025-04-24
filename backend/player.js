@@ -1,11 +1,7 @@
-import { log } from "console";
-
 export default class Player {
   constructor(nickname, id, conn) {
     this.x = 0;
     this.y = 0;
-    // this.row ;
-    // this.col ;
     this.nickname = nickname;
     this.id = id;
     this.conn = conn;
@@ -125,7 +121,7 @@ export default class Player {
           direction: this.direction,
         },
         Id: this.id,
-        element : this.playerElement
+        element: this.playerElement
       };
 
       room.broadcast(Data);
@@ -186,7 +182,7 @@ export default class Player {
     }
     return false;
   }
-  ///////////////////////////////////////////////////////////////////
+
   placebomb(room) {
     if (!this.isAlive()) {
       return;
@@ -216,7 +212,7 @@ export default class Player {
 
     setTimeout(() => {
       this.#removeBomb(row, col, room);
-      this.#destroyWall(row, col, gift, index, directions, frames,room);
+      this.#destroyWall(row, col, gift, index, directions, frames, room);
     }, 3000);
   }
   #drawBomb(row, col, room) {
@@ -238,9 +234,7 @@ export default class Player {
     })
   }
 
-  #destroyWall(row, col, gift, index, directions, frames,room) {
-    // this.#drawExplosion(this.canvas.querySelector(`[data-row="${row}"][data-column="${col}"]`),row,col);
-    
+  #destroyWall(row, col, gift, index, directions, frames, room) {
     room.broadcast({
       type: "drawExplosion",
       position: {
@@ -252,7 +246,7 @@ export default class Player {
     directions.forEach(({ dr, dc }) => {
       const newRow = row + dr;
       const newCol = col + dc;
-      this.#isPlayerHitByExplosion(newRow, newCol,room);
+      this.#isPlayerHitByExplosion(newRow, newCol, room);
       // Check boundaries
       if (newRow >= 0 && newRow < room.map.length && newCol >= 0 && newCol < room.map[0].length) {
         if (room.map[newRow][newCol] === 3) {
@@ -268,27 +262,18 @@ export default class Player {
             frames: frames,
           })
         } else if (room.map[newRow][newCol] === 0) {
-          // const tileElement = this.canvas.querySelector(
-          //   `[data-row="${newRow}"][data-column="${newCol}"]`
-          // );
-          // if (tileElement) {
-            // this.#drawExplosion(tileElement, newRow, newCol);
-            room.broadcast({
-              type: "drawExplosion",
-              position: {
-                row: newRow,
-                col: newCol,
-              },
-              frames: frames,
-            })
-          // }
+          room.broadcast({
+            type: "drawExplosion",
+            position: {
+              row: newRow,
+              col: newCol,
+            },
+            frames: frames,
+          })
         }
       }
     });
   }
-
-  
-  ////////////////////////////////////////////////////////////////
 
   #isPlayerHitByExplosion(row, col, room) {
 
@@ -313,6 +298,4 @@ export default class Player {
       }
     }
   }
-
-
 }

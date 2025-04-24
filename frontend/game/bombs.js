@@ -11,17 +11,5 @@ export default class Bomb {
       this.tileSize = tileSize;
       this.canvas = null;
     }
-  
-    // update(delta, onExplode) {
-    //   if (this.exploded) return;
-    //   this.timer -= delta;
-    //   if (this.timer <= 0) {
-    //     this.exploded = true;
-    //     onExplode(this);
-    //   }
-    // }
-  
-
-
   }
   

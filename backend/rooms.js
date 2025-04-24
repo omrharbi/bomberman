@@ -30,8 +30,4 @@ export default class Room {
     this.map = map;
     this.tileSize = tileSize;
   }
-
-  // destroy(data) {
-  //   this.map[data.row][data.col] = 0;
-  // }
 }

@@ -14,7 +14,7 @@ const router = new Router({
 router.init();
 
 let waitingContainer = null;
-let gameContainer = null;
+
 
   export function waiting(element) {
     waitingContainer = element; 
@@ -72,9 +72,6 @@ function handleServerMessages(data) {
         case 'playerMove':
             updateOtherPlayerPosition(data);
             break;
-        // case 'placeBomb':
-        //     Placingbombinmap(data, tileMap);
-        //     break;
         case 'drawBomb':
             drawBomb(data.position.row, data.position.col);
             break;
@@ -291,12 +288,6 @@ function displayMsg(data) {
 }
 
 
-// function Placingbombinmap(data, tileMap) {
-//     console.log("tileMap", tileMap);
-
-//     tileMap.placeBomb(data.position.row, data.position.col, data.gift, data.index);
-// }
-
 ////////////////////////////////////////////////////bombs
 
 function drawBomb(row, col) {
@@ -312,14 +303,13 @@ function drawBomb(row, col) {
         bombDiv.style.backgroundImage = "url('../images/bomb.png')";
         bombDiv.style.width = "38px";
         bombDiv.style.height = "38px";
-        // bombDiv.style.position = "absolute";
+    
         bombDiv.style.zIndex = "5";
 
         // Center the bomb in the tile
         bombDiv.style.left = "50%";
         bombDiv.style.top = "50%";
-        // bombDiv.style.transform = "translate(-50%, -50%)";
-
+    
         tileElement.appendChild(bombDiv);
     }
 }
@@ -390,7 +380,6 @@ function drawExplosion(row, col, frames) {
     // Center the explosion in the tile
     explosionDiv.style.left = "50%";
     explosionDiv.style.top = "50%";
-    // explosionDiv.style.transform = "translate(-50%, -50%)";
 
     tileElement.appendChild(explosionDiv);
 
