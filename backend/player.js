@@ -15,7 +15,7 @@ export default class Player {
     this.width = 21;
     this.height = 40;
     this.lives = 3;
-    this.speed = 30;
+    this.speed = 25;
     this.isMoving = false;
     this.isDead = false;
     this.direction = "up";
