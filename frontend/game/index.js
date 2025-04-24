@@ -1,4 +1,4 @@
-import { LoginPage ,GamePage } from '../app/config.js'
+import { LoginPage, GamePage } from '../app/config.js'
 import { jsx, createElement } from '../src/framework.js'
 import { render, updateRender } from '../src/vdom.js'
 import { MyEventSystem } from '../src/event.js'
@@ -17,19 +17,19 @@ router.init();
 
 export function waiting(element) {
     const waitingContent = jsx('div', {},
-      jsx('p', { id: 'playercount' }),
-      jsx('div', { className: 'waiting-animation' },
-        jsx('img', {
-          src: '/images/bomberman3d.gif',
-          alt: 'Waiting...',
-          style: 'margin-top: 10px;'
-        }),
-        jsx('p', {}, 'Looking for a match...')
-      )
+        jsx('p', { id: 'playercount' }),
+        jsx('div', { className: 'waiting-animation' },
+            jsx('img', {
+                src: '/images/bomberman3d.gif',
+                alt: 'Waiting...',
+                style: 'margin-top: 10px;'
+            }),
+            jsx('p', {}, 'Looking for a match...')
+        )
     );
-    
+
     render(waitingContent, element);
-  }
+}
 
 export let socket;
 export function connectToGameServer(name) {
@@ -79,8 +79,20 @@ function handleServerMessages(data) {
         case 'playerMove':
             updateOtherPlayerPosition(data);
             break;
-        case 'placeBomb':
-            Placingbombinmap(data, tileMap);
+        // case 'placeBomb':
+        //     Placingbombinmap(data, tileMap);
+        //     break;
+        case 'drawBomb':
+            drawBomb(data.position.row, data.position.col);
+            break;
+        case 'removeBomb':
+            removeBomb(data.position.row, data.position.col);
+            break;
+        case 'destroyWall':
+            destroyWall(data.position.row, data.position.col, data.gift, data.index, data.frames);
+            break;
+        case 'drawExplosion':
+            drawExplosion(data.position.row, data.position.col, data.frames);
             break;
         default:
             break;
@@ -214,8 +226,120 @@ function playerDied(playerId, nickname) {
 }
 
 
-function Placingbombinmap(data, tileMap) {
-    console.log("tileMap", tileMap);
+// function Placingbombinmap(data, tileMap) {
+//     console.log("tileMap", tileMap);
 
-    tileMap.placeBomb(data.position.row, data.position.col, data.gift, data.index);
+//     tileMap.placeBomb(data.position.row, data.position.col, data.gift, data.index);
+// }
+
+////////////////////////////////////////////////////bombs
+
+function drawBomb(row, col) {
+    const canvas = document.getElementById("game")
+    const tileElement = canvas.querySelector(
+        `[data-row="${row}"][data-column="${col}"]`
+    );
+    if (tileElement && !tileElement.querySelector(".bomb")) {
+        const bombDiv = document.createElement("div");
+        bombDiv.classList.add("bomb");
+
+        // Use background image for sprite sheet
+        bombDiv.style.backgroundImage = "url('../images/bomb.png')";
+        bombDiv.style.width = "38px";
+        bombDiv.style.height = "38px";
+        // bombDiv.style.position = "absolute";
+        bombDiv.style.zIndex = "5";
+
+        // Center the bomb in the tile
+        bombDiv.style.left = "50%";
+        bombDiv.style.top = "50%";
+        // bombDiv.style.transform = "translate(-50%, -50%)";
+
+        tileElement.appendChild(bombDiv);
+    }
+}
+
+function removeBomb(row, col) {
+    console.log("Removing bomb at:", row, col);
+    const canvas = document.getElementById("game")
+    const tileElement = canvas.querySelector(
+        `[data-row="${row}"][data-column="${col}"]`
+    );
+    const bombImg = tileElement?.querySelector(".bomb");
+
+    if (bombImg) {
+        bombImg.remove();
+    }
+}
+
+function destroyWall(row, col, gift, index, frames) {
+    const canvas = document.getElementById("game")
+    const tileElement = canvas.querySelector(
+        `[data-row="${row}"][data-column="${col}"]`
+    );
+    if (tileElement) {
+        if (gift) {
+            const power = [
+                "../images/bombing.webp",
+                "../images/speed.webp",
+                "../images/spoil_tileset.webp",
+            ];
+            tileElement.innerHTML =
+                '<img src="' +
+                power[index] +
+                '" style="width: 38px; height: 38px; position: absolute; top: 0; left: 0;">';
+            gift = false;
+        } else {
+            tileElement.innerHTML = "";
+            drawExplosion(row, col, frames);
+        }
+    }
+}
+
+function drawExplosion(row, col, frames) {
+    const canvas = document.getElementById("game")
+    const tileElement = canvas.querySelector(
+        `[data-row="${row}"][data-column="${col}"]`
+    );
+    // if (!tileElement) {
+    //   console.error(
+    //     "Cannot draw explosion - tile element not found at:",
+    //     row,
+    //     col
+    //   );
+    //   return;
+    // }
+
+    let currentFrame = 0;
+    const frameDuration = 75;
+
+    const explosionDiv = document.createElement("div");
+    explosionDiv.className = "damage";
+    explosionDiv.style.backgroundPosition = `${frames[0].x}px ${frames[0].y}px`;
+    explosionDiv.style.backgroundImage = "url('../images/explosion.png')";
+    // explosionDiv.style.position = "absolute";
+    explosionDiv.style.width = "38px";
+    explosionDiv.style.height = "38px";
+    explosionDiv.style.zIndex = "6";
+
+    // Center the explosion in the tile
+    explosionDiv.style.left = "50%";
+    explosionDiv.style.top = "50%";
+    // explosionDiv.style.transform = "translate(-50%, -50%)";
+
+    tileElement.appendChild(explosionDiv);
+
+    const animate = () => {
+        if (currentFrame >= frames.length) {
+            explosionDiv.remove();
+            return;
+        }
+
+        explosionDiv.style.backgroundPosition = `${frames[currentFrame].x}px ${frames[currentFrame].y}px`;
+        currentFrame++;
+
+        setTimeout(animate, frameDuration);
+    };
+
+    animate();
 }

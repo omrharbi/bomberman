@@ -171,11 +171,11 @@ wss.on('connection', (ws) => {
       case "placeBomb":
         currentPlayer.placebomb(currentRoom)
         break;
-      case "loselife":
-        currentPlayer.isPlayerHitByExplosion(data,currentRoom);
-        break;
-      case "destroywall":
-        currentRoom.destroy(data)
+      // case "loselife":
+      //   currentPlayer.isPlayerHitByExplosion(data,currentRoom);
+      //   break;
+      // case "destroywall":
+      //   currentRoom.destroy(data)
       default:
         console.log("Unknown message type:", data.type);
         break;

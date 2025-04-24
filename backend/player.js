@@ -185,32 +185,115 @@ export default class Player {
     }
     return false;
   }
+  ///////////////////////////////////////////////////////////////////
   placebomb(room) {
     const row = Math.floor((this.y + 20) / room.tileSize);
     const col = Math.floor((this.x + 20) / room.tileSize);
+    const gift = Math.random() < 0.3
+    const index = Math.floor(Math.random() * 3); // Random index for the gift
+    const directions = [
+      { dr: -1, dc: 0 }, // Up
+      { dr: 0, dc: 1 }, // Right
+      { dr: 1, dc: 0 }, // Down
+      { dr: 0, dc: -1 }, // Left
+    ];
+    const frames = [
+      { x: -5, y: 0 }, // Frame 1
+      { x: -40, y: 0 }, // Frame 2
+      { x: -75, y: 0 }, // Frame 3
+      { x: -112, y: 0 }, // Frame 4
+      { x: -146, y: 0 }, // Frame 5
+      { x: -75, y: 36 }, // Frame 6
+      { x: -112, y: 36 }, // Frame 7
+      { x: -146, y: 36 }, // Frame 8
+    ];
+    this.#drawBomb(row, col, room);
 
-
+    setTimeout(() => {
+      this.#removeBomb(row, col, room);
+      this.#destroyWall(row, col, gift, index, directions, frames,room);
+    }, 3000);
+  }
+  #drawBomb(row, col, room) {
     room.broadcast({
-      type: "placeBomb",
+      type: "drawBomb",
       position: {
         row: row,
         col: col,
       },
-      gift: Math.random() < 0.3,
-      index: Math.floor(Math.random() * 3),
+    })
+  }
+  #removeBomb(row, col, room) {
+    room.broadcast({
+      type: "removeBomb",
+      position: {
+        row: row,
+        col: col,
+      },
+    })
+  }
+
+  #destroyWall(row, col, gift, index, directions, frames,room) {
+    // this.#drawExplosion(this.canvas.querySelector(`[data-row="${row}"][data-column="${col}"]`),row,col);
+    
+    room.broadcast({
+      type: "drawExplosion",
+      position: {
+        row: row,
+        col: col,
+      },
+      frames: frames,
+    })
+    directions.forEach(({ dr, dc }) => {
+      const newRow = row + dr;
+      const newCol = col + dc;
+      this.#isPlayerHitByExplosion(newRow, newCol,room);
+      // Check boundaries
+      if (newRow >= 0 && newRow < room.map.length && newCol >= 0 && newCol < room.map[0].length) {
+        if (room.map[newRow][newCol] === 3) {
+          room.map[newRow][newCol] = 0;
+          room.broadcast({
+            type: "destroyWall",
+            position: {
+              row: newRow,
+              col: newCol,
+            },
+            gift: gift,
+            index: index,
+            frames: frames,
+          })
+        } else if (room.map[newRow][newCol] === 0) {
+          // const tileElement = this.canvas.querySelector(
+          //   `[data-row="${newRow}"][data-column="${newCol}"]`
+          // );
+          // if (tileElement) {
+            // this.#drawExplosion(tileElement, newRow, newCol);
+            room.broadcast({
+              type: "drawExplosion",
+              position: {
+                row: newRow,
+                col: newCol,
+              },
+              frames: frames,
+            })
+          // }
+        }
+      }
     });
   }
 
-  isPlayerHitByExplosion(data,room) {
-    
+  
+  ////////////////////////////////////////////////////////////////
+
+  #isPlayerHitByExplosion(row, col, room) {
+
     const playerCenterX = this.x + this.width / 2;
     const playerCenterY = this.y + this.height / 2;
-    
+
     const playerTileRow = Math.floor(playerCenterY / room.tileSize);
     const playerTileCol = Math.floor(playerCenterX / room.tileSize);
-    
-    if (data.row === playerTileRow && data.col === playerTileCol) {
-      console.log("data", data);
+
+    if (row === playerTileRow && col === playerTileCol) {
       this.loseLife();
       console.log("💥 Player hit by explosion!");
       if (!this.isAlive()) {
@@ -219,4 +302,6 @@ export default class Player {
       }
     }
   }
+
+
 }
