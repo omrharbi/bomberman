@@ -11,6 +11,7 @@ export const Ref = {
     inputRef : { current: null },
     buttonRef : { current: null },
     messagesRef : { current: null },
+    hearts: { current: null }
 }
 
 export function GamePage() {
@@ -51,7 +52,7 @@ export function GamePage() {
                     jsx('div', { id: 'playerlives' },
                         jsx('p', { id: 'lives', ref: Ref.livesRef }),
                     ),
-                    jsx('div', { id: "hearts" },
+                    jsx('div', { id: "hearts", ref: Ref.hearts},
                         jsx('img', { src: '../images/heart.png', alt: 'Heart', className: 'heart-icon' }),
                         jsx('img', { src: '../images/heart.png', alt: 'Heart', className: 'heart-icon' }),
                         jsx('img', { src: '../images/heart.png', alt: 'Heart', className: 'heart-icon' }),

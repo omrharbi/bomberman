@@ -84,12 +84,24 @@ function handleServerMessages(data) {
         case 'drawExplosion':
             drawExplosion(data.position.row, data.position.col, data.frames);
             break;
-            case 'playerDead':
+        case 'playerDead':
             animationPlayerDead(data)
+            break;
+        case 'hearts': 
+            hearts(data)
             break;
         default:
             break;
     }
+}
+
+function hearts(data) {
+    const hearts = Ref.hearts.current
+
+    console.log("data.Id", data.Id);
+    hearts.lastElementChild.remove()
+    console.log("hearts", hearts);
+    console.log("heartsData", data);
 }
 
 function animationPlayerDead(data) {
@@ -274,7 +286,6 @@ export function sendMessage(nickname) {
         Ref.chatRef.current.value = '';
     }
 }
-
 
 function displayMsg(data) {
     const messageContainer = Ref.messagesRef.current
