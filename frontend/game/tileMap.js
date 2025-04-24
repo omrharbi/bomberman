@@ -3,7 +3,6 @@ import { createElement, jsx } from "../src/framework.js";
 import { updateRender } from "../src/vdom.js";
 import { socket } from "./index.js";
 
-
 export default class Game {
   constructor(tileSize, data) {
     this.tileSize = tileSize;
@@ -30,7 +29,7 @@ export default class Game {
 
   #draw(canvas, data) {
     console.log("Drawing game with data:", data);
-    
+
     const rows = this.map.length;
     const columns = this.map[0].length;
 
@@ -41,7 +40,7 @@ export default class Game {
     canvas.style.alignContent = "center";
     canvas.style.justifyContent = "center";
     canvas.style.position = "relative"; // FIX: Add position relative to allow absolute positioning of children
-    
+
     for (let row = 0; row < rows; row++) {
       for (let column = 0; column < columns; column++) {
         const tile = this.map[row][column];
@@ -51,7 +50,7 @@ export default class Game {
         let divId = "";
         let initialX = 0;
         let initialY = 0;
-        
+
         switch (tile) {
           case 1:
           case 4:
@@ -73,26 +72,26 @@ export default class Game {
             classname = "tile";
             break;
           case 5:
-            initialX = column * this.tileSize
-            initialY = row * this.tileSize
+            initialX = column * this.tileSize;
+            initialY = row * this.tileSize;
             break;
           case 6:
-            initialX = column * this.tileSize
-            initialY = row * this.tileSize
+            initialX = column * this.tileSize;
+            initialY = row * this.tileSize;
             break;
           case 7:
-            initialX = column * this.tileSize
-            initialY = row * this.tileSize
+            initialX = column * this.tileSize;
+            initialY = row * this.tileSize;
             break;
           case 8:
-            initialX = column * this.tileSize
-            initialY = row * this.tileSize
+            initialX = column * this.tileSize;
+            initialY = row * this.tileSize;
             break;
           default:
             classname = "tile";
             break;
         }
-        
+
         // Create tile with background image
         const imgnode = imgProps.src ? jsx("img", imgProps) : [];
         const divnode = jsx(
@@ -104,11 +103,11 @@ export default class Game {
             id: divId || `tile_${row}_${column}`,
             style: divStyle ? `background-image: ${divStyle}` : "",
             "data-initial-x": initialX, // Change to data attributes
-            "data-initial-y": initialY  // Change to data attributes
+            "data-initial-y": initialY, // Change to data attributes
           },
           imgnode
         );
-        
+
         const div = createElement(divnode);
         canvas.appendChild(div);
 
@@ -118,44 +117,39 @@ export default class Game {
             "url('../images/playerStyle.png')",
             "url('../images/playerblue.webp')",
             "url('../images/playerGreen.webp')",
-            "url('../images/playerStyle.png')"
+            "url('../images/playerStyle.png')",
           ];
-          
+
           const playerDiv = document.createElement("div");
           playerDiv.className = "player";
           playerDiv.id = `player_${data.players[playerIndex].id}`;
           playerDiv.style.backgroundImage = playerStyles[playerIndex];
-          playerDiv.style.width = "27px;";  // FIX: Set explicit sizes
+          playerDiv.style.width = "27px;"; // FIX: Set explicit sizes
           playerDiv.style.height = "40px";
           playerDiv.style.position = "absolute";
-          playerDiv.style.zIndex = "10"
-
+          playerDiv.style.zIndex = "10";
 
           // FIX: Initially position player at their spawn tile
           const initialX = column * this.tileSize;
           const initialY = row * this.tileSize;
           console.log("Initial position:", initialX, initialY);
-          
+
           playerDiv.style.transform = `translate(${initialX}px, ${initialY}px)`;
-          if (data.players[playerIndex].playerId === this.MyId) {
-            socket.send(
-              JSON.stringify({
-                type: "PlayerElement",
-                playerElement: playerDiv,
-                // initialX: initialX,
-                // initialY: initialY,
-              })
-            );
-          }
-          
+          // if (data.players[playerIndex].playerId === this.MyId) {
+          socket.send(
+            JSON.stringify({
+              type: "PlayerElement",
+              playerElement: playerDiv,
+            })
+          );
+          // }
+          console.log(`this.map[${row}][${column}]`, this.map[row][column]);
+
           canvas.appendChild(playerDiv);
         }
       }
     }
-
-
   }
-  
 
   #setCanvasSize(canvas) {
     canvas.style.height = `${this.map.length * this.tileSize}px`;
@@ -175,11 +169,11 @@ export default class Game {
         // const tileSize = this.tileSize;
         // const row = Math.floor((data.player.y + 20) / tileSize);
         // const col = Math.floor((data.player.x + 20) / tileSize);
-        
+
         if (socket && socket.readyState === WebSocket.OPEN) {
           socket.send(
             JSON.stringify({
-              type: "placeBomb"
+              type: "placeBomb",
             })
           );
         }
@@ -228,82 +222,47 @@ export default class Game {
     updatePlayerMovement();
   }
 
-  // #checkCollision() {
-  //   const playerLeft = this.player.x;
-  //   const playerTop = this.player.y;
-  //   const playerRight = this.player.x + this.player.width;
-  //   const playerBottom = this.player.y + this.player.height;
-  
-  //   const playerCenterX = this.player.x + (this.player.width / 2);
-  //   const playerCenterY = this.player.y + (this.player.height / 2);
-  
-  //   const playerTileX = Math.floor(playerCenterX / this.tileSize);
-  //   const playerTileY = Math.floor(playerCenterY / this.tileSize);
-  
-  //   for (let y = playerTileY - 1; y <= playerTileY + 1; y++) {
-  //     for (let x = playerTileX - 1; x <= playerTileX + 1; x++) {
-  //       if (
-  //         y >= 0 && y < this.map.length &&
-  //         x >= 0 && x < this.map[0].length
-  //       ) {
-  //         const tileType = this.map[y][x];
-  
-  //         if (tileType === 1 || tileType === 2 || tileType === 3 || tileType === 4) {
-  //           const tileLeft = x * this.tileSize;
-  //           const tileTop = y * this.tileSize;
-  //           const tileRight = tileLeft + this.tileSize;
-  //           const tileBottom = tileTop + this.tileSize;
-  
-  //           if (
-  //             playerLeft < tileRight - 6 &&
-  //             playerRight > tileLeft - 4 &&
-  //             playerTop < tileBottom - 16 &&
-  //             playerBottom > tileTop
-  //           ) {
-  //             return true;
-  //           }
-  //         }
-  //       }
-  //     }
-  //   }
-  //   return false;
-  // }
-  
+ 
 
-  placeBomb(row, col, gift , index) {
+  placeBomb(row, col, gift, index) {
     // Check if position is valid and not already occupied by a wall
-    if (row < 0 || row >= this.map.length || col < 0 || col >= this.map[0].length) {
+
+    if (
+      row < 0 ||
+      row >= this.map.length ||
+      col < 0 ||
+      col >= this.map[0].length
+    ) {
       console.log("Invalid bomb position:", row, col);
       return;
     }
-    
+
     if (this.map[row][col] !== 0 && this.map[row][col] < 5) {
       console.log("Cannot place bomb on wall or obstacle:", row, col);
       return;
     }
-    
+
     this.#drawBomb(row, col);
 
     setTimeout(() => {
       this.#removeBomb(row, col);
-      this.#destroyWall(row, col,gift , index);
+      this.#destroyWall(row, col, gift, index);
     }, 3000);
   }
 
-  #destroyWall(row, col,gift , index) {
+  #destroyWall(row, col, gift, index) {
     console.log("Destroying walls at:", row, col);
     const directions = [
       { dr: -1, dc: 0 }, // Up
-      { dr: 0, dc: 1 },  // Right
-      { dr: 1, dc: 0 },  // Down
+      { dr: 0, dc: 1 }, // Right
+      { dr: 1, dc: 0 }, // Down
       { dr: 0, dc: -1 }, // Left
     ];
-
 
     // Center explosion
     this.#drawExplosion(
       this.canvas.querySelector(`[data-row="${row}"][data-column="${col}"]`),
-      row, 
+      row,
       col
     );
 
@@ -311,17 +270,16 @@ export default class Game {
       const newRow = row + dr;
       const newCol = col + dc;
 
-   
-        if (socket && socket.readyState === WebSocket.OPEN) {
-          socket.send(
-            JSON.stringify({
-              type: "loselife",
-              row: newRow,
-              col: newCol,
-            })
-          );
-        }
-      
+      if (socket && socket.readyState === WebSocket.OPEN) {
+        socket.send(
+          JSON.stringify({
+            type: "loselife",
+            row: newRow,
+            col: newCol,
+          })
+        );
+      }
+
       // Check boundaries
       if (
         newRow >= 0 &&
@@ -346,12 +304,19 @@ export default class Game {
           );
           if (tileElement) {
             if (gift) {
-              const  power = ['../images/bombing.webp','../images/speed.webp','../images/spoil_tileset.webp']
-              tileElement.innerHTML = '<img src="'+power[index]+'" style="width: 38px; height: 38px; position: absolute; top: 0; left: 0;">';
-              gift = false              
+              const power = [
+                "../images/bombing.webp",
+                "../images/speed.webp",
+                "../images/spoil_tileset.webp",
+              ];
+              tileElement.innerHTML =
+                '<img src="' +
+                power[index] +
+                '" style="width: 38px; height: 38px; position: absolute; top: 0; left: 0;">';
+              gift = false;
             } else {
-            tileElement.innerHTML = "";;
-            this.#drawExplosion(tileElement, newRow, newCol);
+              tileElement.innerHTML = "";
+              this.#drawExplosion(tileElement, newRow, newCol);
             }
           }
         } else if (this.map[newRow][newCol] === 0) {
@@ -365,11 +330,12 @@ export default class Game {
       }
     });
   }
-  
+
   #drawBomb(row, col) {
     const tileElement = this.canvas.querySelector(
       `[data-row="${row}"][data-column="${col}"]`
     );
+
 
     if (tileElement && !tileElement.querySelector(".bomb")) {
       const bombDiv = document.createElement("div");
@@ -379,26 +345,26 @@ export default class Game {
       bombDiv.style.backgroundImage = "url('../images/bomb.png')";
       bombDiv.style.width = "38px";
       bombDiv.style.height = "38px";
-      bombDiv.style.position = "absolute";
+      // bombDiv.style.position = "absolute";
       bombDiv.style.zIndex = "5";
-      
+
       // Center the bomb in the tile
       bombDiv.style.left = "50%";
       bombDiv.style.top = "50%";
-      bombDiv.style.transform = "translate(-50%, -50%)";
+      // bombDiv.style.transform = "translate(-50%, -50%)";
 
-      tileElement.appendChild(bombDiv)
+      tileElement.appendChild(bombDiv);
     }
   }
 
   #removeBomb(row, col) {
     console.log("Removing bomb at:", row, col);
-    
+
     const tileElement = this.canvas.querySelector(
       `[data-row="${row}"][data-column="${col}"]`
     );
     const bombImg = tileElement?.querySelector(".bomb");
-    
+
     if (bombImg) {
       bombImg.remove();
     }
@@ -406,38 +372,42 @@ export default class Game {
 
   #drawExplosion(tileElement, row, col) {
     if (!tileElement) {
-      console.error("Cannot draw explosion - tile element not found at:", row, col);
+      console.error(
+        "Cannot draw explosion - tile element not found at:",
+        row,
+        col
+      );
       return;
     }
 
     const frames = [
-      { x: -5, y: 0 },    // Frame 1
-      { x: -40, y: 0 },   // Frame 2
-      { x: -75, y: 0 },   // Frame 3
-      { x: -112, y: 0 },  // Frame 4
-      { x: -146, y: 0 },  // Frame 5
-      { x: -75, y: 36 },  // Frame 6
+      { x: -5, y: 0 }, // Frame 1
+      { x: -40, y: 0 }, // Frame 2
+      { x: -75, y: 0 }, // Frame 3
+      { x: -112, y: 0 }, // Frame 4
+      { x: -146, y: 0 }, // Frame 5
+      { x: -75, y: 36 }, // Frame 6
       { x: -112, y: 36 }, // Frame 7
       { x: -146, y: 36 }, // Frame 8
     ];
 
     let currentFrame = 0;
     const frameDuration = 75;
-    
+
     const explosionDiv = document.createElement("div");
     explosionDiv.className = "damage";
     explosionDiv.style.backgroundPosition = `${frames[0].x}px ${frames[0].y}px`;
     explosionDiv.style.backgroundImage = "url('../images/explosion.png')";
-    explosionDiv.style.position = "absolute";
+    // explosionDiv.style.position = "absolute";
     explosionDiv.style.width = "38px";
     explosionDiv.style.height = "38px";
     explosionDiv.style.zIndex = "6";
-    
+
     // Center the explosion in the tile
     explosionDiv.style.left = "50%";
     explosionDiv.style.top = "50%";
-    explosionDiv.style.transform = "translate(-50%, -50%)";
-    
+    // explosionDiv.style.transform = "translate(-50%, -50%)";
+
     tileElement.appendChild(explosionDiv);
 
     const animate = () => {
@@ -448,7 +418,7 @@ export default class Game {
 
       explosionDiv.style.backgroundPosition = `${frames[currentFrame].x}px ${frames[currentFrame].y}px`;
       currentFrame++;
-      
+
       setTimeout(animate, frameDuration);
     };
 

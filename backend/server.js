@@ -70,13 +70,6 @@ function startRoom(room) {
     }
   }
 
-
-  // const players = playersArray.map((player, index) => {
-  //   return {
-  //     player: player
-  //   };
-  // });
-
   // Start game for all players
   for (const player of playersArray) {
     console.log(`Player ${player.nickname} in room ${room.id}`);
@@ -173,7 +166,7 @@ wss.on('connection', (ws) => {
         currentPlayer.Updatemove(data, currentRoom)
         break;
       case "PlayerElement":
-        currentPlayer.UpdatePlayerElement(data)
+        currentPlayer.UpdatePlayerElement(data,currentRoom)
         break;
       case "placeBomb":
         currentPlayer.placebomb(currentRoom)

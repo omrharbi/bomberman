@@ -33,9 +33,8 @@ export default class Player {
     return this.lives > 0;
   }
 
-  UpdatePlayerElement(data) {
+  UpdatePlayerElement(data, room) {
     this.playerElement = data.playerElement;
-    console.log(this.x, this.y, this.nickname);
   }
 
   Updatemove(data, room) {
@@ -101,7 +100,6 @@ export default class Player {
       ],
     };
 
-
     if (this.#checkCollision(room)) {
       this.x = prevX;
       this.y = prevY;
@@ -146,7 +144,6 @@ export default class Player {
   }
 
   #checkCollision(room) {
-
     const playerLeft = this.x;
     const playerTop = this.y;
     const playerRight = this.x + this.width;
@@ -192,6 +189,7 @@ export default class Player {
     const row = Math.floor((this.y + 20) / room.tileSize);
     const col = Math.floor((this.x + 20) / room.tileSize);
 
+
     room.broadcast({
       type: "placeBomb",
       position: {
@@ -202,11 +200,6 @@ export default class Player {
       index: Math.floor(Math.random() * 3),
     });
   }
-
-//   setMapData(map, tileSize) {
-//     this.map = map;
-//     this.tileSize = tileSize;
-//   }
 
   isPlayerHitByExplosion(data) {
     const playerCenterX = this.x + this.width / 2;
