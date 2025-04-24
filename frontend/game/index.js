@@ -75,10 +75,51 @@ function handleServerMessages(data) {
         case 'placeBomb':
             Placingbombinmap(data, tileMap);
             break;
+            case 'playerDead':
+            animationPlayerDead(data)
+            break;
         default:
             break;
     }
 }
+
+function animationPlayerDead(data) {
+    let playerElement = playersElement.get(data.Id)
+    playerElement.style.backgroundImage = `url('../images/player_dead.png')`;
+    
+    if (!playerElement) {
+        console.log("player not found", data.Id);
+        return;
+    }
+
+    const deathFrames = [
+        { x: -17, y: 1 },   // Frame 1
+        { x: -55, y: 1 },   // Frame 2
+        { x: -91, y: 1 },   // Frame 3
+        { x: -126, y: 1 },  // Frame 4
+        { x: -162, y: 1 },  // Frame 5
+        { x: -198, y: 1 },  // Frame 6
+        { x: -235, y: 1 }   // Frame 7
+      ];
+
+      let currentFrame = 0;
+      const frameDuration = 100;
+      
+      const animateDeath = () => {
+        if (currentFrame >= deathFrames.length) {
+          return;
+        }
+        
+        playerElement.style.backgroundPositionX = `${deathFrames[currentFrame].x}px`;
+        playerElement.style.backgroundPositionY = `${deathFrames[currentFrame].y}px`;
+        currentFrame++;
+
+        setTimeout(animateDeath, frameDuration);
+      };
+
+      animateDeath();
+}
+
 function updateOtherPlayerPosition(data) {
     let playerElement = playersElement.get(data.Id)
     if (!playerElement) {
