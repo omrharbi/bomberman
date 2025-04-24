@@ -164,6 +164,8 @@ export default class Game {
       keysPressed[e.key] = true;
 
       if ((e.key === "b" || e.key === "B") && !e.repeat) {
+        console.log("Placing bomb");
+        
         // const tileSize = this.tileSize;
         // const row = Math.floor((data.player.y + 20) / tileSize);
         // const col = Math.floor((data.player.x + 20) / tileSize);
