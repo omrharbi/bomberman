@@ -1,5 +1,7 @@
 import http from 'http';
 import WebSocket, { WebSocketServer } from 'ws';
+import Player from './player.js';
+import Room from './rooms.js';
 
 const server = http.createServer((req, res) => {
   res.writeHead(200, { 'Content-Type': 'text/plain' });
@@ -11,83 +13,6 @@ const wss = new WebSocketServer({ server });
 let nextRoomID = 1;
 const rooms = new Map();
 
-// class Player {
-//   constructor(nickname, id, conn) {
-//     this.nickname = nickname;
-//     this.id = id;
-//     this.conn = conn;
-//     this.lives = 3;
-//   }
-//   loseLife() {
-//     this.lives -= 1;
-//   }
-
-//   isAlive() {
-//     return this.lives > 0;
-//   }
-// }
-class Player {
-  constructor(nickname, id, conn) {
-    this.nickname = nickname;
-    this.id = id;
-    this.conn = conn;
-    // Game-related properties
-    this.lives = 3;
-    this.x = 1;
-    this.y = 1;
-    this.bombsPlaced = 0;
-    this.bombPower = 1;
-    this.positionX = 52;
-    this.positionY = 0;
-    this.width = 22;
-    this.height = 40;
-    this.speed = 7;
-    this.isMoving = false;
-    this.isDead = false;
-    this.direction = 'up';
-    this.style = "assets/images/playerStyle.png"; // Just the URL string
-  }
-
-  loseLife() {
-    this.lives -= 1;
-  }
-
-  isAlive() {
-    return this.lives > 0;
-  }
-
-  setDirection(direction) {
-    this.direction = direction;
-  }
-
-}
-
-class Room {
-  constructor(id) {
-    this.id = id;
-    this.players = new Map();
-    this.started = false;
-  }
-
-  addPlayer(player) {
-    this.players.set(player.id, player);
-  }
-
-  removePlayer(playerID) {
-    this.players.delete(playerID);
-  }
-
-  broadcast(data) {
-    for (const player of this.players.values()) {
-      if (player.conn.readyState === WebSocket.OPEN) {
-        player.conn.send(JSON.stringify(data));
-      }
-    }
-  }
-  getAllPlayerIDs() {
-    return [...this.players.keys()];
-  }
-}
 
 function findAvailableRoom() {
   for (const room of rooms.values()) {
@@ -132,48 +57,46 @@ function startRoom(room) {
   ];
 
   const playersArray = Array.from(room.players.values());
-
+  
   // Place players directly in the map with values 5, 6, 7, 8
   for (let i = 0; i < playersArray.length; i++) {
     const pos = positionPlayers[i];
+    const player = playersArray[i];
     if (pos) {
       const [row, col] = pos;
       map[row][col] = 5 + i; // Set player number on map
+      player.x = col * 40;
+      player.y = row * 40;
     }
+  
   }
 
-  // Prepare player data with the shared map
-  const players = playersArray.map((player, index) => {
-    const pos = positionPlayers[index] || [1, 1]; // fallback if needed
-    return {
-      nickname: player.nickname,
-      lives: player.lives,
-      playerId: player.id,
-      playerIndex: index,
-      row: pos[0],
-      col: pos[1],
-    };
-  });
+  // const players = playersArray.map((player, index) => {
+  //   return {
+  //     player: player
+  //   };
+  // });
 
   // Start game for all players
   for (const player of playersArray) {
     console.log(`Player ${player.nickname} in room ${room.id}`);
-    startGameForPlayer(player, room, players,map);
+    startGameForPlayer(player, room, playersArray, map);
   }
 }
 
 
 
 
-function startGameForPlayer(player, room, players,map) {
+function startGameForPlayer(player, room, playersArray, map) {
 
   player.conn.send(JSON.stringify({
     type: 'startGame',
     nickname: player.nickname,
     lives: player.lives,
-    players: players,
+    players: playersArray,
     MyId: player.id,
-    map : map,
+    map: map,
+
   }));
 
   player.conn.on('message', (message) => {
@@ -188,20 +111,7 @@ function startGameForPlayer(player, room, players,map) {
     if (data.type === 'loseLife') {
       player.loseLife();  // Decrease lives
     }
-    // room.broadcast({
-    //   type: 'updateLives',
-    //   playerId: player.id,
-    //   lives: player.lives,
-    //   nickname: player.nickname,
-    // });
 
-    // if (!player.isAlive()) {
-    //   room.broadcast({
-    //     type: 'playerDied',
-    //     playerId: player.id,
-    //     nickname: player.nickname,
-    //   });
-    // }
     switch (data.type) {
       case "chatMsg":
         room.broadcast({
@@ -210,18 +120,12 @@ function startGameForPlayer(player, room, players,map) {
           messageText: data.messageText || ''
         });
         break;
-      case "playerMove":
-        room.broadcast({
-          type: 'playerMove',
-          PlayerId: player.id,
-          position: data.position,
-        });
-        break;
+
       case "placeBomb":
         room.broadcast({
           type: 'placeBomb',
           position: data.position,
-          gift : Math.random() < 0.3,
+          gift: Math.random() < 0.3,
           index: Math.floor(Math.random() * 3),
         });
         break;
@@ -235,6 +139,7 @@ function startGameForPlayer(player, room, players,map) {
     room.broadcast({ type: 'updatePlayers', playerCount: room.players.size, playerId: player.id });
   });
 }
+
 
 wss.on('connection', (ws) => {
   let currentPlayer;
@@ -253,6 +158,7 @@ wss.on('connection', (ws) => {
       case "newPlayer":
         const id = Date.now() + Math.floor(Math.random() * 1000);
         currentPlayer = new Player(data.nickname, id, ws);
+        // currentPlayer.playerElement = currentPlayer;
         currentRoom = findAvailableRoom();
         currentRoom.addPlayer(currentPlayer);
 
@@ -269,7 +175,12 @@ wss.on('connection', (ws) => {
           }
         }, 5000);
         break;
-
+      case "playerMove":
+        currentPlayer.Updatemove(data, currentRoom)
+        break;
+      case "PlayerElement":
+        currentPlayer.UpdatePlayerElement(data)
+        break;
       default:
         console.log("Unknown message type:", data.type);
         break;

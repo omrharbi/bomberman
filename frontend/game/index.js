@@ -27,7 +27,7 @@ function waiting() {
     const waitingGif = jsx('div', {}, jsx('img', {
         src: '/images/bomberman3d.gif',
         alt: 'Waiting...',
-        style: ' margin-top: 10px;' 
+        style: ' margin-top: 10px;'
     }), jsx('p', {}, ' Looking for a match...'));
     render(waitingGif, contDiv);
 
@@ -53,7 +53,7 @@ function connectToGameServer(name) {
         console.log('Disconnected from WebSocket server');
     };
 }
-let tileMap ;
+let tileMap;
 function handleServerMessages(data) {
     const tileSize = 40;
     if (data.type == 'startGame') {
@@ -84,19 +84,27 @@ function handleServerMessages(data) {
             updateOtherPlayerPosition(data);
             break;
         case 'placeBomb':
-            Placingbombinmap(data,tileMap);
+            Placingbombinmap(data, tileMap);
         default:
             break;
     }
 }
 function updateOtherPlayerPosition(data) {
-    //if (data.PlayerId === this.MyId) return;
-    let playerElement = document.getElementById(`player_${data.PlayerId}`);
-    if (!playerElement) return;
+    
+    let playerElement = document.getElementById(`player_${data.Id}`);
+    // console.log("playerElement",playerElement);
+    
+    if (!playerElement) {
+        console.log("player not found", data.Id);
+        return;
+    }
 
     playerElement.style.backgroundPositionY = data.position.spriteY + 'px';
     playerElement.style.backgroundPositionX = data.position.spriteX + 'px';
-
+    // console.log("data.position.x", data.position.x);
+    // console.log("data.position.y", data.position.y);
+    
+    
     playerElement.style.transform = `translate(${data.position.x}px, ${data.position.y}px)`;
 }
 
@@ -218,8 +226,8 @@ function playerDied(playerId, nickname) {
 //     }
 // }
 
-function Placingbombinmap(data,tileMap) {
+function Placingbombinmap(data, tileMap) {
     console.log("tileMap", tileMap);
-    
+
     tileMap.placeBomb(data.position.row, data.position.col, data.gift, data.index);
 }
