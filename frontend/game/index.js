@@ -14,7 +14,7 @@ const router = new Router({
 router.init();
 
 let waitingContainer = null;
-
+let gameContainer = null;
 
   export function waiting(element) {
     waitingContainer = element; 
@@ -100,22 +100,74 @@ function updateOtherPlayerPosition(data) {
 }
 
 
-function updatePlayerCount(count, playerId) {
-    if (document.getElementById('playercount')) {
-        document.getElementById('playercount').innerText = `Players: ${count}/4`;
-    } else {
-        if (count == 1) {
-            alert("you win")
-        } else {
-            console.log(`removing player have id : ${playerId}`);
-            document.getElementById(`${playerId}`).remove()
-        }
-    }
-}
 
+function updatePlayerCount(count, playerId) {
+    gameState.playerCount = count;
+    
+    // For waiting screen
+    if (waitingContainer) {
+      const updatedWaitingContent = jsx('div', {},
+        jsx('p', { id: 'playercount' }, `Players: ${count}/4`),
+        jsx('div', { className: 'waiting-animation' },
+          jsx('img', {
+            src: '/images/bomberman3d.gif',
+            alt: 'Waiting...',
+            style: 'margin-top: 10px;'
+          }),
+          jsx('p', {}, 'Looking for a match...')
+        )
+      );
+      
+      updateRender(updatedWaitingContent, waitingContainer);
+    }
+    
+    // else {
+    //   if (count === 1) {
+    //     alert('you win ');
+    //     const winScreen = jsx('div', { className: 'win-screen' },
+    //       jsx('h2', {}, 'You Win!'),
+    //       jsx('button', { 
+    //         className: 'play-again-btn',
+    //         onclick: () => router.navigate('/')
+    //       }, 'Play Again')
+    //     );
+    //     updateRender(winScreen, gameContainer);
+    //   } else {
+    //     // Update game state to remove player
+    //     // This assumes your TileMap has a removePlayer method or similar
+    //     // if (tileMap) {
+    //     //   tileMap.removePlayer(playerId);
+    //     // }
+        
+    //     // // Update the players section in UI
+    //     // updatePlayersSection();
+    //   }
+    // }
+  }
+/**** */
+function updatePlayersSection() {
+    const playersSection = jsx('div', { className: 'footer-section players-section', id: 'players' },
+      Array.from(gameState.players.entries()).map(([id, player]) => 
+        jsx('div', { className: 'player-info', key: id },
+          jsx('span', {}, player.nickname),
+          jsx('span', { className: 'lives' }, `Lives: ${player.lives}`)
+        )
+      )
+    );
+    
+    // Find the players section container
+    const footerContent = document.querySelector('.footer-content');
+    if (footerContent) {
+      const playersContainer = footerContent.querySelector('.players-section');
+      if (playersContainer) {
+        updateRender(playersSection, playersContainer);
+      }
+    }
+  }
+/*** */
 function startGame(data, tileMap) {
     let count = 3
-
+    gameContainer = document.getElementById('game')
     const interval = setInterval(() => {
         count--
         document.getElementById('playercount').innerText = `start Game in : ${count}s`;
