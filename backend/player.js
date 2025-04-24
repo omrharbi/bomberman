@@ -201,14 +201,16 @@ export default class Player {
     });
   }
 
-  isPlayerHitByExplosion(data) {
+  isPlayerHitByExplosion(data,room) {
+    
     const playerCenterX = this.x + this.width / 2;
     const playerCenterY = this.y + this.height / 2;
-
-    const playerTileRow = Math.floor(playerCenterY / this.tileSize);
-    const playerTileCol = Math.floor(playerCenterX / this.tileSize);
-
+    
+    const playerTileRow = Math.floor(playerCenterY / room.tileSize);
+    const playerTileCol = Math.floor(playerCenterX / room.tileSize);
+    
     if (data.row === playerTileRow && data.col === playerTileCol) {
+      console.log("data", data);
       this.loseLife();
       console.log("💥 Player hit by explosion!");
       if (!this.isAlive()) {

@@ -172,7 +172,7 @@ wss.on('connection', (ws) => {
         currentPlayer.placebomb(currentRoom)
         break;
       case "loselife":
-        currentPlayer.isPlayerHitByExplosion(data);
+        currentPlayer.isPlayerHitByExplosion(data,currentRoom);
         break;
       case "destroywall":
         currentRoom.destroy(data)
