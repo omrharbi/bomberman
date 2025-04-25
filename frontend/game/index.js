@@ -84,6 +84,11 @@ function handleServerMessages(data) {
         case 'drawExplosion':
             drawExplosion(data.position.row, data.position.col, data.frames);
             break;
+        case 'HitByExplosion':
+            socket.send(
+                JSON.stringify(data)
+              );
+            break;
         case 'playerDead':
             animationPlayerDead(data)
             break;

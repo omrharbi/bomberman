@@ -243,11 +243,21 @@ export default class Player {
       },
       frames: frames,
     })
+    room.broadcast({
+      type: "HitByExplosion",
+      row: row,
+      col: col,
+    })
     directions.forEach(({ dr, dc }) => {
       const newRow = row + dr;
       const newCol = col + dc;
-      this.#isPlayerHitByExplosion(newRow, newCol, room);
-      // Check boundaries
+
+      room.broadcast({
+        type: "HitByExplosion",
+        row: newRow,
+        col: newCol,
+      }
+      );
       if (newRow >= 0 && newRow < room.map.length && newCol >= 0 && newCol < room.map[0].length) {
         if (room.map[newRow][newCol] === 3) {
           room.map[newRow][newCol] = 0;
@@ -275,15 +285,14 @@ export default class Player {
     });
   }
 
-  #isPlayerHitByExplosion(row, col, room) {
-
+  isPlayerHitByExplosion(data, room) {
     const playerCenterX = this.x + this.width / 2;
     const playerCenterY = this.y + this.height / 2;
 
     const playerTileRow = Math.floor(playerCenterY / room.tileSize);
     const playerTileCol = Math.floor(playerCenterX / room.tileSize);
-
-    if (row === playerTileRow && col === playerTileCol) {
+    
+    if (data.row === playerTileRow && data.col === playerTileCol) {
       this.loseLife();
       console.log("💥 Player hit by explosion!");
 
@@ -292,7 +301,7 @@ export default class Player {
         Id: this.id,
         hearts: this.lives
       }));
-      
+
 
       if (!this.isAlive()) {
         this.isDead = true;
