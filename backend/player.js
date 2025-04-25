@@ -6,18 +6,27 @@ export default class Player {
     this.id = id;
     this.conn = conn;
     this.bombsPlaced = 0;
-    this.bombPower = 1;
     this.positionX = 52;
     this.positionY = 0;
     this.width = 21;
     this.height = 40;
     this.lives = 3;
     this.speed = 25;
+    this.fire = 1;
     this.isMoving = false;
     this.isDead = false;
     this.direction = "up";
     this.movementStartTime = null;
-
+    this.timePlacbomb = 3000;
+    this.lastTimePlacbomb = 0;
+    this.rewards = {
+      bombing: false,
+      speed: false,
+      fire: false
+    };
+    this.setTimeoutbomb = null;
+    this.setTimeoutspeed = null;
+    this.setTimeoutfire = null;
     // this.map = null; // Add this line
     // this.tileSize = 40;
   }
@@ -99,7 +108,10 @@ export default class Player {
     if (this.#checkCollision(room)) {
       this.x = prevX;
       this.y = prevY;
+    } else {
+      this.#checkRewardCollection(room);
     }
+
     if (this.isMoving) {
       const currentSprite = spriteMap[this.direction];
 
@@ -184,6 +196,12 @@ export default class Player {
   }
 
   placebomb(room) {
+    if (!this.rewards.bombing) {
+      if (Date.now() - this.lastTimePlacbomb < this.timePlacbomb) {
+        return;
+      }
+    }
+    this.lastTimePlacbomb = Date.now();
     if (!this.isAlive()) {
       return;
     }
@@ -198,6 +216,15 @@ export default class Player {
       { dr: 1, dc: 0 }, // Down
       { dr: 0, dc: -1 }, // Left
     ];
+    if (this.rewards.fire) {
+      directions.push(
+        { dr: -2, dc: 0 },  // Up 2 tiles
+        { dr: 0, dc: 2 },   // Right 2 tiles
+        { dr: 2, dc: 0 },   // Down 2 tiles
+        { dr: 0, dc: -2 }   // Left 2 tiles
+      );
+    }
+
     const frames = [
       { x: -5, y: 0 }, // Frame 1
       { x: -40, y: 0 }, // Frame 2
@@ -261,6 +288,9 @@ export default class Player {
             index: index,
             frames: frames,
           })
+          if (gift) {
+            room.addReward(newRow, newCol, index);
+          }
         } else if (room.map[newRow][newCol] === 0) {
           room.broadcast({
             type: "drawExplosion",
@@ -292,7 +322,7 @@ export default class Player {
         Id: this.id,
         hearts: this.lives
       }));
-      
+
 
       if (!this.isAlive()) {
         this.isDead = true;
@@ -306,4 +336,91 @@ export default class Player {
       }
     }
   }
+  #checkRewardCollection(room) {
+    const playerCenterX = this.x + this.width / 2;
+    const playerCenterY = this.y + this.height / 2;
+
+    const playerTileX = Math.floor(playerCenterX / room.tileSize);
+    const playerTileY = Math.floor(playerCenterY / room.tileSize);
+
+    if (room.rewards && room.rewards[`${playerTileY}_${playerTileX}`]) {
+      const rewardType = room.rewards[`${playerTileY}_${playerTileX}`]
+      this.collectReward(rewardType);
+
+      // Broadcast that the reward has been collected
+      room.broadcast({
+        type: "rewardCollected",
+        position: {
+          row: playerTileY,
+          col: playerTileX,
+        },
+        playerId: this.id,
+        rewardType: rewardType
+      });
+
+      // Remove the reward from the map
+      delete room.rewards[`${playerTileY}_${playerTileX}`];
+
+    }
+  }
+
+  collectReward(rewardType) {
+    const rewardDurations = {
+      bomb: 5000,
+      speed: 5000,
+      fire: 5000
+    };
+  
+    const resetReward = (type) => {
+      switch (type) {
+        case 'bomb':
+          this.rewards.bombing = false;
+          break;
+        case 'speed':
+          this.rewards.speed = false;
+          this.speed = 25;
+          break;
+        case 'fire':
+          this.rewards.fire = false;
+          break;
+      }
+  
+      this.sendPlayerStatsUpdate();
+    };
+  
+    switch (rewardType) {
+      case 'bomb':
+        this.rewards.bombing = true;
+        clearTimeout(this.bombTimeout);
+        this.bombTimeout = setTimeout(() => resetReward('bomb'), rewardDurations.bomb);
+        break;
+      case 'speed':
+        this.rewards.speed = true;
+        this.speed = 50;
+        clearTimeout(this.speedTimeout);
+        this.speedTimeout = setTimeout(() => resetReward('speed'), rewardDurations.speed);
+        break;
+      case 'fire':
+        this.rewards.fire = true;
+        clearTimeout(this.fireTimeout);
+        this.fireTimeout = setTimeout(() => resetReward('fire'), rewardDurations.fire);
+        break;
+      default:
+        console.warn(`Unknown reward type: ${rewardType}`);
+        return;
+    }
+  
+    this.sendPlayerStatsUpdate();
+  }
+  
+  sendPlayerStatsUpdate() {
+    this.conn.send(JSON.stringify({
+      type: "playerStatsUpdate",
+      bombPower: this.rewards.bombing,
+      speed: this.rewards.speed,
+      fire: this.rewards.fire
+    }));
+  }
+  
+
 }

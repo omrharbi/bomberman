@@ -146,7 +146,10 @@ export function render(vNode, container) {
 
 export function updateRender(newVNode, container) {
   const oldVNode = container._vdom;
-  
+  if (!oldVNode) {
+    render(newVNode, container);
+    return;
+  }
   const patches = diff(oldVNode, newVNode);
   
   patch(container, patches, 0);
