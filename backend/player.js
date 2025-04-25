@@ -188,6 +188,7 @@ export default class Player {
       return;
     }
 
+    this.bombsPlaced = 1;
     const row = Math.floor((this.y + 20) / room.tileSize);
     const col = Math.floor((this.x + 20) / room.tileSize);
     const gift = Math.random() < 0.3
@@ -251,6 +252,7 @@ export default class Player {
     directions.forEach(({ dr, dc }) => {
       const newRow = row + dr;
       const newCol = col + dc;
+      const roomValue = room.map[newRow][newCol];
 
       room.broadcast({
         type: "HitByExplosion",
@@ -259,7 +261,7 @@ export default class Player {
       }
       );
       if (newRow >= 0 && newRow < room.map.length && newCol >= 0 && newCol < room.map[0].length) {
-        if (room.map[newRow][newCol] === 3) {
+        if (roomValue === 3) {
           room.map[newRow][newCol] = 0;
           room.broadcast({
             type: "destroyWall",
@@ -271,7 +273,7 @@ export default class Player {
             index: index,
             frames: frames,
           })
-        } else if (room.map[newRow][newCol] === 0) {
+        } else if (roomValue === 0 || roomValue === 5 || roomValue === 6 || roomValue === 7 || roomValue === 8) {
           room.broadcast({
             type: "drawExplosion",
             position: {
@@ -294,14 +296,11 @@ export default class Player {
     
     if (data.row === playerTileRow && data.col === playerTileCol) {
       this.loseLife();
-      console.log("💥 Player hit by explosion!");
-
       this.conn.send(JSON.stringify({
         type: "hearts",
         Id: this.id,
         hearts: this.lives
       }));
-
 
       if (!this.isAlive()) {
         this.isDead = true;
@@ -310,8 +309,6 @@ export default class Player {
           type: "playerDead",
           Id: this.id
         });
-
-        console.log("💀 Player is dead!");
       }
     }
   }
