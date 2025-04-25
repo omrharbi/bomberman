@@ -12,7 +12,8 @@ export const Ref = {
     buttonRef : { current: null },
     messagesRef : { current: null },
     hearts: { current: null },
-    StatusRef : { current: null }
+    StatusRef : { current: null },
+    notificationsRef : { current: null }
 }
 
 export function GamePage() {
@@ -22,6 +23,13 @@ export function GamePage() {
         jsx('header', { className: 'header' },
             jsx('h1', { className: 'game-title' }, 'Bomber Man')
         ),
+
+        jsx('div', { 
+            id: 'power-notifications', 
+            ref: Ref.notificationsRef,
+            style: 'position: absolute; top: 70px; right: 20px; z-index: 100; width: 250px;'
+        }),
+
         // Content Container
         jsx('div', { className: 'content-container' },
             // Main Game Area

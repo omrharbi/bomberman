@@ -100,11 +100,38 @@ function handleServerMessages(data) {
             break;
         case 'playerStatsUpdate':
             updatePlayerStats(data)
+            notificationPower(data)
             break;
         default:
             break;
     }
 }
+
+function notificationPower(data) {
+    let notificationsEle = Ref.notificationsRef.current
+    if (!notificationsEle) return;
+    
+    // let notification = jsx("div", { className: "power-notification"})
+    
+    if (data.bombPower) {
+        notificationsEle.innerHTML = '💣 Bomb Power increased!';
+        notificationsEle.style.borderLeft = '4px solid #ff6b6b';
+    } else if (data.speed) {
+        notificationsEle.innerHTML = '⚡ Speed boost activated!';
+        notificationsEle.style.borderLeft = '4px solid #4ecdc4';
+    } else if (data.fire) {
+        notificationsEle.innerHTML = '🔥 Fire Range increased!';
+        notificationsEle.style.borderLeft = '4px solid #ffa502';
+    } else {
+        return;
+    }
+    
+    setTimeout(() => {
+            // notificationsEle.removeChild(elementToRemove);
+            notificationsEle.innerHTML = '';
+    }, 3000);
+}
+
 function updatePlayerStats(data) {
     const status = Ref.StatusRef.current
     const statsNode = jsx("div", { className: "stella-status" },
@@ -117,6 +144,7 @@ function updatePlayerStats(data) {
     );
     updateRender(statsNode, status);
 }
+
 function rewardCollected(data) {
     const canvas = Ref.gameCanvasRef.current
     const tileElement = Selectbyrowcol(canvas, data.position.row, data.position.col);
@@ -124,6 +152,7 @@ function rewardCollected(data) {
         tileElement.innerHTML = "";
     }
 }
+
 function hearts(data) {
     const hearts = Ref.hearts.current
 
