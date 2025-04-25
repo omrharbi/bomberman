@@ -1,10 +1,10 @@
-import { LoginPage ,GamePage,gameState , Ref} from '../app/config.js'
+import { LoginPage, GamePage, gameState, Ref } from '../app/config.js'
 import { jsx, createElement } from '../src/framework.js'
 import { render, updateRender } from '../src/vdom.js'
 import { MyEventSystem } from '../src/event.js'
 import { Router } from '../src/router.js';
 import TileMap from './tileMap.js';
-import { playersElement} from './tileMap.js'
+import { playersElement } from './tileMap.js'
 
 
 const router = new Router({
@@ -16,18 +16,18 @@ router.init();
 let waitingContainer = null;
 
 
-  export function waiting(element) {
-    waitingContainer = element; 
+export function waiting(element) {
+    waitingContainer = element;
     const waitingContent = jsx('div', {},
-      jsx('p', { id: 'playercount' }, `Players: ${gameState.playerCount}/4`),
-      jsx('div', { className: 'waiting-animation' },
-        jsx('img', {
-          src: '/images/bomberman3d.gif',
-          alt: 'Waiting...',
-          style: 'margin-top: 10px;'
-        }),
-        jsx('p', {}, 'Looking for a match...')
-      )
+        jsx('p', { id: 'playercount' }, `Players: ${gameState.playerCount}/4`),
+        jsx('div', { className: 'waiting-animation' },
+            jsx('img', {
+                src: '/images/bomberman3d.gif',
+                alt: 'Waiting...',
+                style: 'margin-top: 10px;'
+            }),
+            jsx('p', {}, 'Looking for a match...')
+        )
     );
 
     render(waitingContent, element);
@@ -92,14 +92,38 @@ function handleServerMessages(data) {
         case 'playerDead':
             animationPlayerDead(data)
             break;
-        case 'hearts': 
+        case 'hearts':
             hearts(data)
+            break;
+        case 'rewardCollected':
+            rewardCollected(data)
+            break;
+        case 'playerStatsUpdate':
+            updatePlayerStats(data)
             break;
         default:
             break;
     }
 }
-
+function updatePlayerStats(data) {
+    const status = Ref.StatusRef.current
+    const statsNode = jsx("div", { className: "stella-status" },
+        jsx("h3", { style: "color:rgb(0, 0, 0); margin-bottom: 8px;" }, "✨ Stella's Power Stats ✨"),
+        jsx("div", { style: "list-style: none; padding: 0; margin: 0;" },
+            jsx("p", {}, `💣 Bomb Power: ${data.bombPower}`),
+            jsx("p", {}, `⚡ Speed: ${data.speed}`),
+            jsx("p", {}, `🔥 Fire Range: ${data.fire}`)
+        )
+    );
+    updateRender(statsNode, status);
+}
+function rewardCollected(data) {
+    const canvas = Ref.gameCanvasRef.current
+    const tileElement = Selectbyrowcol(canvas, data.position.row, data.position.col);
+    if (tileElement) {
+        tileElement.innerHTML = "";
+    }
+}
 function hearts(data) {
     const hearts = Ref.hearts.current
 
@@ -112,7 +136,7 @@ function hearts(data) {
 function animationPlayerDead(data) {
     let playerElement = playersElement.get(data.Id)
     playerElement.style.backgroundImage = `url('../images/player_dead.png')`;
-    
+
     if (!playerElement) {
         console.log("player not found", data.Id);
         return;
@@ -127,15 +151,15 @@ function animationPlayerDead(data) {
         { x: -162, y: 1 },  // Frame 5
         { x: -198, y: 1 },  // Frame 6
         { x: -235, y: 1 }   // Frame 7
-      ];
+    ];
 
-      let currentFrame = 0;
-      const frameDuration = 100;
-      
-      const animateDeath = () => {
+    let currentFrame = 0;
+    const frameDuration = 100;
+
+    const animateDeath = () => {
         if (currentFrame >= deathFrames.length) {
             playerElement.remove()
-          return;
+            return;
         }
 
         playerElement.style.backgroundPositionX = `${deathFrames[currentFrame].x}px`;
@@ -143,9 +167,9 @@ function animationPlayerDead(data) {
         currentFrame++;
 
         setTimeout(animateDeath, frameDuration);
-      };
+    };
 
-      animateDeath();
+    animateDeath();
 }
 
 function updateOtherPlayerPosition(data) {
@@ -163,24 +187,24 @@ function updateOtherPlayerPosition(data) {
 
 function updatePlayerCount(count, playerId) {
     gameState.playerCount = count;
-    
+
     // For waiting screen
     if (waitingContainer) {
-      const updatedWaitingContent = jsx('div', {},
-        jsx('p', { id: 'playercount' }, `Players: ${count}/4`),
-        jsx('div', { className: 'waiting-animation' },
-          jsx('img', {
-            src: '/images/bomberman3d.gif',
-            alt: 'Waiting...',
-            style: 'margin-top: 10px;'
-          }),
-          jsx('p', {}, 'Looking for a match...')
-        )
-      );
-      
-      updateRender(updatedWaitingContent, waitingContainer);
+        const updatedWaitingContent = jsx('div', {},
+            jsx('p', { id: 'playercount' }, `Players: ${count}/4`),
+            jsx('div', { className: 'waiting-animation' },
+                jsx('img', {
+                    src: '/images/bomberman3d.gif',
+                    alt: 'Waiting...',
+                    style: 'margin-top: 10px;'
+                }),
+                jsx('p', {}, 'Looking for a match...')
+            )
+        );
+
+        updateRender(updatedWaitingContent, waitingContainer);
     }
-    
+
     // else {
     //   if (count === 1) {
     //     alert('you win ');
@@ -198,12 +222,12 @@ function updatePlayerCount(count, playerId) {
     //     // if (tileMap) {
     //     //   tileMap.removePlayer(playerId);
     //     // }
-        
+
     //     // // Update the players section in UI
     //     // updatePlayersSection();
     //   }
     // }
-  }
+}
 /**** */
 // function updatePlayersSection() {
 //     const playersSection = jsx('div', { className: 'footer-section players-section', id: 'players' },
@@ -214,7 +238,7 @@ function updatePlayerCount(count, playerId) {
 //         )
 //       )
 //     );
-    
+
 //     // Find the players section container
 //     const footerContent = document.querySelector('.footer-content');
 //     if (footerContent) {
@@ -232,16 +256,16 @@ function startGame(data, tileMap) {
         const updatedWaitingContent = jsx('div', {},
             jsx('p', { id: 'playercount' }, `start Game in : ${count}s`),
             jsx('div', { className: 'waiting-animation' },
-              jsx('img', {
-                src: '/images/bomberman3d.gif',
-                alt: 'Waiting...',
-                style: 'margin-top: 10px;'
-              }),
-              jsx('p', {}, 'Looking for a match...')
+                jsx('img', {
+                    src: '/images/bomberman3d.gif',
+                    alt: 'Waiting...',
+                    style: 'margin-top: 10px;'
+                }),
+                jsx('p', {}, 'Looking for a match...')
             )
-          );
-          
-          updateRender(updatedWaitingContent, waitingContainer);
+        );
+
+        updateRender(updatedWaitingContent, waitingContainer);
         if (count == 0) {
             GoToGame(data, tileMap)
             clearInterval(interval)
@@ -251,7 +275,7 @@ function startGame(data, tileMap) {
 
 function GoToGame(data, tileMap) {
     const body = document.body;
-    render(GamePage(), body)    
+    render(GamePage(), body)
     let game = Ref.gameCanvasRef.current
     function gameLoop() {
         tileMap.drawGame(game, data)
@@ -275,7 +299,7 @@ function GoToGame(data, tileMap) {
 }
 
 function chat(nickname) {
-    const sendButton = Ref.buttonRef.current    
+    const sendButton = Ref.buttonRef.current
     MyEventSystem.addEventListener(sendButton, 'click', () => {
         sendMessage(nickname);
     });
@@ -309,7 +333,7 @@ function displayMsg(data) {
 function drawBomb(row, col) {
     const canvas = Ref.gameCanvasRef.current
     const tileElement = Selectbyrowcol(canvas, row, col);
-    if (tileElement && !hasclass(tileElement,"bomb")) {
+    if (tileElement && !hasclass(tileElement, "bomb")) {
         const bombDiv = jsx("div", {
             className: "bomb",
             style: "background-image: url('../images/bomb.png'); width: 38px; height: 38px; z-index: 5; left: 50%; top: 50%;"
@@ -323,9 +347,9 @@ function drawBomb(row, col) {
 function removeBomb(row, col) {
     const canvas = Ref.gameCanvasRef.current
     const tileElement = Selectbyrowcol(canvas, row, col);
-    const bombImg = hasclass(tileElement,"bomb");
+    const bombImg = hasclass(tileElement, "bomb");
     if (bombImg) {
-        tileElement.innerHTML = ""; // Remove the bomb div
+        tileElement.innerHTML = "";
     }
 }
 
@@ -335,15 +359,15 @@ function destroyWall(row, col, gift, index, frames) {
     if (tileElement) {
         if (gift) {
             const power = [
-                "../images/bombing.webp",
-                "../images/speed.webp",
                 "../images/spoil_tileset.webp",
+                "../images/speed.webp",
+                "../images/bombing.webp",
             ];
             tileElement.innerHTML =
                 '<img src="' +
                 power[index] +
                 '" style="width: 38px; height: 38px; position: absolute; top: 0; left: 0;">';
-            gift = false;
+            //gift = false;
         } else {
             tileElement.innerHTML = "";
             drawExplosion(row, col, frames);
@@ -360,19 +384,19 @@ function drawExplosion(row, col, frames) {
 
     const explosionDiv = jsx("div", {
         className: "damage",
-        style: 
-          `background-position: ${frames[0].x}px ${frames[0].y}px;
+        style:
+            `background-position: ${frames[0].x}px ${frames[0].y}px;
           background-image: url('../images/explosion.png');
           width: 38px;
           height: 38px;
           z-index: 6;
           left: 50%;
           top: 50%;`
-        
-      });
 
-      const explosionElement = createElement(explosionDiv);
-      tileElement.appendChild(explosionElement);
+    });
+
+    const explosionElement = createElement(explosionDiv);
+    tileElement.appendChild(explosionElement);
 
     const animate = () => {
         if (currentFrame >= frames.length) {
@@ -400,7 +424,7 @@ function hasclass(tile, className) {
     }
     return false;
 }
-function Selectbyrowcol(canvas,row, col) {
+function Selectbyrowcol(canvas, row, col) {
     let tileElement = null;
     for (let i = 0; i < canvas.children.length; i++) {
         const child = canvas.children[i];

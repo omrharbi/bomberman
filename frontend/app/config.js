@@ -11,7 +11,8 @@ export const Ref = {
     inputRef : { current: null },
     buttonRef : { current: null },
     messagesRef : { current: null },
-    hearts: { current: null }
+    hearts: { current: null },
+    StatusRef : { current: null }
 }
 
 export function GamePage() {
@@ -60,8 +61,15 @@ export function GamePage() {
                 ),
                 jsx('div', { className: 'footer-section players-section', id: 'players', ref: Ref.playersRef },
                 ),
-                jsx('div', { className: 'footer-section status-section' },
-                    jsx('p', {}, 'Status: Game In Progress')
+                jsx('div', { className: 'footer-section status-section', ref: Ref.StatusRef },
+                    jsx("div", { className: "stella-status" },
+                        jsx("h3", { style: "color: #ff69b4; margin-bottom: 8px;" }, "✨ Stella's Power Stats ✨"),
+                        jsx("div", { style: "list-style: none; padding: 0; margin: 0;" },
+                          jsx("p", {}, "💣 Bomb Power: false", ),
+                          jsx("p", {}, "⚡ Speed: false", ),
+                          jsx("p", {}, "🔥 Fire Range: false",)
+                        )
+                      )
                 )
             ),
         )

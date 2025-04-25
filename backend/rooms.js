@@ -5,6 +5,7 @@ export default class Room {
     this.id = id;
     this.players = new Map();
     this.started = false;
+    this.rewards = {};
   }
 
   addPlayer(player) {
@@ -29,5 +30,25 @@ export default class Room {
   setMapData(map, tileSize) {
     this.map = map;
     this.tileSize = tileSize;
+  }
+
+  addReward(row, col, index) {
+    const powerUpTypes = ["bomb", "speed", "fire"];
+    const rewardType = powerUpTypes[index];
+    this.rewards[`${row}_${col}`] = rewardType;
+    
+    this.broadcast({
+      type: "rewardAdded",
+      position: {
+        row: row,
+        col: col
+      },
+      rewardType: rewardType
+    });
+  }
+  
+  // Remove a reward from the map (when collected)
+  removeReward(row, col) {
+    delete this.rewards[`${row}_${col}`];
   }
 }
