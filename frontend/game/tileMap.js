@@ -12,6 +12,9 @@ export default class Game {
     this.MyId = data.MyId;
     this.map = data.map;
     this.canvas = null;
+    this.controlsInitialized = false; 
+    this.keydownHandler = null;
+    this.keyupHandler = null;
   }
 
   #image(fileName) {
@@ -146,13 +149,18 @@ export default class Game {
   }
 
   #setupPlayerControls() {
+    if (this.controlsInitialized) {
+      console.log("Controls are already initialized, using existing handlers");
+      return;
+    }
+  
     let keysPressed = {};
     let lastUpdateTime = Date.now();
     let lastSendTime = 0;
     const updateInterval = 50;
-    MyEventSystem.addEventListener(window, "keydown", (e) => {
+    this.keydownHandler = (e) => {
       keysPressed[e.key] = true;
-
+  
       if ((e.key === "b" || e.key === "B") && !e.repeat) {
         if (socket && socket.readyState === WebSocket.OPEN) {
           socket.send(
@@ -162,17 +170,25 @@ export default class Game {
           );
         }
       }
-    });
-
-    MyEventSystem.addEventListener(window,"keyup", (e) => {
+    };
+  
+    this.keyupHandler = (e) => {
       keysPressed[e.key] = false;
-    });
-
+    };
+  
+    MyEventSystem.addEventListener(window, "keydown", this.keydownHandler);
+    MyEventSystem.addEventListener(window, "keyup", this.keyupHandler);
+  
     const updatePlayerMovement = () => {
+      if (!this.controlsInitialized) {
+        console.log("Controls are not initialized, skipping update");
+        return;
+      }
+      
       const now = Date.now();
       const deltaTime = (now - lastUpdateTime) / 100;
       lastUpdateTime = now;
-
+  
       let direction;
       if (keysPressed["w"] || keysPressed["ArrowUp"]) {
         direction = "up";
@@ -186,7 +202,7 @@ export default class Game {
       if (keysPressed["a"] || keysPressed["ArrowLeft"]) {
         direction = "left";
       }
-
+  
       if (now - lastSendTime > updateInterval) {
         if (socket && socket.readyState === WebSocket.OPEN) {
           socket.send(
@@ -199,10 +215,17 @@ export default class Game {
           lastSendTime = now;
         }
       }
-
-      requestAnimationFrame(updatePlayerMovement);
+  
+      if (this.controlsInitialized) {
+        requestAnimationFrame(updatePlayerMovement);
+      }
     };
-
+  
+    this.controlsInitialized = true;
     updatePlayerMovement();
+  }
+  cleanup() {
+    this.controlsInitialized = false;
+    console.log("TileMap controls cleaned up");
   }
 }

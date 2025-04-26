@@ -14,12 +14,13 @@ export const Ref = {
     hearts: { current: null },
     StatusRef : { current: null },
     notificationsRef : { current: null },
-    popupRef: { current: null }
+    popupRef: { current: null },
+    gamePageRef : { current: null },
 }
 
 export function GamePage() {
     return jsx(
-        'div', {},
+        'div', { ref: Ref.gamePageRef },
         // Header
         jsx('header', { className: 'header' },
             jsx('h1', { className: 'game-title' }, 'Bomber Man')
