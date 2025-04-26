@@ -35,7 +35,7 @@ export function waiting(element) {
 
 export let socket;
 export function connectToGameServer(name) {
-    socket = new WebSocket('ws://localhost:8080');
+    socket = new WebSocket('ws://10.1.6.10:8080');
     socket.onopen = () => {
         console.log('Connected to WebSocket server');
         socket.send(JSON.stringify({

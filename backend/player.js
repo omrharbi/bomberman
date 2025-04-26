@@ -22,7 +22,7 @@ export default class Player {
     this.rewards = {
       bombing: false,
       speed: false,
-      fire: false
+      fire: false,
     };
     this.setTimeoutbomb = null;
     this.setTimeoutspeed = null;
@@ -39,7 +39,9 @@ export default class Player {
   }
 
   Updatemove(data, room) {
-    if (!this.isAlive()) { return }
+    if (!this.isAlive()) {
+      return;
+    }
     let movementStartTime = null;
     let lastSendTime = 0;
     const updateInterval = 50;
@@ -131,7 +133,7 @@ export default class Player {
           direction: this.direction,
         },
         Id: this.id,
-        element: this.playerElement
+        element: this.playerElement,
       };
 
       room.broadcast(Data);
@@ -200,40 +202,43 @@ export default class Player {
 
     const playerTileX = Math.floor(playerCenterX / room.tileSize);
     const playerTileY = Math.floor(playerCenterY / room.tileSize);
-    
+
     const tileKey = `${playerTileY}_${playerTileX}`;
-    
+
     const toRemove = [];
     for (const bombKey of this.overlappingBombs) {
-      const [bombRow, bombCol] = bombKey.split('_').map(Number);
+      const [bombRow, bombCol] = bombKey.split("_").map(Number);
       const bombTileLeft = bombCol * room.tileSize;
       const bombTileTop = bombRow * room.tileSize;
       const bombTileRight = bombTileLeft + room.tileSize;
       const bombTileBottom = bombTileTop + room.tileSize;
-      
-      if (
-        this.x + this.width < bombTileLeft + 4 ||
+
+      const outside =
+        this.x + this.width < bombTileLeft ||
         this.x > bombTileRight - 6 ||
         this.y + this.height < bombTileTop ||
-        this.y > bombTileBottom - 16
-      ) {
+        this.y > bombTileBottom - 16;
+
+      if (outside) {
         toRemove.push(bombKey);
       }
     }
-    
-    // Remove bombs player is no longer overlapping with
+
     for (const key of toRemove) {
+      console.log(`Removing bomb overlap: ${key}`);
       this.overlappingBombs.delete(key);
     }
-    
-    // Check if current tile is a bomb and add to overlapping set if it is
-    if (
-      playerTileY >= 0 && 
-      playerTileY < room.map.length && 
-      playerTileX >= 0 && 
-      playerTileX < room.map[0].length
-    ) {
-      if (room.map[playerTileY][playerTileX] === 4) {
+
+    const mapValid =
+      playerTileY >= 0 &&
+      playerTileY < room.map.length &&
+      playerTileX >= 0 &&
+      playerTileX < room.map[0].length;
+
+    if (mapValid) {
+      const tileValue = room.map[playerTileY][playerTileX];
+
+      if (tileValue === 4) {
         this.overlappingBombs.add(tileKey);
       }
     }
@@ -253,7 +258,7 @@ export default class Player {
     this.bombsPlaced = 1;
     const row = Math.floor((this.y + 20) / room.tileSize);
     const col = Math.floor((this.x + 20) / room.tileSize);
-    const gift = Math.random() < 0.3
+    const gift = Math.random() < 0.3;
     const index = Math.floor(Math.random() * 3); // Random index for the gift
     const directions = [
       { dr: -1, dc: 0 }, // Up
@@ -263,10 +268,10 @@ export default class Player {
     ];
     if (this.rewards.fire) {
       directions.push(
-        { dr: -2, dc: 0 },  // Up 2 tiles
-        { dr: 0, dc: 2 },   // Right 2 tiles
-        { dr: 2, dc: 0 },   // Down 2 tiles
-        { dr: 0, dc: -2 }   // Left 2 tiles
+        { dr: -2, dc: 0 }, // Up 2 tiles
+        { dr: 0, dc: 2 }, // Right 2 tiles
+        { dr: 2, dc: 0 }, // Down 2 tiles
+        { dr: 0, dc: -2 } // Left 2 tiles
       );
     }
 
@@ -280,41 +285,41 @@ export default class Player {
       { x: -112, y: 36 }, // Frame 7
       { x: -146, y: 36 }, // Frame 8
     ];
-    
+
     // Add this bomb to the player's overlapping bombs set
     this.overlappingBombs.add(`${row}_${col}`);
-    
+
     this.#drawBomb(row, col, room);
 
     setTimeout(() => {
       this.#removeBomb(row, col, room);
       this.#destroyWall(row, col, gift, index, directions, frames, room);
-      
+
       // Remove this bomb from the player's overlapping bombs set
       this.overlappingBombs.delete(`${row}_${col}`);
     }, 3000);
   }
 
   #drawBomb(row, col, room) {
-    room.map[row][col] = 4
+    room.map[row][col] = 4;
     room.broadcast({
       type: "drawBomb",
       position: {
         row: row,
         col: col,
       },
-    })
+    });
   }
-  
+
   #removeBomb(row, col, room) {
-    room.map[row][col] = 0
+    room.map[row][col] = 0;
     room.broadcast({
       type: "removeBomb",
       position: {
         row: row,
         col: col,
       },
-    })
+    });
   }
 
   #destroyWall(row, col, gift, index, directions, frames, room) {
@@ -325,25 +330,28 @@ export default class Player {
         col: col,
       },
       frames: frames,
-    })
+    });
     room.broadcast({
       type: "HitByExplosion",
       row: row,
       col: col,
-    })
+    });
     directions.forEach(({ dr, dc }) => {
       const newRow = row + dr;
       const newCol = col + dc;
-      const roomValue = room.map[newRow][newCol];
-
+      
       room.broadcast({
         type: "HitByExplosion",
         row: newRow,
         col: newCol,
-      }
-      );
-      if (newRow >= 0 && newRow < room.map.length && newCol >= 0 && newCol < room.map[0].length) {
-        if (roomValue === 3) {
+      });
+      if (
+        newRow >= 0 &&
+        newRow < room.map.length &&
+        newCol >= 0 &&
+        newCol < room.map[0].length
+      ) {
+        if (room.map[newRow][newCol] === 3) {
           room.map[newRow][newCol] = 0;
           room.broadcast({
             type: "destroyWall",
@@ -354,12 +362,17 @@ export default class Player {
             gift: gift,
             index: index,
             frames: frames,
-          })
+          });
           if (gift) {
             room.addReward(newRow, newCol, index);
           }
-        } else if (roomValue === 0 || roomValue === 5 || roomValue === 6 || roomValue === 7 || roomValue === 8) {
-         
+        } else if (
+          room.map[newRow][newCol] === 0 ||
+          room.map[newRow][newCol] === 5 ||
+          room.map[newRow][newCol] === 6 ||
+          room.map[newRow][newCol] === 7 ||
+          room.map[newRow][newCol] === 8
+        ) {
           room.broadcast({
             type: "drawExplosion",
             position: {
@@ -367,7 +380,7 @@ export default class Player {
               col: newCol,
             },
             frames: frames,
-          })
+          });
         }
       }
     });
@@ -379,26 +392,28 @@ export default class Player {
 
     const playerTileRow = Math.floor(playerCenterY / room.tileSize);
     const playerTileCol = Math.floor(playerCenterX / room.tileSize);
-    
+
     if (data.row === playerTileRow && data.col === playerTileCol) {
       this.loseLife();
-      this.conn.send(JSON.stringify({
-        type: "hearts",
-        Id: this.id,
-        hearts: this.lives
-      }));
+      this.conn.send(
+        JSON.stringify({
+          type: "hearts",
+          Id: this.id,
+          hearts: this.lives,
+        })
+      );
 
       if (!this.isAlive()) {
         this.isDead = true;
 
         room.broadcast({
           type: "playerDead",
-          Id: this.id
+          Id: this.id,
         });
       }
     }
   }
-  
+
   #checkRewardCollection(room) {
     const playerCenterX = this.x + this.width / 2;
     const playerCenterY = this.y + this.height / 2;
@@ -407,7 +422,7 @@ export default class Player {
     const playerTileY = Math.floor(playerCenterY / room.tileSize);
 
     if (room.rewards && room.rewards[`${playerTileY}_${playerTileX}`]) {
-      const rewardType = room.rewards[`${playerTileY}_${playerTileX}`]
+      const rewardType = room.rewards[`${playerTileY}_${playerTileX}`];
       this.collectReward(rewardType);
 
       // Broadcast that the reward has been collected
@@ -418,12 +433,11 @@ export default class Player {
           col: playerTileX,
         },
         playerId: this.id,
-        rewardType: rewardType
+        rewardType: rewardType,
       });
 
       // Remove the reward from the map
       delete room.rewards[`${playerTileY}_${playerTileX}`];
-
     }
   }
 
@@ -431,57 +445,68 @@ export default class Player {
     const rewardDurations = {
       bomb: 5000,
       speed: 5000,
-      fire: 5000
+      fire: 5000,
     };
-  
+
     const resetReward = (type) => {
       switch (type) {
-        case 'bomb':
+        case "bomb":
           this.rewards.bombing = false;
           break;
-        case 'speed':
+        case "speed":
           this.rewards.speed = false;
           this.speed = 25;
           break;
-        case 'fire':
+        case "fire":
           this.rewards.fire = false;
           break;
       }
-  
+
       this.sendPlayerStatsUpdate();
     };
-  
+
     switch (rewardType) {
-      case 'bomb':
+      case "bomb":
         this.rewards.bombing = true;
         clearTimeout(this.bombTimeout);
-        this.bombTimeout = setTimeout(() => resetReward('bomb'), rewardDurations.bomb);
+        this.bombTimeout = setTimeout(
+          () => resetReward("bomb"),
+          rewardDurations.bomb
+        );
         break;
-      case 'speed':
+      case "speed":
         this.rewards.speed = true;
         this.speed = 50;
         clearTimeout(this.speedTimeout);
-        this.speedTimeout = setTimeout(() => resetReward('speed'), rewardDurations.speed);
+        this.speedTimeout = setTimeout(
+          () => resetReward("speed"),
+          rewardDurations.speed
+        );
         break;
-      case 'fire':
+      case "fire":
         this.rewards.fire = true;
         clearTimeout(this.fireTimeout);
-        this.fireTimeout = setTimeout(() => resetReward('fire'), rewardDurations.fire);
+        this.fireTimeout = setTimeout(
+          () => resetReward("fire"),
+          rewardDurations.fire
+        );
         break;
       default:
         console.warn(`Unknown reward type: ${rewardType}`);
         return;
     }
-  
+
     this.sendPlayerStatsUpdate();
   }
-  
+
   sendPlayerStatsUpdate() {
-    this.conn.send(JSON.stringify({
-      type: "playerStatsUpdate",
-      bombPower: this.rewards.bombing,
-      speed: this.rewards.speed,
-      fire: this.rewards.fire
-    }));
+    this.conn.send(
+      JSON.stringify({
+        type: "playerStatsUpdate",
+        bombPower: this.rewards.bombing,
+        speed: this.rewards.speed,
+        fire: this.rewards.fire,
+      })
+    );
   }
 }
