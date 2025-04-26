@@ -500,11 +500,23 @@ function Selectbyrowcol(canvas, row, col) {
 
 function broadcastPlayerInfo(data) {
   const playersElement = Ref.playersRef.current;
+  const images = [
+    "../images/bluecaracter.png",
+    "../images/redcaracter.png",
+    "../images/greencaracter.png",
+    "../images/yellowcaracter.png",
+  ];
+
   const playerList = data.players.map((player, index) => {
     return jsx(
       "li",
       { id: `${player.id}` },
-      `${player.nickname} - Lives: ${player.lives == 0 ? "dead" : player.lives}`
+      `${player.nickname} - Lives: ${player.lives == 0 ? "dead" : player.lives}`,
+      jsx("img", {
+        src: images[index],
+        alt: "player",
+        style: `width: 30px; height: 30px; margin-left: 10px;`,
+      }),
     );
   });
   const showPlayersTitle = jsx("p", {}, "Players:");
