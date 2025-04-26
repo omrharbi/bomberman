@@ -1,5 +1,6 @@
 import { MyEventSystem } from "./event.js";
 import { render } from "./vdom.js";
+import { jsx } from "./framework.js";
 export class Router {
     constructor(routes) {
         this.routes = routes;
@@ -12,12 +13,6 @@ export class Router {
         MyEventSystem.addEventListener(window,'popstate',() => {
             this.handleRouting();
         })
-        // document.addEventListener('click', (e) => {
-        //     if (e.target.tagName === 'A' && e.target.getAttribute('href')) {
-        //         e.preventDefault();
-        //         this.navigate(e.target.getAttribute('href'));
-        //     }
-        // });
     }
 
     navigate(path) {
@@ -46,20 +41,25 @@ export class Router {
     }
 
     handle404() {
-        const body = document.body
-        body.innerHTML = `
-        <div class="not-found-container">
-            <h1 class="not-found-title">404</h1>
-            <p class="not-found-text">Page Nout found</p>
-            <a href="/" class="home-link">Go Home</a>
-        </div>
-    `
-
-        document.querySelector('.home-link').addEventListener('click', (e) => {
-            e.preventDefault();
-            this.navigate
-        })
-    }
+        const NotFoundPage = () => {
+          return jsx('div', { className: 'not-found-container' },
+            jsx('h1', { className: 'not-found-title' }, '404'),
+            jsx('p', { className: 'not-found-text' }, 'Page Not found'),
+            jsx('a', { 
+              href: '/', 
+              className: 'home-link',
+              onClick: (e) => {
+                e.preventDefault();
+                this.navigate('/');
+              }
+            }, 'Go Home')
+          );
+        };
+        
+        const body = document.body;
+        body.innerHTML = '';
+        render(NotFoundPage(), body);
+      }
 
     init() {
         this.handleRouting();

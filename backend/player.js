@@ -435,6 +435,7 @@ export default class Player {
     }
   
     if (alivePlayers.length === 1) {
+      room.started = false
       room.broadcast({
         type: "theWinnerIs",
         name:  alivePlayers[0].nickname

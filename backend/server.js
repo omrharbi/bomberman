@@ -122,6 +122,7 @@ function startGameForPlayer(player, room, playersArray, map) {
   });
 
   player.conn.on('close', () => {
+    console.log(`Player ${player.nickname} disconnected`);
     room.removePlayer(player.id);
     room.broadcast({ type: 'updatePlayers', playerCount: room.players.size, playerId: player.id });
   });

@@ -114,7 +114,8 @@ function handleServerMessages(data) {
     case "brodcastplayerinfo":
       broadcastPlayerInfo(data);
       break;
-    case "theWinnerIs": 
+    case "theWinnerIs":
+        socket.close()
       theWinnerIs(data);
       break;
     default:
@@ -124,8 +125,17 @@ function handleServerMessages(data) {
 
 function theWinnerIs(data){
   let popup = Ref.popupRef.current
-  popup.innerHTML = `🎉 The winner is: ${data.name} 🎉`;
-  popup.className = 'popup'
+  const winScreen = jsx('div', { id: 'popup-msg',className:  'popup', ref: Ref.popupRef, },
+          jsx('h2', {}, `🎉 The winner is: ${data.name} 🎉`),
+          jsx('button', { 
+            className: 'play-again-btn',
+            onclick: () =>{
+                location.reload()
+                //router.navigate('/')
+            }
+          }, 'Play Again')
+        );
+    updateRender(winScreen, popup);
 }
 
 function notificationPower(data) {
