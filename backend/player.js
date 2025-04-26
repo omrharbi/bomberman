@@ -31,6 +31,7 @@ export default class Player {
   }
 
   loseLife() {
+    if (!this.isAlive()) {return}
     this.lives -= 1;
   }
 
@@ -394,6 +395,8 @@ export default class Player {
     const playerTileCol = Math.floor(playerCenterX / room.tileSize);
 
     if (data.row === playerTileRow && data.col === playerTileCol) {
+      const playersArray = Array.from(room.players.values());
+
       this.loseLife();
       this.conn.send(
         JSON.stringify({
@@ -402,6 +405,10 @@ export default class Player {
           hearts: this.lives,
         })
       );
+      room.broadcast({
+        type : "brodcastplayerinfo",
+        players : playersArray
+      })
 
       if (!this.isAlive()) {
         this.isDead = true;

@@ -58,6 +58,8 @@ function startRoom(room) {
 
   const playersArray = Array.from(room.players.values());
 
+  
+
   // Place players directly in the map with values 5, 6, 7, 8
   for (let i = 0; i < playersArray.length; i++) {
     const pos = positionPlayers[i];
@@ -74,6 +76,8 @@ function startRoom(room) {
   for (const player of playersArray) {
     console.log(`Player ${player.nickname} in room ${room.id}`);
     startGameForPlayer(player, room, playersArray, map);
+    console.log("playerid",player.id);
+    
   }
 }
 

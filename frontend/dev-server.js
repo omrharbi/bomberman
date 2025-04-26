@@ -44,5 +44,4 @@ const server = http.createServer((req, res) => {
 
 server.listen(PORT, () => {
     console.log(`Dev server running at \x1b[94m http://localhost:${PORT} \x1b[0m`);
-
 });
