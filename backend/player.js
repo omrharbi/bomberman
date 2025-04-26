@@ -27,8 +27,7 @@ export default class Player {
     this.setTimeoutbomb = null;
     this.setTimeoutspeed = null;
     this.setTimeoutfire = null;
-    // this.map = null; // Add this line
-    // this.tileSize = 40;
+    this.overlappingBombs = new Set();
   }
 
   loseLife() {
@@ -38,8 +37,6 @@ export default class Player {
   isAlive() {
     return this.lives > 0;
   }
-
-
 
   Updatemove(data, room) {
     if (!this.isAlive()) { return }
@@ -110,6 +107,7 @@ export default class Player {
       this.y = prevY;
     } else {
       this.#checkRewardCollection(room);
+      this.#updateBombOverlap(room);
     }
 
     if (this.isMoving) {
@@ -169,11 +167,12 @@ export default class Player {
         if (y >= 0 && y < room.map.length && x >= 0 && x < room.map[0].length) {
           const tileType = room.map[y][x];
 
+          // Check for collision with wall, block, or bomb (if player is not overlapping it)
           if (
             tileType === 1 ||
             tileType === 2 ||
             tileType === 3 ||
-            tileType === 4
+            (tileType === 4 && !this.overlappingBombs.has(`${y}_${x}`))
           ) {
             const tileLeft = x * room.tileSize;
             const tileTop = y * room.tileSize;
@@ -193,6 +192,51 @@ export default class Player {
       }
     }
     return false;
+  }
+
+  #updateBombOverlap(room) {
+    const playerCenterX = this.x + this.width / 2;
+    const playerCenterY = this.y + this.height / 2;
+
+    const playerTileX = Math.floor(playerCenterX / room.tileSize);
+    const playerTileY = Math.floor(playerCenterY / room.tileSize);
+    
+    const tileKey = `${playerTileY}_${playerTileX}`;
+    
+    const toRemove = [];
+    for (const bombKey of this.overlappingBombs) {
+      const [bombRow, bombCol] = bombKey.split('_').map(Number);
+      const bombTileLeft = bombCol * room.tileSize;
+      const bombTileTop = bombRow * room.tileSize;
+      const bombTileRight = bombTileLeft + room.tileSize;
+      const bombTileBottom = bombTileTop + room.tileSize;
+      
+      if (
+        this.x + this.width < bombTileLeft + 4 ||
+        this.x > bombTileRight - 6 ||
+        this.y + this.height < bombTileTop ||
+        this.y > bombTileBottom - 16
+      ) {
+        toRemove.push(bombKey);
+      }
+    }
+    
+    // Remove bombs player is no longer overlapping with
+    for (const key of toRemove) {
+      this.overlappingBombs.delete(key);
+    }
+    
+    // Check if current tile is a bomb and add to overlapping set if it is
+    if (
+      playerTileY >= 0 && 
+      playerTileY < room.map.length && 
+      playerTileX >= 0 && 
+      playerTileX < room.map[0].length
+    ) {
+      if (room.map[playerTileY][playerTileX] === 4) {
+        this.overlappingBombs.add(tileKey);
+      }
+    }
   }
 
   placebomb(room) {
@@ -236,14 +280,23 @@ export default class Player {
       { x: -112, y: 36 }, // Frame 7
       { x: -146, y: 36 }, // Frame 8
     ];
+    
+    // Add this bomb to the player's overlapping bombs set
+    this.overlappingBombs.add(`${row}_${col}`);
+    
     this.#drawBomb(row, col, room);
 
     setTimeout(() => {
       this.#removeBomb(row, col, room);
       this.#destroyWall(row, col, gift, index, directions, frames, room);
+      
+      // Remove this bomb from the player's overlapping bombs set
+      this.overlappingBombs.delete(`${row}_${col}`);
     }, 3000);
   }
+
   #drawBomb(row, col, room) {
+    room.map[row][col] = 4
     room.broadcast({
       type: "drawBomb",
       position: {
@@ -252,7 +305,9 @@ export default class Player {
       },
     })
   }
+  
   #removeBomb(row, col, room) {
+    room.map[row][col] = 0
     room.broadcast({
       type: "removeBomb",
       position: {
@@ -343,6 +398,7 @@ export default class Player {
       }
     }
   }
+  
   #checkRewardCollection(room) {
     const playerCenterX = this.x + this.width / 2;
     const playerCenterY = this.y + this.height / 2;
@@ -428,6 +484,4 @@ export default class Player {
       fire: this.rewards.fire
     }));
   }
-  
-
 }
