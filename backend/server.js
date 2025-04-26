@@ -58,8 +58,6 @@ function startRoom(room) {
 
   const playersArray = Array.from(room.players.values());
 
-  
-
   // Place players directly in the map with values 5, 6, 7, 8
   for (let i = 0; i < playersArray.length; i++) {
     const pos = positionPlayers[i];

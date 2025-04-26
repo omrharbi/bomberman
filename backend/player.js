@@ -1,3 +1,5 @@
+import { log } from "console";
+
 export default class Player {
   constructor(nickname, id, conn) {
     this.x = 0;
@@ -410,14 +412,35 @@ export default class Player {
         players : playersArray
       })
 
+      this.checkPlayerwin(room, Array.from(room.players) )
+
       if (!this.isAlive()) {
         this.isDead = true;
-
         room.broadcast({
           type: "playerDead",
           Id: this.id,
         });
       }
+    }
+  }
+
+  checkPlayerwin(room, players) {    
+    let alivePlayers = [];
+
+    for (let index = 0; index < players.length; index++) {
+      const player = players[index][1]; // Get the Player object
+      if (player.lives > 0) {
+        alivePlayers.push(player);
+      }
+    }
+  
+    if (alivePlayers.length === 1) {
+      room.broadcast({
+        type: "theWinnerIs",
+        name:  alivePlayers[0].nickname
+      });
+    } else if (alivePlayers.length === 0) {
+      console.log("No players alive. It's a draw!");
     }
   }
 

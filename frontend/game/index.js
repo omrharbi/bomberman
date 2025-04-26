@@ -113,9 +113,19 @@ function handleServerMessages(data) {
       break;
     case "brodcastplayerinfo":
       broadcastPlayerInfo(data);
+      break;
+    case "theWinnerIs": 
+      theWinnerIs(data);
+      break;
     default:
       break;
   }
+}
+
+function theWinnerIs(data){
+  let popup = Ref.popupRef.current
+  popup.innerHTML = `🎉 The winner is: ${data.name} 🎉`;
+  popup.className = 'popup'
 }
 
 function notificationPower(data) {

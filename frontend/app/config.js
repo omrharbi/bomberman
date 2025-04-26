@@ -13,7 +13,8 @@ export const Ref = {
     messagesRef : { current: null },
     hearts: { current: null },
     StatusRef : { current: null },
-    notificationsRef : { current: null }
+    notificationsRef : { current: null },
+    popupRef: { current: null }
 }
 
 export function GamePage() {
@@ -28,6 +29,12 @@ export function GamePage() {
             id: 'power-notifications', 
             ref: Ref.notificationsRef,
             style: 'position: absolute; top: 70px; right: 20px; z-index: 100; width: 250px;'
+        }),
+
+        jsx('div', { 
+            id: 'popup-msg',
+            ref: Ref.popupRef,
+            // style: 'position: absolute; top: 70px; right: 20px; z-index: 100; width: 250px;'
         }),
 
         // Content Container
