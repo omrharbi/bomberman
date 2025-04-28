@@ -14,6 +14,22 @@ export default class Room {
 
   removePlayer(playerID) {
     this.players.delete(playerID);
+    if (this.started === true) {
+      const playersArray = Array.from(this.players.values());
+      this.broadcast({
+        type: "removePlayer",
+        id: playerID,
+        players: playersArray,
+      });
+      if (this.players.size === 1) {
+        this.broadcast({
+          type: "theWinnerIs",
+          name: this.players.values().next().value.nickname
+        });
+      } else if (this.players.size === 0) {
+        this.started = false
+      }
+    }
   }
 
   safeStringify(obj) {
@@ -49,7 +65,7 @@ export default class Room {
     const powerUpTypes = ["bomb", "speed", "fire"];
     const rewardType = powerUpTypes[index];
     this.rewards[`${row}_${col}`] = rewardType;
-    
+
     this.broadcast({
       type: "rewardAdded",
       position: {
@@ -59,7 +75,7 @@ export default class Room {
       rewardType: rewardType
     });
   }
-  
+
   // Remove a reward from the map (when collected)
   removeReward(row, col) {
     delete this.rewards[`${row}_${col}`];

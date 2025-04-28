@@ -580,9 +580,9 @@ export default class Player {
 
   collectReward(rewardType) {
     const rewardDurations = {
-      bomb: 5000,
-      speed: 5000,
-      fire: 5000,
+      bomb: 10000,
+      speed: 10000,
+      fire: 10000,
     };
 
     const resetReward = (type) => {

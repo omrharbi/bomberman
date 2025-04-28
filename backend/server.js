@@ -74,8 +74,8 @@ function startRoom(room) {
   for (const player of playersArray) {
     console.log(`Player ${player.nickname} in room ${room.id}`);
     startGameForPlayer(player, room, playersArray, map);
-    console.log("playerid",player.id);
-    
+    console.log("playerid", player.id);
+
   }
 }
 
@@ -93,7 +93,7 @@ function startGameForPlayer(player, room, playersArray, map) {
     map: map,
 
   }));
-  room.setMapData(map,40)
+  room.setMapData(map, 40)
 
   player.conn.on('message', (message) => {
     let data;
@@ -155,11 +155,11 @@ wss.on('connection', (ws) => {
         });
 
         console.log(`Player ${data.nickname} joined Room ${currentRoom.id}`);
-        setTimeout(() => {
-          if (currentRoom.players.size >= 2 && !currentRoom.started) {
+        if (currentRoom.players.size >= 2 && !currentRoom.started) {
+          setTimeout(() => {
             startRoom(currentRoom);
-          }
-        }, 5000);
+          }, 20000)
+        }
         break;
       case "playerMove":
         currentPlayer.Updatemove(data, currentRoom)

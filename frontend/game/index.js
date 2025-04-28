@@ -120,11 +120,22 @@ function handleServerMessages(data) {
             }, 5000);
             theWinnerIs(data);
             break;
+        case "removePlayer":
+            console.log("Player removed:", data.id);
+            removePlayer(data.id);
+            broadcastPlayerInfo(data);
+            break
         default:
             break;
     }
 }
-
+function removePlayer(id) {
+    const playerElement = playerElement.get(id)
+    if (playerElement){
+        playerElement.remove()
+        playerElement.delete(id)
+    }
+}
 function theWinnerIs(data) {
     let popup = Ref.popupRef.current;
     let gamepage = Ref.gamePageRef.current;
@@ -137,6 +148,7 @@ function theWinnerIs(data) {
         jsx('button', {
             className: 'play-again-btn',
             onclick: (e) => {
+                gameState.name = ""
                 e.preventDefault();
                 router.navigate('/');
             }
@@ -291,7 +303,7 @@ function updatePlayerCount(count, playerId) {
 function startGame(data, tileMap) {
     console.log(data.players);
 
-    let count = 3;
+    let count = 10;
     const interval = setInterval(() => {
         count--;
         const updatedWaitingContent = jsx(

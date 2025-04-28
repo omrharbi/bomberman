@@ -159,6 +159,7 @@ export default class Game {
     let lastSendTime = 0;
     const updateInterval = 50;
     this.keydownHandler = (e) => {
+      if (e.target.tagName == "INPUT" || e.target.tagName == "TEXTAREA") return;
       keysPressed[e.key] = true;
   
       if ((e.key === "b" || e.key === "B") && !e.repeat) {
@@ -190,16 +191,16 @@ export default class Game {
       lastUpdateTime = now;
   
       let direction;
-      if (keysPressed["w"] || keysPressed["ArrowUp"]) {
+      if (keysPressed["w"] || keysPressed["W"]) {
         direction = "up";
       }
-      if (keysPressed["d"] || keysPressed["ArrowRight"]) {
+      if (keysPressed["d"] || keysPressed["D"]) {
         direction = "right";
       }
-      if (keysPressed["s"] || keysPressed["ArrowDown"]) {
+      if (keysPressed["s"] || keysPressed["S"]) {
         direction = "down";
       }
-      if (keysPressed["a"] || keysPressed["ArrowLeft"]) {
+      if (keysPressed["a"] || keysPressed["A"]) {
         direction = "left";
       }
   
