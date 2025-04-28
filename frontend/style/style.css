@@ -5,6 +5,8 @@ body {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
+    touch-action: manipulation;
+    -webkit-overflow-scrolling: touch;
 }
 
 * {
@@ -136,13 +138,8 @@ body::before {
         radial-gradient(circle at 80% 70%, rgba(58, 123, 213, 0.2) 0%, transparent 25%),
         radial-gradient(circle at 50% 50%, rgba(0, 180, 219, 0.1) 0%, transparent 50%);
     z-index: -1;
-    animation: backgroundPulse 15s infinite alternate;
 }
 
-@keyframes backgroundPulse {
-    0% { opacity: 0.7; }
-    100% { opacity: 1; }
-}
 
 /* Game page styles with modern visuals */
 .header {
@@ -163,12 +160,6 @@ body::before {
     width: 100%;
     height: 100%;
     background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-    animation: headerShine 3s infinite;
-}
-
-@keyframes headerShine {
-    0% { left: -100%; }
-    100% { left: 200%; }
 }
 
 .game-title {
@@ -383,7 +374,6 @@ body::before {
     width: 100%;
     height: 100%;
     background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-    animation: footerShine 3s infinite;
 }
 
 @keyframes footerShine {
@@ -451,78 +441,6 @@ body::before {
     font-weight: bold;
 }
 
-@keyframes heartbeat {
-    0%, 100% {
-        transform: scale(1);
-        filter: drop-shadow(0 0 5px rgba(255, 0, 0, 0.7));
-    }
-    50% {
-        transform: scale(1.3); 
-        filter: drop-shadow(0 0 8px rgba(255, 0, 0, 0.9));
-    }
-}
-
-/* Improved Responsive Styles */
-@media (max-width: 768px) {
-    .content-container {
-        flex-direction: column;
-    }
-    
-    .chat-sidebar {
-        width: 100%;
-        height: 300px;
-        border-left: none;
-        border-top: 1px solid #3a7bd5;
-    }
-    
-    .message-container {
-        max-height: 200px;
-    }
-    
-    .footer {
-        height: auto;
-        padding: 15px 10px;
-    }
-    
-    .footer-content {
-        flex-direction: column;
-        gap: 15px;
-    }
-    
-    .footer-section {
-        text-align: center;
-        min-width: 100%;
-    }
-}
-
-@media (max-width: 480px) {
-    #login {
-        width: 95%;
-        padding: 1.5rem;
-    }
-    
-    #login h1 {
-        font-size: 2rem;
-    }
-    
-    .game-title {
-        font-size: 22px;
-    }
-    
-    .game-area {
-        padding: 10px;
-    }
-    
-    .chat-input-area {
-        gap: 5px;
-    }
-    
-    .chat-input, .send-button {
-        padding: 8px;
-        font-size: 14px;
-    }
-}
-
 .player {
     z-index: 1;
     width: 27px; 
@@ -561,53 +479,16 @@ body::before {
     background-image: url('../images/explosion.png');
     background-size: 500%;
     filter: brightness(1.2) drop-shadow(0 0 15px rgba(255, 200, 0, 0.8));
-    animation: explosion-pulse 0.5s infinite alternate;
-}
-
-@keyframes explosion-pulse {
-    0% { filter: brightness(1.2) drop-shadow(0 0 10px rgba(255, 200, 0, 0.8)); }
-    100% { filter: brightness(1.5) drop-shadow(0 0 20px rgba(255, 100, 0, 0.9)); }
 }
 
 .game-container {
-    width: 700px;
+    max-width: 700px;
     height: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
     transform-origin: center center;
     filter: drop-shadow(0 0 20px rgba(58, 123, 213, 0.3));
-}
-
-/* Make it responsive at different screen sizes */
-@media (max-width: 768px) {
-    .game-container {
-        transform: scale(0.7);
-    }
-}
-
-@media (max-width: 480px) {
-    .game-container {
-        transform: scale(0.6);
-    }
-}
-
-@media (max-width: 430px) {
-    .game-container {
-        transform: scale(0.5);
-    }
-}
-
-@media (max-width: 430px) {
-    .game-container {
-        transform: scale(0.4);
-    }
-}
-
-@media (max-width: 290px) {
-    .game-container {
-        transform: scale(0.3);
-    }
 }
 
 .power-notification {
@@ -656,33 +537,34 @@ body::before {
     
     z-index: 1000;
     animation: popupAnimation 0.5s ease-out forwards;
-  }
+}
 
-  @keyframes popupAnimation {
+@keyframes popupAnimation {
     0% {
-      opacity: 0;
-      transform: translate(-50%, -50%) scale(0.5);
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.5);
     }
     100% {
-      opacity: 1;
-      transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
     }
-  }
-/*==============================================*/ 
+}
+
 .modal-overlay {
-   position: fixed;
-   top: 0;
-   left: 0;
-   width: 100%;
-   height: 100%;
-   background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
-   backdrop-filter: blur(5px); /* This creates the blur effect */
-   z-index: 9999; 
-   display: flex;
-   justify-content: center;
-   align-items: center;
- }
- /* Game-themed Play Again button */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+    backdrop-filter: blur(5px); /* This creates the blur effect */
+    z-index: 9999; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Game-themed Play Again button */
 .play-again-btn {
     background: linear-gradient(to right, #ff4b1f, #ff9068);;
     color: #333;
@@ -693,55 +575,347 @@ body::before {
     border: 3px solid #333;
     border-radius: 8px;
     box-shadow: 
-      0 6px 0 #cc7700,
-      0 8px 10px rgba(0, 0, 0, 0.3);
+        0 6px 0 #cc7700,
+        0 8px 10px rgba(0, 0, 0, 0.3);
     position: relative;
     cursor: pointer;
     text-transform: uppercase;
     text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.4);
     margin-top: 20px;
     transition: all 0.1s ease;
-  }
-  
-  .play-again-btn:hover {
+}
+
+.play-again-btn:hover {
     transform: translateY(-2px);
     box-shadow: 
-      0 8px 0 #cc7700,
-      0 10px 15px rgba(0, 0, 0, 0.3);
-  }
-  
-  .play-again-btn:active {
+        0 8px 0 #cc7700,
+        0 10px 15px rgba(0, 0, 0, 0.3);
+}
+
+.play-again-btn:active {
     transform: translateY(4px);
     box-shadow: 
-      0 2px 0 #cc7700,
-      0 4px 6px rgba(0, 0, 0, 0.3);
-  }
-  
-  /* Pulsing effect */
-  @keyframes pulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-    100% { transform: scale(1); }
-  }
-  
-  .play-again-btn {
-    animation: pulse 1.5s infinite ease-in-out;
-  }
-  
-  /* For the popup overall */
-  .popup {
+        0 2px 0 #cc7700,
+        0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+/* For the popup overall */
+.popup {
     background-color: #333;
-    border: 5px solid linear-gradient(to right, #ff4b1f, #ff9068);;
+    border: 5px solid #ff4b1f;
     border-radius: 12px;
     color: white;
     text-align: center;
     padding: 25px;
     box-shadow: 0 0 20px rgba(255, 204, 0, 0.6);
     z-index: 99999; 
-  }
-  
-  .popup h2 {
-    color: linear-gradient(to right, #ff4b1f, #ff9068);;
+    width: max-content;
+}
+
+.popup h2 {
+    color: #ff9068;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
     margin-bottom: 20px;
-  }
+}
+
+/* Enhanced Media Queries for Better Responsiveness */
+@media (max-width: 1200px) {
+    .content-container {
+        flex-direction: column;
+    }
+    
+    .chat-sidebar {
+        width: 100%;
+        max-height: 250px;
+        border-left: none;
+        border-top: 1px solid #3a7bd5;
+    }
+    
+    .message-container {
+        max-height: 150px;
+    }
+    
+    .footer {
+        padding: 12px;
+    }
+}
+
+@media (max-width: 900px) {
+    .game-container {
+        transform: scale(0.9);
+    }
+    
+    .footer-content {
+        flex-direction: column;
+    }
+    
+    .footer-section {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+    
+    .message-container {
+        max-height: calc(100vh - 450px);
+    }
+}
+
+@media (max-width: 768px) {
+    .content-container {
+        flex-direction: column;
+    }
+    
+    .chat-sidebar {
+        width: 100%;
+        height: 250px;
+        border-left: none;
+        border-top: 1px solid #3a7bd5;
+    }
+    
+    .message-container {
+        max-height: 150px;
+    }
+    
+    .footer {
+        height: auto;
+        padding: 10px;
+    }
+    
+    .footer-content {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .footer-section {
+        text-align: center;
+        min-width: 100%;
+    }
+    
+    .game-container {
+        transform: scale(0.8);
+    }
+    
+    .header {
+        padding: 10px 0;
+    }
+    
+    .game-title {
+        font-size: 22px;
+    }
+}
+
+@media (max-width: 600px) {
+    .game-container {
+        transform: scale(0.7);
+    }
+    
+    #login {
+        width: 90%;
+        padding: 1.5rem;
+    }
+    
+    .game-area {
+        padding: 5px;
+    }
+    
+    /* Optimize chat for small screens */
+    .chat-input {
+        font-size: 14px;
+        padding: 8px;
+    }
+    
+    .send-button {
+        min-width: 60px;
+        font-size: 14px;
+        padding: 8px 12px;
+    }
+    
+    .message {
+        padding: 10px;
+        margin-bottom: 8px;
+    }
+    
+    .footer-section {
+        padding: 8px;
+    }
+    
+    .footer {
+        min-height: auto;
+        padding: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    #login {
+        width: 95%;
+        padding: 1.5rem;
+    }
+    
+    #login h1 {
+        font-size: 1.8rem;
+    }
+    
+    .game-title {
+        font-size: 20px;
+    }
+    
+    .game-area {
+        padding: 5px;
+    }
+    
+    .chat-input-area {
+        gap: 5px;
+    }
+    
+    .chat-input, .send-button {
+        padding: 8px;
+        font-size: 14px;
+    }
+    
+    .game-container {
+        transform: scale(0.6);
+    }
+    
+    /* Make notifications more visible on mobile */
+    #power-notifications {
+        width: 200px !important;
+        top: 60px !important;
+        right: 10px !important;
+        font-size: 14px;
+    }
+    
+    /* Optimize popup for mobile */
+    .popup {
+        width: 90% !important;
+        padding: 15px !important;
+        font-size: 16px !important;
+    }
+    
+    .play-again-btn {
+        padding: 8px 16px;
+        font-size: 14px;
+    }
+    
+    .footer-section {
+        min-height: auto;
+    }
+}
+
+@media (max-width: 380px) {
+    .game-container {
+        transform: scale(0.5);
+    }
+    
+    /* Further reduce elements */
+    .game-title {
+        font-size: 18px;
+    }
+    
+    .chat-sidebar {
+        max-height: 200px;
+    }
+    
+    .message-container {
+        max-height: 130px;
+    }
+    
+    .connected-players li {
+        font-size: 12px;
+    }
+    
+    .connected-players li img {
+        width: 24px;
+        height: 24px;
+    }
+}
+
+@media (max-width: 320px) {
+    .game-container {
+        transform: scale(0.4);
+    }
+    
+    /* Minimal UI for very small screens */
+    .message-container {
+        max-height: 120px;
+    }
+    
+    #login h1 {
+        font-size: 1.6rem;
+    }
+    
+    .footer {
+        padding: 5px;
+    }
+    
+    .footer-section {
+        padding: 6px;
+        margin-bottom: 5px;
+    }
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+    /* Larger hit areas for touch */
+    .send-button {
+        padding: 12px 15px;
+        min-width: 70px;
+    }
+    
+    #NameBut {
+        padding: 12px 24px;
+    }
+    
+    /* Remove hover effects that might cause issues on touch devices */
+    .message:hover {
+        transform: none;
+    }
+    
+    /* Better focus states for touch */
+    input:focus, button:focus {
+        outline: 2px solid #00b4db;
+    }
+    
+    .connected-players li:hover {
+        padding-left: 0;
+    }
+}
+
+/* Orientation handling */
+@media (orientation: landscape) and (max-height: 500px) {
+    .content-container {
+        flex-direction: row;
+    }
+    
+    .chat-sidebar {
+        width: 30%;
+        height: auto;
+        max-height: none;
+    }
+    
+    .game-container {
+        height: 80vh;
+    }
+    
+    .footer {
+        padding: 5px;
+        min-height: auto;
+    }
+    
+    .footer-content {
+        flex-direction: row;
+    }
+    
+    .message-container {
+        max-height: calc(100vh - 130px);
+    }
+}
+
+@keyframes heartbeat {
+    0%, 100% {
+        transform: scale(1);
+        filter: drop-shadow(0 0 5px rgba(255, 0, 0, 0.7));
+    }
+    50% {
+        transform: scale(1.3); 
+        filter: drop-shadow(0 0 8px rgba(255, 0, 0, 0.9));
+    }
+}
