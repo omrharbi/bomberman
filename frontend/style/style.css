@@ -583,6 +583,7 @@ body::before {
     text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.4);
     margin-top: 20px;
     transition: all 0.1s ease;
+    animation: heartbeat 2s infinite;
 }
 
 .play-again-btn:hover {
@@ -909,7 +910,7 @@ body::before {
     }
 }
 
-@keyframes heartbeat {
+@keyframes heartbeat{
     0%, 100% {
         transform: scale(1);
         filter: drop-shadow(0 0 5px rgba(255, 0, 0, 0.7));
