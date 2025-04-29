@@ -220,7 +220,10 @@ function hearts(data) {
     const hearts = Ref.hearts.current;
 
     console.log("data.Id", data.Id);
-    hearts.lastElementChild.remove();
+    if(hearts.lastElementChild){
+
+        hearts.lastElementChild.remove();
+    }
     console.log("hearts", hearts);
     console.log("heartsData", data);
 }
@@ -339,7 +342,7 @@ function GoToGame(data, tileMap) {
     const body = document.body;
     render(GamePage(), body);
 
-    let game = document.getElementById("game");
+    let game = Ref.gameCanvasRef.current //document.getElementById("game");
     function gameLoop() {
         tileMap.drawGame(game, data);
     }
