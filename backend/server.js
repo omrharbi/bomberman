@@ -12,7 +12,8 @@ const wss = new WebSocketServer({ server });
 
 let nextRoomID = 1;
 const rooms = new Map();
-
+// Store timeouts at room level
+const roomTimeouts = new Map();
 
 function findAvailableRoom() {
   for (const room of rooms.values()) {
@@ -26,8 +27,20 @@ function findAvailableRoom() {
 }
 
 function startRoom(room) {
+  // Prevent multiple calls to startRoom for the same room
+  if (room.started) {
+    console.log(`Room ${room.id} is already started, ignoring duplicate start request`);
+    return;
+  }
+  
   room.started = true;
   console.log(`Starting game in room ${room.id}`);
+
+  // Clear any existing timeout for this room
+  if (roomTimeouts.has(room.id)) {
+    clearTimeout(roomTimeouts.get(room.id));
+    roomTimeouts.delete(room.id);
+  }
 
   let map = [
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
@@ -78,11 +91,7 @@ function startRoom(room) {
   }
 }
 
-
-
-
 function startGameForPlayer(player, room, playersArray, map) {
-
   player.conn.send(JSON.stringify({
     type: 'startGame',
     nickname: player.nickname,
@@ -90,7 +99,6 @@ function startGameForPlayer(player, room, playersArray, map) {
     players: playersArray,
     MyId: player.id,
     map: map,
-
   }));
   room.setMapData(map, 40)
 
@@ -127,7 +135,6 @@ function startGameForPlayer(player, room, playersArray, map) {
   });
 }
 
-
 wss.on('connection', (ws) => {
   let currentPlayer;
   let currentRoom;
@@ -152,17 +159,31 @@ wss.on('connection', (ws) => {
           type: 'updatePlayers',
           playerCount: currentRoom.players.size,
         });
-        
-        let start;
+
         console.log(`Player ${data.nickname} joined Room ${currentRoom.id}`);
+        
+        // Handle game start conditions
         if ((currentRoom.players.size == 2 || currentRoom.players.size == 3) && !currentRoom.started) {
-          start = setTimeout(() => {
+          // Clear any existing timeout first
+          if (roomTimeouts.has(currentRoom.id)) {
+            clearTimeout(roomTimeouts.get(currentRoom.id));
+          }
+          
+          // Set new timeout
+          const timeout = setTimeout(() => {
             startRoom(currentRoom);
-          }, 20000)
-        } else if (currentRoom.players.size == 4 &&
-          !currentRoom.started) {
-            clearTimeout(start)
-            startRoom(currentRoom);
+          }, 20000);
+          
+          roomTimeouts.set(currentRoom.id, timeout);
+          
+        } else if (currentRoom.players.size == 4 && !currentRoom.started) {
+          // Clear existing timeout if any
+          if (roomTimeouts.has(currentRoom.id)) {
+            clearTimeout(roomTimeouts.get(currentRoom.id));
+            roomTimeouts.delete(currentRoom.id);
+          }
+          // Start immediately
+          startRoom(currentRoom);
         }
               
         break;
