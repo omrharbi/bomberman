@@ -1,10 +1,10 @@
-import http from 'http';
-import WebSocket, { WebSocketServer } from 'ws';
-import Player from './player.js';
-import Room from './rooms.js';
+import http from "http";
+import WebSocket, { WebSocketServer } from "ws";
+import Player from "./player.js";
+import Room from "./rooms.js";
 
 const server = http.createServer((req, res) => {
-  res.writeHead(200, { 'Content-Type': 'text/plain' });
+  res.writeHead(200, { "Content-Type": "text/plain" });
   res.end("WebSocket game server is running.");
 });
 
@@ -29,10 +29,12 @@ function findAvailableRoom() {
 function startRoom(room) {
   // Prevent multiple calls to startRoom for the same room
   if (room.started) {
-    console.log(`Room ${room.id} is already started, ignoring duplicate start request`);
+    console.log(
+      `Room ${room.id} is already started, ignoring duplicate start request`
+    );
     return;
   }
-  
+
   room.started = true;
   console.log(`Starting game in room ${room.id}`);
 
@@ -63,10 +65,10 @@ function startRoom(room) {
   ];
 
   const positionPlayers = [
-    [1, 1],   // Player 1
+    [1, 1], // Player 1
     [14, 13], // Player 2
-    [1, 15],  // Player 3
-    [12, 1],  // Player 4
+    [1, 15], // Player 3
+    [12, 1], // Player 4
   ];
 
   const playersArray = Array.from(room.players.values());
@@ -92,35 +94,37 @@ function startRoom(room) {
 }
 
 function startGameForPlayer(player, room, playersArray, map) {
-  player.conn.send(JSON.stringify({
-    type: 'startGame',
-    nickname: player.nickname,
-    lives: player.lives,
-    players: playersArray,
-    MyId: player.id,
-    map: map,
-  }));
-  room.setMapData(map, 40)
+  player.conn.send(
+    JSON.stringify({
+      type: "startGame",
+      nickname: player.nickname,
+      lives: player.lives,
+      players: playersArray,
+      MyId: player.id,
+      map: map,
+    })
+  );
+  room.setMapData(map, 40);
 
-  player.conn.on('message', (message) => {
+  player.conn.on("message", (message) => {
     let data;
     try {
       data = JSON.parse(message);
     } catch (err) {
-      console.error('Invalid message:', err);
+      console.error("Invalid message:", err);
       return;
     }
 
-    if (data.type === 'loseLife') {
-      player.loseLife();  // Decrease lives
+    if (data.type === "loseLife") {
+      player.loseLife(); // Decrease lives
     }
 
     switch (data.type) {
       case "chatMsg":
         room.broadcast({
-          type: 'chatMsg',
+          type: "chatMsg",
           nickname: player.nickname,
-          messageText: data.messageText || ''
+          messageText: data.messageText || "",
         });
         break;
       default:
@@ -128,23 +132,27 @@ function startGameForPlayer(player, room, playersArray, map) {
     }
   });
 
-  player.conn.on('close', () => {
+  player.conn.on("close", () => {
     console.log(`Player ${player.nickname} disconnected`);
     room.removePlayer(player.id);
-    room.broadcast({ type: 'updatePlayers', playerCount: room.players.size, playerId: player.id });
+    room.broadcast({
+      type: "updatePlayers",
+      playerCount: room.players.size,
+      playerId: player.id,
+    });
   });
 }
 
-wss.on('connection', (ws) => {
+wss.on("connection", (ws) => {
   let currentPlayer;
   let currentRoom;
 
-  ws.on('message', (message) => {
+  ws.on("message", (message) => {
     let data;
     try {
       data = JSON.parse(message);
     } catch (err) {
-      console.error('Bad message format:', err);
+      console.error("Bad message format:", err);
       return;
     }
 
@@ -156,26 +164,40 @@ wss.on('connection', (ws) => {
         currentRoom.addPlayer(currentPlayer);
 
         currentRoom.broadcast({
-          type: 'updatePlayers',
+          type: "updatePlayers",
           playerCount: currentRoom.players.size,
         });
 
         console.log(`Player ${data.nickname} joined Room ${currentRoom.id}`);
-        
+
         // Handle game start conditions
-        if ((currentRoom.players.size == 2 || currentRoom.players.size == 3) && !currentRoom.started) {
-          // Clear any existing timeout first
-          if (roomTimeouts.has(currentRoom.id)) {
-            clearTimeout(roomTimeouts.get(currentRoom.id));
+        if (
+          (currentRoom.players.size == 2 || currentRoom.players.size == 3) &&
+          !currentRoom.started
+        ) {
+          if (!roomTimeouts.has(currentRoom.id)) {
+            //clearTimeout(roomTimeouts.get(currentRoom.id));
+            const timeout = setTimeout(() => {
+              startRoom(currentRoom);
+            }, 20000);
+            roomTimeouts.set(currentRoom.id, timeout);
           }
-          
-          // Set new timeout
-          const timeout = setTimeout(() => {
-            startRoom(currentRoom);
-          }, 20000);
-          
-          roomTimeouts.set(currentRoom.id, timeout);
-          
+          /******************************* */
+          if (!currentRoom.countInterval) {
+            currentRoom.countP = 0;
+            currentRoom.countInterval = setInterval(() => {
+              currentRoom.countP++;
+              currentRoom.broadcast({
+                type: "updatePlayers",
+                playerCount: currentRoom.players.size,
+                countP: currentRoom.countP,
+              });
+              if (currentRoom.countP >= 20) {
+                clearInterval(currentRoom.countInterval);
+                currentRoom.countInterval = null;
+              }
+            }, 1000);
+          }
         } else if (currentRoom.players.size == 4 && !currentRoom.started) {
           // Clear existing timeout if any
           if (roomTimeouts.has(currentRoom.id)) {
@@ -183,18 +205,20 @@ wss.on('connection', (ws) => {
             roomTimeouts.delete(currentRoom.id);
           }
           // Start immediately
+          clearInterval(currentRoom.countInterval);
+          currentRoom.countInterval = null;
           startRoom(currentRoom);
         }
-              
+
         break;
       case "playerMove":
-        currentPlayer.Updatemove(data, currentRoom)
+        currentPlayer.Updatemove(data, currentRoom);
         break;
       case "placeBomb":
-        currentPlayer.placebomb(currentRoom)
+        currentPlayer.placebomb(currentRoom);
         break;
       case "HitByExplosion":
-        currentPlayer.isPlayerHitByExplosion(data, currentRoom)
+        currentPlayer.isPlayerHitByExplosion(data, currentRoom);
         break;
       default:
         console.log("Unknown message type:", data.type);
@@ -202,11 +226,11 @@ wss.on('connection', (ws) => {
     }
   });
 
-  ws.on('close', () => {
+  ws.on("close", () => {
     if (currentRoom && currentPlayer) {
       currentRoom.removePlayer(currentPlayer.id);
       currentRoom.broadcast({
-        type: 'updatePlayers',
+        type: "updatePlayers",
         playerCount: currentRoom.players.size,
       });
     }

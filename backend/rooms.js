@@ -6,6 +6,8 @@ export default class Room {
     this.players = new Map();
     this.started = false;
     this.rewards = {};
+    this.countInterval = null;
+    this.countP = null;
   }
 
   addPlayer(player) {
