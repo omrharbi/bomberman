@@ -532,22 +532,8 @@ body::before {
     font-size: 24px;
     font-weight: bold;
     text-align: center;
-
     border: 1px solid #3a7bd5;
-    
     z-index: 1000;
-    animation: popupAnimation 0.5s ease-out forwards;
-}
-
-@keyframes popupAnimation {
-    0% {
-        opacity: 0;
-        transform: translate(-50%, -50%) scale(0.5);
-    }
-    100% {
-        opacity: 1;
-        transform: translate(-50%, -50%) scale(1);
-    }
 }
 
 .modal-overlay {
@@ -583,21 +569,6 @@ body::before {
     text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.4);
     margin-top: 20px;
     transition: all 0.1s ease;
-    animation: heartbeat 2s infinite;
-}
-
-.play-again-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 
-        0 8px 0 #cc7700,
-        0 10px 15px rgba(0, 0, 0, 0.3);
-}
-
-.play-again-btn:active {
-    transform: translateY(4px);
-    box-shadow: 
-        0 2px 0 #cc7700,
-        0 4px 6px rgba(0, 0, 0, 0.3);
 }
 
 /* For the popup overall */

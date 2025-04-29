@@ -75,7 +75,6 @@ function startRoom(room) {
     console.log(`Player ${player.nickname} in room ${room.id}`);
     startGameForPlayer(player, room, playersArray, map);
     console.log("playerid", player.id);
-
   }
 }
 
@@ -153,13 +152,19 @@ wss.on('connection', (ws) => {
           type: 'updatePlayers',
           playerCount: currentRoom.players.size,
         });
-
+        
+        let start;
         console.log(`Player ${data.nickname} joined Room ${currentRoom.id}`);
-        if (currentRoom.players.size >= 2 && !currentRoom.started) {
-          setTimeout(() => {
+        if ((currentRoom.players.size == 2 || currentRoom.players.size == 3) && !currentRoom.started) {
+          start = setTimeout(() => {
             startRoom(currentRoom);
           }, 20000)
+        } else if (currentRoom.players.size == 4 &&
+          !currentRoom.started) {
+            clearTimeout(start)
+            startRoom(currentRoom);
         }
+              
         break;
       case "playerMove":
         currentPlayer.Updatemove(data, currentRoom)
