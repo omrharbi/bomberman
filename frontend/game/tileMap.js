@@ -116,9 +116,9 @@ export default class Game {
           const playerIndex = tile - 5;
           const playerStyles = [
             "url('../images/playerStyle.png')",
-            "url('../images/playerblue.webp')",
-            "url('../images/playerGreen.webp')",
-            "url('../images/playerStyle.png')",
+            "url('../images/playerRed.png')",
+            "url('../images/playerGreen.png')",
+            "url('../images/playerYallow.png')",
           ];
           const playerVNode = jsx(
             "div",
