@@ -137,12 +137,7 @@ function removePlayer(id) {
     }
 }
 function theWinnerIs(data) {
-    let popup = Ref.popupRef.current;
     let gamepage = Ref.gamePageRef.current;
-    const overlay = jsx('div', {
-        id: 'modal-overlay',
-        className: 'modal-overlay',
-    });
     const winScreen = jsx('div', { id: 'popup-msg', className: 'popup', ref: Ref.popupRef },
         jsx('h2', {}, `🎉 The winner is: ${data.name} 🎉`),
         jsx('button', {
@@ -154,8 +149,7 @@ function theWinnerIs(data) {
             }
         }, 'Play Again')
     );
-    gamepage.appendChild(createElement(overlay));
-    updateRender(winScreen, popup);
+    render(winScreen, gamepage);
 }
 
 function notificationPower(data) {
