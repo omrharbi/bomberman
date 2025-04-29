@@ -130,10 +130,10 @@ function handleServerMessages(data) {
     }
 }
 function removePlayer(id) {
-    const playerElement = playerElement.get(id)
+    const playerElement = playersElement.get(id)
     if (playerElement){
         playerElement.remove()
-        playerElement.delete(id)
+        playersElement.delete(id)
     }
 }
 function theWinnerIs(data) {
