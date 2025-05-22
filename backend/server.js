@@ -46,21 +46,21 @@ function startRoom(room) {
 
   let map = [
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-    [1, 0, 0, 0, 0, 3, 3, 3, 3, 3, 0, 3, 3, 0, 3, 0, 1],
-    [1, 0, 4, 0, 4, 0, 4, 3, 4, 3, 4, 0, 4, 0, 4, 0, 1],
-    [1, 3, 0, 0, 0, 0, 3, 3, 0, 3, 0, 3, 0, 0, 0, 0, 1],
-    [1, 0, 4, 3, 4, 0, 4, 0, 4, 0, 4, 0, 4, 0, 4, 3, 1],
-    [1, 3, 0, 3, 0, 3, 0, 3, 0, 3, 0, 3, 0, 3, 3, 3, 1],
-    [1, 0, 4, 0, 4, 3, 4, 3, 4, 3, 4, 3, 4, 0, 4, 0, 1],
-    [1, 3, 3, 3, 0, 3, 3, 0, 3, 3, 0, 3, 0, 3, 0, 3, 1],
+    [1, 0, 0, 3, 0, 3, 3, 3, 3, 3, 0, 3, 3, 3, 0, 0, 1],
+    [1, 0, 4, 0, 4, 3, 4, 3, 4, 3, 4, 0, 4, 3, 4, 0, 1],
+    [1, 3, 0, 3, 0, 0, 3, 3, 0, 3, 3, 3, 0, 3, 3, 3, 1],
+    [1, 0, 4, 3, 4, 0, 4, 3, 4, 3, 4, 0, 4, 0, 4, 3, 1],
+    [1, 3, 0, 3, 0, 3, 3, 3, 3, 3, 3, 3, 0, 3, 3, 3, 1],
+    [1, 0, 4, 0, 4, 3, 4, 3, 4, 0, 4, 3, 4, 3, 4, 0, 1],
+    [1, 3, 3, 3, 0, 3, 3, 0, 3, 3, 3, 3, 0, 3, 0, 3, 1],
     [1, 0, 4, 3, 4, 0, 4, 3, 4, 3, 4, 0, 4, 3, 4, 0, 1],
-    [1, 3, 0, 3, 0, 3, 3, 0, 3, 3, 0, 3, 0, 3, 0, 3, 1],
-    [1, 0, 4, 0, 4, 0, 4, 3, 4, 0, 4, 0, 4, 0, 4, 0, 1],
-    [1, 0, 0, 0, 3, 3, 3, 3, 3, 3, 3, 3, 0, 0, 0, 3, 1],
-    [1, 0, 4, 0, 4, 0, 4, 0, 4, 3, 4, 0, 4, 0, 4, 3, 1],
-    [1, 3, 3, 3, 3, 3, 0, 3, 0, 3, 0, 3, 3, 0, 0, 3, 1],
+    [1, 3, 0, 3, 0, 3, 3, 0, 3, 3, 3, 3, 3, 3, 0, 3, 1],
+    [1, 0, 4, 3, 4, 0, 4, 3, 4, 3, 4, 0, 4, 3, 4, 0, 1],
+    [1, 0, 3, 3, 3, 3, 3, 3, 3,3, 3, 3, 0, 3, 0, 3, 1],
+    [1, 0, 4, 3, 4, 3, 4, 0, 4, 3, 4, 0, 4, 3, 4, 3, 1],
+    [1, 3, 3, 0, 3, 3, 3, 3, 3, 3, 0, 3, 3, 0, 3, 3, 1],
     [1, 0, 4, 3, 4, 0, 4, 0, 4, 0, 4, 3, 4, 3, 4, 0, 1],
-    [1, 3, 3, 0, 3, 3, 0, 0, 3, 3, 0, 3, 3, 3, 3, 3, 1],
+    [1, 0, 0, 0, 3, 3, 0, 3, 3, 3, 0, 3, 3, 3, 0, 0, 1],
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
   ];
 
@@ -70,9 +70,20 @@ function startRoom(room) {
     [1, 15], // Player 3
     [12, 1], // Player 4
   ];
-
   const playersArray = Array.from(room.players.values());
 
+
+const tileTypes = [0, 3]; // 0 = empty, 3 = breakable wall
+
+  // Loop through each row and column
+  for (let row = 0; row < map.length; row++) {
+    for (let col = 0; col < map[row].length; col++) {
+      if (map[row][col] === 3) {
+        // Replace only where there was a breakable wall
+        map[row][col] = Math.random() < 0.8 ? 3 : 0;;
+      }
+    }
+  }
   // Place players directly in the map with values 5, 6, 7, 8
   for (let i = 0; i < playersArray.length; i++) {
     const pos = positionPlayers[i];
@@ -171,44 +182,44 @@ wss.on("connection", (ws) => {
         console.log(`Player ${data.nickname} joined Room ${currentRoom.id}`);
 
         // Handle game start conditions
-        if (
-          (currentRoom.players.size == 2 || currentRoom.players.size == 3) &&
-          !currentRoom.started
-        ) {
-          if (!roomTimeouts.has(currentRoom.id)) {
-            //clearTimeout(roomTimeouts.get(currentRoom.id));
-            const timeout = setTimeout(() => {
-              startRoom(currentRoom);
-            }, 20000);
-            roomTimeouts.set(currentRoom.id, timeout);
-          }
-          /******************************* */
-          if (!currentRoom.countInterval) {
-            currentRoom.countP = 0;
-            currentRoom.countInterval = setInterval(() => {
-              currentRoom.countP++;
-              currentRoom.broadcast({
-                type: "updatePlayers",
-                playerCount: currentRoom.players.size,
-                countP: currentRoom.countP,
-              });
-              if (currentRoom.countP >= 20) {
-                clearInterval(currentRoom.countInterval);
-                currentRoom.countInterval = null;
-              }
-            }, 1000);
-          }
-        } else if (currentRoom.players.size == 4 && !currentRoom.started) {
-          // Clear existing timeout if any
-          if (roomTimeouts.has(currentRoom.id)) {
-            clearTimeout(roomTimeouts.get(currentRoom.id));
-            roomTimeouts.delete(currentRoom.id);
-          }
-          // Start immediately
-          clearInterval(currentRoom.countInterval);
-          currentRoom.countInterval = null;
-          startRoom(currentRoom);
-        }
+        // if (
+        //   (currentRoom.players.size == 2 || currentRoom.players.size == 3) &&
+        //   !currentRoom.started
+        // ) {
+        // if (!roomTimeouts.has(currentRoom.id)) {
+        //   //clearTimeout(roomTimeouts.get(currentRoom.id));
+        //   // const timeout = setTimeout(() => {
+        startRoom(currentRoom);
+        //   // }, 20000);
+        //   // roomTimeouts.set(currentRoom.id, timeout);
+        // }
+        /******************************* */
+        // if (!currentRoom.countInterval) {
+        //   currentRoom.countP = 0;
+        //   currentRoom.countInterval = setInterval(() => {
+        //     currentRoom.countP++;
+        //     currentRoom.broadcast({
+        //       type: "updatePlayers",
+        //       playerCount: currentRoom.players.size,
+        //       countP: currentRoom.countP,
+        //     });
+        //     if (currentRoom.countP >= 20) {
+        //       clearInterval(currentRoom.countInterval);
+        //       currentRoom.countInterval = null;
+        //     }
+        //   }, 1000);
+        // }
+        // } else if (currentRoom.players.size == 4 && !currentRoom.started) {
+        //   // Clear existing timeout if any
+        //   if (roomTimeouts.has(currentRoom.id)) {
+        //     clearTimeout(roomTimeouts.get(currentRoom.id));
+        //     roomTimeouts.delete(currentRoom.id);
+        //   }
+        //   // Start immediately
+        //   clearInterval(currentRoom.countInterval);
+        //   currentRoom.countInterval = null;
+        //   startRoom(currentRoom);
+        // }
 
         break;
       case "playerMove":
