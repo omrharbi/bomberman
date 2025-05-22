@@ -81,9 +81,9 @@ export function GamePage() {
                     jsx("div", { className: "stella-status" },
                         jsx("h3", { style: "color:rgb(0, 0, 0); margin-bottom: 8px;" }, "✨ Stella's Power Stats ✨"),
                         jsx("div", { style: "list-style: none; padding: 0; margin: 0;" },
-                          jsx("p", {}, "💣 Bomb Power: false", ),
-                          jsx("p", {}, "⚡ Speed: false", ),
-                          jsx("p", {}, "🔥 Fire Range: false",)
+                          jsx("p", {}, "💣 Bomb Power: 1", ),
+                          jsx("p", {}, "⚡ Speed: 1", ),
+                          jsx("p", {}, "🔥 Fire Range: 1",)
                         )
                       )
                 )
