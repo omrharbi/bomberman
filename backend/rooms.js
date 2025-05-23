@@ -8,12 +8,15 @@ export default class Room {
     this.rewards = {};
     this.countInterval = null;
     this.countP = null;
+    this.ChatHistory = [];
   }
 
   addPlayer(player) {
     this.players.set(player.id, player);
   }
-
+  addchat(nickname, messageText) {
+    this.ChatHistory.push({ nickname, messageText });
+  }
   removePlayer(playerID) {
     this.players.delete(playerID);
     if (this.started === true) {

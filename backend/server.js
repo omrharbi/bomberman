@@ -1,5 +1,5 @@
 import http from "http";
-import WebSocket, { WebSocketServer } from "ws";
+import { WebSocketServer } from "ws";
 import Player from "./player.js";
 import Room from "./rooms.js";
 
@@ -89,7 +89,6 @@ function startRoom(room) {
   for (const player of playersArray) {
     console.log(`Player ${player.nickname} in room ${room.id}`);
     startGameForPlayer(player, room, playersArray, map);
-    console.log("playerid", player.id);
   }
 }
 
@@ -117,18 +116,6 @@ function startGameForPlayer(player, room, playersArray, map) {
 
     if (data.type === "loseLife") {
       player.loseLife(); // Decrease lives
-    }
-
-    switch (data.type) {
-      case "chatMsg":
-        room.broadcast({
-          type: "chatMsg",
-          nickname: player.nickname,
-          messageText: data.messageText || "",
-        });
-        break;
-      default:
-        break;
     }
   });
 
@@ -168,6 +155,14 @@ wss.on("connection", (ws) => {
           playerCount: currentRoom.players.size,
         });
 
+        currentPlayer.conn.send(
+          JSON.stringify({
+            type: "getname",
+            nickname: data.nickname
+          })
+        );
+
+        sendhistorichat(currentRoom, currentPlayer)
         console.log(`Player ${data.nickname} joined Room ${currentRoom.id}`);
 
         // Handle game start conditions
@@ -220,9 +215,21 @@ wss.on("connection", (ws) => {
       case "HitByExplosion":
         currentPlayer.isPlayerHitByExplosion(data, currentRoom);
         break;
-      default:
-        console.log("Unknown message type:", data.type);
+      case "chatMsg":
+        if (!currentRoom.started) {
+          currentRoom.addchat(currentPlayer.nickname, data.messageText || "");
+        }
+        currentRoom.broadcast({
+          type: "chatMsg",
+          nickname: currentPlayer.nickname,
+          messageText: data.messageText || "",
+        });
         break;
+      case "gethistory":
+        sendhistorichat(currentRoom, currentPlayer)
+        break
+      default:
+        break
     }
   });
 
@@ -236,6 +243,21 @@ wss.on("connection", (ws) => {
     }
   });
 });
+
+
+function sendhistorichat(room, player) {
+  if (room.ChatHistory.length > 0) {
+    for (const msg of room.ChatHistory) {
+      player.conn.send(
+        JSON.stringify({
+          type: "chatMsg",
+          nickname: msg.nickname,
+          messageText: msg.messageText,
+        })
+      )
+    }
+  }
+}
 
 // Start server
 server.listen(8080, () => {
