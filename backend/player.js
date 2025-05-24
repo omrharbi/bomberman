@@ -430,64 +430,6 @@ export default class Player {
     });
   }
 
-  // #destroyWall(row, col, directions, frames, room) {
-  //   room.broadcast({
-  //     type: "drawExplosion",
-  //     position: {
-  //       row: row,
-  //       col: col,
-  //     },
-  //     frames: frames,
-  //   });
-  //   room.broadcast({
-  //     type: "HitByExplosion",
-  //     row: row,
-  //     col: col,
-  //   });
-
-  //   directions.forEach(({ dr, dc }) => {
-  //     const newRow = row + dr;
-  //     const newCol = col + dc;
-
-  //     room.broadcast({
-  //       type: "HitByExplosion",
-  //       row: newRow,
-  //       col: newCol,
-  //     });
-
-  //     if (newRow >= 0 &&newRow < room.map.length &&newCol >= 0 &&newCol < room.map[0].length) {
-  //       if (room.map[newRow][newCol] === 3) {
-  //         const gift = Math.random() < 0.3;
-  //         const index = Math.floor(Math.random() * 3);
-
-  //         room.map[newRow][newCol] = 0;
-  //         room.broadcast({
-  //           type: "destroyWall",
-  //           position: {
-  //             row: newRow,
-  //             col: newCol,
-  //           },
-  //           gift: gift,
-  //           index: index,
-  //           frames: frames,
-  //         });
-
-  //         if (gift) {
-  //           room.addReward(newRow, newCol, index);
-  //         }
-  //       } else if (room.map[newRow][newCol] === 0 ||room.map[newRow][newCol] === 5 ||room.map[newRow][newCol] === 6 ||room.map[newRow][newCol] === 7 ||room.map[newRow][newCol] === 8) {
-  //         room.broadcast({
-  //           type: "drawExplosion",
-  //           position: {
-  //             row: newRow,
-  //             col: newCol,
-  //           },
-  //           frames: frames,
-  //         });
-  //       }
-  //     }
-  //   });
-  // }
   #destroyWall(row, col, frames, room) {
     room.broadcast({
       type: "drawExplosion",
