@@ -16,6 +16,7 @@ export const Ref = {
     notificationsRef : { current: null },
     popupRef: { current: null },
     gamePageRef : { current: null },
+    loginRef : { current: null },
 }
 
 export function GamePage() {
@@ -113,8 +114,8 @@ export function LoginPage() {
         }
     }
 
-    return jsx(
-        'div', { id: 'login' },
+    return jsx('div',{ref : Ref.loginRef},jsx(
+        'div', { id: 'login',  },
         jsx('h1', {}, 'bomberMane'),
         jsx('p', { id: 'cont' }),
         jsx('div', { id: 'input' },
@@ -130,5 +131,5 @@ export function LoginPage() {
                 className: "login-button"
             }, "Join Game")
         )
-    );
+    ));
 }

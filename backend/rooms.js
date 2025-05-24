@@ -32,6 +32,7 @@ export default class Room {
           name: this.players.values().next().value.nickname
         });
       } else if (this.players.size === 0) {
+        this.ChatHistory = [];
         this.started = false
       }
     }

@@ -12,10 +12,10 @@ const router = new Router({
 
 router.init();
 
-let waitingContainer = null;
 
-export function waiting(element) {
-  waitingContainer = element;
+
+export function waiting() {
+
   const waitingContent = jsx(
     "div",
     {},
@@ -32,7 +32,7 @@ export function waiting(element) {
     )
   );
 
-  render(waitingContent, element);
+  render(waitingContent, Ref.loginRef.current);
 }
 
 export let socket;
@@ -64,8 +64,10 @@ function handleServerMessages(data) {
   if (data.type == "startGame") {
     tileMap = new TileMap(tileSize, data);
   }
+  console.log("========", data.type);
   switch (data.type) {
     case "updatePlayers":
+      
       updatePlayerCount(data.playerCount, data.playerId, data.countP);
       break;
     case "getname":
@@ -182,7 +184,6 @@ function notificationPower(data) {
   }
 
   setTimeout(() => {
-    // notificationsEle.removeChild(elementToRemove);
     notificationsEle.innerHTML = "";
   }, 3000);
 }
@@ -222,13 +223,10 @@ function rewardCollected(data) {
 
 function hearts(data) {
   const hearts = Ref.hearts.current;
-
-  console.log("data.Id", data.Id);
   if (hearts.lastElementChild) {
     hearts.lastElementChild.remove();
   }
-  console.log("hearts", hearts);
-  console.log("heartsData", data);
+
 }
 
 function animationPlayerDead(data) {
@@ -281,6 +279,8 @@ function updateOtherPlayerPosition(data) {
 }
 
 function updatePlayerCount(count, playerId, countP) {
+  console.log(Ref.loginRef.current);
+  
   gameState.playerCount = count;
   let progressText = "";
   if (countP === null) {
@@ -288,7 +288,7 @@ function updatePlayerCount(count, playerId, countP) {
   } else {
     progressText = countP < 20 ? `Game starting soon... ${countP}s` : "Game starting soon...";
   }
-  if (waitingContainer) {
+
     const updatedWaitingContent = jsx(
       'div', { className: 'content-container' },
       jsx(
@@ -305,7 +305,7 @@ function updatePlayerCount(count, playerId, countP) {
           jsx("p", {}, progressText)
         )
       ),
-      jsx("aside", { className: "chat-sidebar" },
+      jsx("aside", { className: "chat-sidebar-loby" },
         jsx("div", { className: "message-container", ref: Ref.messagesRef }),
         jsx(
           "div",
@@ -320,33 +320,47 @@ function updatePlayerCount(count, playerId, countP) {
         )
       )
     )
-    updateRender(updatedWaitingContent, document.body);
-  }
+    updateRender(updatedWaitingContent, Ref.loginRef.current);
+
 }
 
 function startGame(data, tileMap) {
-  console.log(data.players);
-
   let count = 10;
   const interval = setInterval(() => {
-    count--;
     const updatedWaitingContent = jsx(
-      "div",
-      {},
-      jsx("p", { id: "playercount" }, `start Game in : ${count}s`),
+      'div', { className: 'content-container' },
       jsx(
-        "div",
-        { className: "waiting-animation" },
-        jsx("img", {
-          src: "/images/bomberman3d.gif",
-          alt: "Waiting...",
-          style: "margin-top: 10px;",
-        }),
-        jsx("p", {}, "")
+        "div", { id: 'login' },
+        jsx("p", { id: "playercount" }, `start Game in : ${count}s`),
+        jsx(
+          "div",
+          { className: "waiting-animation" },
+          jsx("img", {
+            src: "/images/bomberman3d.gif",
+            alt: "Waiting...",
+            style: "margin-top: 10px;",
+          })
+        )
+      ),
+      jsx("aside", { className: "chat-sidebar-loby" },
+        jsx("div", { className: "message-container", ref: Ref.messagesRef }),
+        jsx(
+          "div",
+          { className: "chat-input-area" },
+          jsx("input", {
+            type: "text",
+            className: "chat-input",
+            placeholder: "Type a message...",
+            ref: Ref.chatRef,
+          }),
+          jsx("button", { className: "send-button", ref: Ref.buttonRef }, "Send")
+        )
       )
-    );
-
-    updateRender(updatedWaitingContent, waitingContainer);
+    )
+    
+    updateRender(updatedWaitingContent,Ref.loginRef.current);
+    
+    count--;
     if (count == 0) {
       GoToGame(data, tileMap);
       clearInterval(interval);
