@@ -116,7 +116,7 @@ export function LoginPage() {
 
     return jsx('div',{ref : Ref.loginRef},jsx(
         'div', { id: 'login',  },
-        jsx('h1', {}, 'bomberMane'),
+        jsx('h1', {}, 'bomberMan'),
         jsx('p', { id: 'cont' }),
         jsx('div', { id: 'input' },
             jsx('input', {
