@@ -48,27 +48,27 @@ function startRoom(room) {
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
     [1, 0, 0, 3, 0, 3, 3, 3, 3, 3, 0, 3, 3, 3, 0, 0, 1],
     [1, 0, 4, 0, 4, 3, 4, 3, 4, 3, 4, 0, 4, 3, 4, 0, 1],
-    [1, 3, 0, 3, 0, 0, 3, 3, 0, 3, 3, 3, 0, 3, 3, 3, 1],
-    [1, 0, 4, 3, 4, 0, 4, 3, 4, 3, 4, 0, 4, 0, 4, 3, 1],
+    [1, 3, 0, 3, 0, 0, 3, 3, 0, 3, 3, 3, 3, 3, 3, 3, 1],
+    [1, 0, 4, 3, 4, 0, 4, 3, 4, 3, 4, 3, 4, 0, 4, 3, 1],
     [1, 3, 0, 3, 0, 3, 3, 3, 3, 3, 3, 3, 0, 3, 3, 3, 1],
-    [1, 0, 4, 0, 4, 3, 4, 3, 4, 0, 4, 3, 4, 3, 4, 0, 1],
-    [1, 3, 3, 3, 0, 3, 3, 0, 3, 3, 3, 3, 0, 3, 0, 3, 1],
-    [1, 0, 4, 3, 4, 0, 4, 3, 4, 3, 4, 0, 4, 3, 4, 0, 1],
-    [1, 3, 0, 3, 0, 3, 3, 0, 3, 3, 3, 3, 3, 3, 0, 3, 1],
-    [1, 0, 4, 3, 4, 0, 4, 3, 4, 3, 4, 0, 4, 3, 4, 0, 1],
-    [1, 0, 3, 3, 3, 3, 3, 3, 3,3, 3, 3, 0, 3, 0, 3, 1],
-    [1, 0, 4, 3, 4, 3, 4, 0, 4, 3, 4, 0, 4, 3, 4, 3, 1],
+    [1, 0, 4, 0, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 0, 1],
+    [1, 3, 3, 3, 0, 3, 3, 3, 3, 3, 3, 3, 0, 3, 0, 3, 1],
+    [1, 3, 4, 3, 4, 0, 4, 3, 4, 3, 4, 0, 4, 3, 4, 0, 1],
+    [1, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0, 3, 1],
+    [1, 3, 4, 3, 4, 0, 4, 3, 4, 3, 4, 0, 4, 3, 4, 0, 1],
+    [1, 3, 3, 3, 3, 3, 3, 3, 3,3, 3, 3, 0, 3, 0, 3, 1],
+    [1, 3, 4, 3, 4, 3, 4, 0, 4, 3, 4, 0, 4, 3, 4, 3, 1],
     [1, 3, 3, 0, 3, 3, 3, 3, 3, 3, 0, 3, 3, 0, 3, 3, 1],
-    [1, 0, 4, 3, 4, 0, 4, 0, 4, 0, 4, 3, 4, 3, 4, 0, 1],
-    [1, 0, 0, 0, 3, 3, 0, 3, 3, 3, 0, 3, 3, 3, 0, 0, 1],
+    [1, 0, 4, 3, 4, 3, 4, 3, 4, 0, 4, 3, 4, 3, 4, 0, 1],
+    [1, 0, 0, 0, 3, 3, 3, 3, 3, 3, 0, 3, 3, 3, 0, 0, 1],
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
   ];
 
   const positionPlayers = [
     [1, 1], // Player 1
-    [14, 13], // Player 2
+    [15, 15], // Player 2
     [1, 15], // Player 3
-    [12, 1], // Player 4
+    [15, 1], // Player 4
   ];
   const playersArray = Array.from(room.players.values());
 
@@ -80,7 +80,7 @@ const tileTypes = [0, 3]; // 0 = empty, 3 = breakable wall
     for (let col = 0; col < map[row].length; col++) {
       if (map[row][col] === 3) {
         // Replace only where there was a breakable wall
-        map[row][col] = Math.random() < 0.8 ? 3 : 0;;
+        map[row][col] = Math.random() < 0.8 ? 3 : 0;
       }
     }
   }
@@ -178,7 +178,7 @@ wss.on("connection", (ws) => {
         sendhistorichat(currentRoom, currentPlayer)
         console.log(`Player ${data.nickname} joined Room ${currentRoom.id}`);
 
-        // Handle game start conditions
+        // // Handle game start conditions
         if (
           (currentRoom.players.size == 2 || currentRoom.players.size == 3) &&
           !currentRoom.started
@@ -187,8 +187,8 @@ wss.on("connection", (ws) => {
           clearTimeout(roomTimeouts.get(currentRoom.id));
           const timeout = setTimeout(() => {
         startRoom(currentRoom);
-          }, 20000);
-          // roomTimeouts.set(currentRoom.id, timeout);
+         }, 20000);
+          roomTimeouts.set(currentRoom.id, timeout);
         }
         /******************************* */
         if (!currentRoom.countInterval) {
