@@ -35,12 +35,12 @@ export default class Player {
       },
       flames: {
         level: 1,          
-        maxLevel: 5,     
+        maxLevel: 4,     
         baseValue: 1  
       },
       speed: {
         level: 1,        
-        maxLevel: 4,       
+        maxLevel: 5,       
         baseValue: 25 
       }
     };
@@ -595,7 +595,7 @@ export default class Player {
       return;
     }
 
-    if (this.powerUps[powerUpType].level <= this.powerUps[powerUpType].maxLevel) {
+    if (this.powerUps[powerUpType].level < this.powerUps[powerUpType].maxLevel) {
       this.powerUps[powerUpType].level++;
       this.updateDerivedStats(powerUpType);      
     }
@@ -609,7 +609,6 @@ export default class Player {
     } else if (powerUpType === "speed") {
       this.powerUps.speed.baseValue += 5;
     } else if (powerUpType === "flames") {
-      // Fixed: Simply increment by 1, not by baseValue + 1
       this.powerUps.flames.baseValue += 1;
     }
   }
