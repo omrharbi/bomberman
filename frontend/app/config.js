@@ -110,7 +110,7 @@ export function LoginPage() {
 
         if (gameState.name.trim()) {
             connectToGameServer(gameState.name);
-            waiting(event.target.parentNode)
+            // waiting(event.target.parentNode)
         }
     }
 
