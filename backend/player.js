@@ -1,4 +1,3 @@
-import { log } from "console";
 
 export default class Player {
   constructor(nickname, id, conn) {
@@ -60,12 +59,11 @@ export default class Player {
       return;
     }
     let movementStartTime = null;
-    let lastSendTime = 0;
-    const updateInterval = 50;
-    const now = Date.now();
     const deltaTime = data.deltaTime;
-    const moveSpeed = this.powerUps.speed.baseValue * deltaTime;
 
+    const moveSpeed = this.powerUps.speed.baseValue * deltaTime;
+    console.log(`Player ${deltaTime} is moving at speed: ${moveSpeed}`);
+    
     const prevX = this.x;
     const prevY = this.y;
 

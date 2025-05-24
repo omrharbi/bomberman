@@ -73,14 +73,13 @@ function startRoom(room) {
   const playersArray = Array.from(room.players.values());
 
 
-const tileTypes = [0, 3]; // 0 = empty, 3 = breakable wall
+const tileTypes = [0, 3]; // 0 = empty, 3 = breakwall
 
-  // Loop through each row and column
   for (let row = 0; row < map.length; row++) {
     for (let col = 0; col < map[row].length; col++) {
       if (map[row][col] === 3) {
-        // Replace only where there was a breakable wall
-        map[row][col] = Math.random() < 0.8 ? 3 : 0;
+        // Replace only where there was a break wall
+        map[row][col] = Math.random() < 0.8 ? 3 : 0; // 0 = empty, 3 = breakwall
       }
     }
   }
