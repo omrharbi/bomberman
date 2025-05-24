@@ -353,7 +353,7 @@ export default class Player {
     if (this.powerUps.bombs.numBomb <= this.bombes ){
       return;
     }
-
+  
     if (!this.isAlive()) {
       return;
     }
@@ -361,15 +361,12 @@ export default class Player {
     setTimeout(() => {
       this.bombes--;
     }, 3000);
-
+  
     const row = Math.floor((this.y + 20) / room.tileSize);
     const col = Math.floor((this.x + 20) / room.tileSize);
-    const gift = Math.random() < 0.3;
-    const index = Math.floor(Math.random() * 3); // Random index for the gift
     
-    // Generate explosion directions based on flame power
     const directions = this.#generateExplosionDirections();
-
+  
     const frames = [
       { x: -5, y: 0 }, // Frame 1
       { x: -40, y: 0 }, // Frame 2
@@ -380,17 +377,15 @@ export default class Player {
       { x: -112, y: 36 }, // Frame 7
       { x: -146, y: 36 }, // Frame 8
     ];
-
-    // Add this bomb to the player's overlapping bombs set
+  
     this.overlappingBombs.add(`${row}_${col}`);
-
+  
     this.#drawBomb(row, col, room);
-
+  
     setTimeout(() => {
       this.#removeBomb(row, col, room);
-      this.#destroyWall(row, col, gift, index, directions, frames, room);
-
-      // Remove this bomb from the player's overlapping bombs set
+      this.#destroyWall(row, col, directions, frames, room);
+  
       this.overlappingBombs.delete(`${row}_${col}`);
     }, 3000);
   }
@@ -435,7 +430,7 @@ export default class Player {
     });
   }
 
-  #destroyWall(row, col, gift, index, directions, frames, room) {
+  #destroyWall(row, col, directions, frames, room) {
     room.broadcast({
       type: "drawExplosion",
       position: {
@@ -449,6 +444,7 @@ export default class Player {
       row: row,
       col: col,
     });
+    
     directions.forEach(({ dr, dc }) => {
       const newRow = row + dr;
       const newCol = col + dc;
@@ -458,6 +454,7 @@ export default class Player {
         row: newRow,
         col: newCol,
       });
+      
       if (
         newRow >= 0 &&
         newRow < room.map.length &&
@@ -465,6 +462,9 @@ export default class Player {
         newCol < room.map[0].length
       ) {
         if (room.map[newRow][newCol] === 3) {
+          const gift = Math.random() < 0.3;
+          const index = Math.floor(Math.random() * 3);
+          
           room.map[newRow][newCol] = 0;
           room.broadcast({
             type: "destroyWall",
@@ -476,6 +476,7 @@ export default class Player {
             index: index,
             frames: frames,
           });
+          
           if (gift) {
             room.addReward(newRow, newCol, index);
           }
