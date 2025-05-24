@@ -182,44 +182,44 @@ wss.on("connection", (ws) => {
         console.log(`Player ${data.nickname} joined Room ${currentRoom.id}`);
 
         // Handle game start conditions
-        // if (
-        //   (currentRoom.players.size == 2 || currentRoom.players.size == 3) &&
-        //   !currentRoom.started
-        // ) {
-        // if (!roomTimeouts.has(currentRoom.id)) {
-        //   //clearTimeout(roomTimeouts.get(currentRoom.id));
-        //   // const timeout = setTimeout(() => {
+        if (
+          (currentRoom.players.size == 2 || currentRoom.players.size == 3) &&
+          !currentRoom.started
+        ) {
+        if (!roomTimeouts.has(currentRoom.id)) {
+          clearTimeout(roomTimeouts.get(currentRoom.id));
+          const timeout = setTimeout(() => {
         startRoom(currentRoom);
-        //   // }, 20000);
-        //   // roomTimeouts.set(currentRoom.id, timeout);
-        // }
+          }, 20000);
+          // roomTimeouts.set(currentRoom.id, timeout);
+        }
         /******************************* */
-        // if (!currentRoom.countInterval) {
-        //   currentRoom.countP = 0;
-        //   currentRoom.countInterval = setInterval(() => {
-        //     currentRoom.countP++;
-        //     currentRoom.broadcast({
-        //       type: "updatePlayers",
-        //       playerCount: currentRoom.players.size,
-        //       countP: currentRoom.countP,
-        //     });
-        //     if (currentRoom.countP >= 20) {
-        //       clearInterval(currentRoom.countInterval);
-        //       currentRoom.countInterval = null;
-        //     }
-        //   }, 1000);
-        // }
-        // } else if (currentRoom.players.size == 4 && !currentRoom.started) {
-        //   // Clear existing timeout if any
-        //   if (roomTimeouts.has(currentRoom.id)) {
-        //     clearTimeout(roomTimeouts.get(currentRoom.id));
-        //     roomTimeouts.delete(currentRoom.id);
-        //   }
-        //   // Start immediately
-        //   clearInterval(currentRoom.countInterval);
-        //   currentRoom.countInterval = null;
-        //   startRoom(currentRoom);
-        // }
+        if (!currentRoom.countInterval) {
+          currentRoom.countP = 0;
+          currentRoom.countInterval = setInterval(() => {
+            currentRoom.countP++;
+            currentRoom.broadcast({
+              type: "updatePlayers",
+              playerCount: currentRoom.players.size,
+              countP: currentRoom.countP,
+            });
+            if (currentRoom.countP >= 20) {
+              clearInterval(currentRoom.countInterval);
+              currentRoom.countInterval = null;
+            }
+          }, 1000);
+        }
+        } else if (currentRoom.players.size == 4 && !currentRoom.started) {
+          // Clear existing timeout if any
+          if (roomTimeouts.has(currentRoom.id)) {
+            clearTimeout(roomTimeouts.get(currentRoom.id));
+            roomTimeouts.delete(currentRoom.id);
+          }
+          // Start immediately
+          clearInterval(currentRoom.countInterval);
+          currentRoom.countInterval = null;
+          startRoom(currentRoom);
+        }
 
         break;
       case "playerMove":
