@@ -140,8 +140,10 @@ export function render(vNode, container) {
 }
 
 export function updateRender(newVNode, container) {
+  console.log("updateRender");
   const oldVNode = container._vdom;
   if (!oldVNode) {
+    console.log("oldVNode is null");
     render(newVNode, container);
     return;
   }

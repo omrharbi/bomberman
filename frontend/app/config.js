@@ -16,6 +16,7 @@ export const Ref = {
     notificationsRef : { current: null },
     popupRef: { current: null },
     gamePageRef : { current: null },
+    loginRef : { current: null },
 }
 
 export function GamePage() {
@@ -81,9 +82,9 @@ export function GamePage() {
                     jsx("div", { className: "stella-status" },
                         jsx("h3", { style: "color:rgb(0, 0, 0); margin-bottom: 8px;" }, "✨ Stella's Power Stats ✨"),
                         jsx("div", { style: "list-style: none; padding: 0; margin: 0;" },
-                          jsx("p", {}, "💣 Bomb Power: false", ),
-                          jsx("p", {}, "⚡ Speed: false", ),
-                          jsx("p", {}, "🔥 Fire Range: false",)
+                          jsx("p", {}, "💣 Bomb Power: 1", ),
+                          jsx("p", {}, "⚡ Speed: 1", ),
+                          jsx("p", {}, "🔥 Fire Range: 1",)
                         )
                       )
                 )
@@ -113,8 +114,8 @@ export function LoginPage() {
         }
     }
 
-    return jsx(
-        'div', { id: 'login' },
+    return jsx('div',{ref : Ref.loginRef},jsx(
+        'div', { id: 'login',  },
         jsx('h1', {}, 'bomberMane'),
         jsx('p', { id: 'cont' }),
         jsx('div', { id: 'input' },
@@ -130,5 +131,5 @@ export function LoginPage() {
                 className: "login-button"
             }, "Join Game")
         )
-    );
+    ));
 }
