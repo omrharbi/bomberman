@@ -278,7 +278,9 @@ function updateOtherPlayerPosition(data) {
   playerElement.style.transform = `translate(${data.position.x}px, ${data.position.y}px)`;
 }
 
-function updatePlayerCount(count,countP) {
+function updatePlayerCount(count, playerId, countP) {
+  console.log(Ref.loginRef.current);
+  
   gameState.playerCount = count;
   let progressText = "";
   if (countP === null) {
@@ -321,7 +323,6 @@ function updatePlayerCount(count,countP) {
     updateRender(updatedWaitingContent, Ref.loginRef.current);
 
 }
-
 function startGame(data, tileMap) {
   let count = 10;
   const interval = setInterval(() => {
