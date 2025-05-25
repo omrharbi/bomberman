@@ -91,7 +91,7 @@ export default class Player {
         break;
     }
 
-    const spriteMap = {
+    const spriteMap = { // Sprite positions for each direction
       up: [
         { x: 55, y: 82 },
         { x: 28, y: 82 },
@@ -118,12 +118,12 @@ export default class Player {
       ],
     };
 
-    if (this.#checkCollision(room)) {
+    if (this.#checkCollision(room)) { // Check for collision with walls or blocks
       this.x = prevX;
       this.y = prevY;
     } else {
-      this.#checkRewardCollection(room);
-      this.#updateBombOverlap(room);
+      this.#checkRewardCollection(room); // Check for reward collection
+      this.#updateBombOverlap(room);// Update bomb overlap status
     }
 
     if (this.isMoving) {
@@ -166,7 +166,7 @@ export default class Player {
     }
   }
 
-  #checkCollision(room, moveSpeed) {
+  #checkCollision(room) {
     const playerLeft = this.x;
     const playerTop = this.y;
     const playerRight = this.x + this.width;
@@ -178,7 +178,7 @@ export default class Player {
     const playerTileX = Math.floor(playerCenterX / room.tileSize);
     const playerTileY = Math.floor(playerCenterY / room.tileSize);
 
-    console.log(`playerTileX ${playerTileX} is playerTileY ${playerTileY} room.map[0].length: ${room.map[0].length}`);
+    // console.log(`playerTileX ${playerTileX} is playerTileY ${playerTileY} room.map[0].length: ${room.map[0].length}`);
 
     for (let y = playerTileY - 1; y <= playerTileY + 1; y++) {
       for (let x = playerTileX - 1; x <= playerTileX + 1; x++) {
@@ -190,7 +190,9 @@ export default class Player {
             tileType === 1 ||
             tileType === 2 ||
             tileType === 3 ||
-            (tileType === 4 && !this.overlappingBombs.has(`${y}_${x}`))
+            (tileType === 4 && !this.overlappingBombs.has(`${y}_${x}`) 
+          
+          )
           ) {
             const tileLeft = x * room.tileSize;
             const tileTop = y * room.tileSize;
@@ -198,18 +200,20 @@ export default class Player {
             const tileBottom = tileTop + room.tileSize;
 
             if (
-              playerLeft < tileRight - 6 &&
+              playerLeft < tileRight - 6 && //  tileRight - 6 
               playerRight > tileLeft - 4 &&
               playerTop < tileBottom - 16 &&
               playerBottom > tileTop
             ) {
               if (this.direction === "down") {
                 const rightEdgeCollision =
-                  Math.abs(playerRight - tileLeft + 5) <= 19.75;
+                  Math.abs(playerRight - tileLeft +5 ) <= 19.75;
+                const right = Math.abs(playerRight - tileLeft +5) > 38;
 
-                const right = Math.abs(playerRight - tileLeft) > 38;
-                console.log(Math.abs(playerRight - tileLeft + 5));
-
+                console.log("rightEdgeCollision",rightEdgeCollision, Math.abs(playerRight - tileLeft +5));
+                // console.log("rightEdgeCollision",rightEdgeCollision, Math.abs(playerRight - tileLeft +5));
+                // console.log(Math.abs(playerRight - tileLeft -5));
+                
                 if (tileType === 0 || tileTypes === 0) {
                   if (rightEdgeCollision) {
                     if (playerLeft <= tileLeft) {
@@ -237,8 +241,8 @@ export default class Player {
 
 
                   const rightEdgeCollision =
-                    Math.abs(playerRight - tileLeft + 5) >= 48
-                    || Math.abs(playerRight - tileLeft) <= 13;
+                    Math.abs(playerRight - tileLeft +5) >= 48
+                    || Math.abs(playerRight - tileLeft -5) <= 13;
 
                   // console.log(
                   //   rightEdgeCollision,
@@ -391,23 +395,7 @@ export default class Player {
     }, 3000);
   }
 
-  // New method to generate explosion directions based on flame power
-  // #generateExplosionDirections() {
-  //   const directions = [];
-  //   const flameRange = this.powerUps.flames.baseValue;
 
-  //   // Generate directions for each range level
-  //   for (let range = 1; range <= flameRange; range++) {
-  //     directions.push(
-  //       { dr: -range, dc: 0 }, // Up
-  //       { dr: 0, dc: range },  // Right
-  //       { dr: range, dc: 0 },  // Down
-  //       { dr: 0, dc: -range }  // Left
-  //     );
-  //   }
-
-  //   return directions;
-  // }
 
   #drawBomb(row, col, room) {
     room.map[row][col] = 4;

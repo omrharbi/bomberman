@@ -46,21 +46,21 @@ function startRoom(room) {
 
   let map = [
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-    [1, 0, 0, 3, 0, 3, 3, 3, 3, 3, 0, 3, 3, 3, 0, 0, 1],
-    [1, 0, 4, 0, 4, 3, 4, 3, 4, 3, 4, 0, 4, 3, 4, 0, 1],
-    [1, 3, 0, 3, 0, 0, 3, 3, 0, 3, 3, 3, 3, 3, 3, 3, 1],
-    [1, 0, 4, 3, 4, 0, 4, 3, 4, 3, 4, 3, 4, 0, 4, 3, 1],
-    [1, 3, 0, 3, 0, 3, 3, 3, 3, 3, 3, 3, 0, 3, 3, 3, 1],
-    [1, 0, 4, 0, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 0, 1],
-    [1, 3, 3, 3, 0, 3, 3, 3, 3, 3, 3, 3, 0, 3, 0, 3, 1],
-    [1, 3, 4, 3, 4, 0, 4, 3, 4, 3, 4, 0, 4, 3, 4, 0, 1],
-    [1, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0, 3, 1],
-    [1, 3, 4, 3, 4, 0, 4, 3, 4, 3, 4, 0, 4, 3, 4, 0, 1],
-    [1, 3, 3, 3, 3, 3, 3, 3, 3,3, 3, 3, 0, 3, 0, 3, 1],
-    [1, 3, 4, 3, 4, 3, 4, 0, 4, 3, 4, 0, 4, 3, 4, 3, 1],
-    [1, 3, 3, 0, 3, 3, 3, 3, 3, 3, 0, 3, 3, 0, 3, 3, 1],
-    [1, 0, 4, 3, 4, 3, 4, 3, 4, 0, 4, 3, 4, 3, 4, 0, 1],
-    [1, 0, 0, 0, 3, 3, 3, 3, 3, 3, 0, 3, 3, 3, 0, 0, 1],
+    [1, 0, 0, 0, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0, 0, 0, 1],
+    [1, 0, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 0, 1],
+    [1, 0, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0, 1],
+    [1, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 1],
+    [1, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 1],
+    [1, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 1],
+    [1, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 1],
+    [1, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 1],
+    [1, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 1],
+    [1, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 1],
+    [1, 3, 3, 3, 3, 3, 3, 3, 3,3, 3, 3, 3, 3, 3, 3, 1],
+    [1, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 1],
+    [1, 0, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0, 1],
+    [1, 0, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 0, 1],
+    [1, 0, 0, 0, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0, 0, 0, 1],
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
   ];
 
@@ -132,6 +132,9 @@ function startGameForPlayer(player, room, playersArray, map) {
   player.conn.on("close", () => {
     console.log(`Player ${player.nickname} disconnected`);
     room.removePlayer(player.id);
+    if (room.players.size === 0) {
+      rooms.delete(room.id);
+    }
     if (!room.started) {
       room.broadcast({
         type: "updatePlayers",
@@ -141,7 +144,6 @@ function startGameForPlayer(player, room, playersArray, map) {
     }
   });
 }
-
 wss.on("connection", (ws) => {
   let currentPlayer;
   let currentRoom;
@@ -184,7 +186,7 @@ wss.on("connection", (ws) => {
         ) {
         if (!roomTimeouts.has(currentRoom.id)) {
           clearTimeout(roomTimeouts.get(currentRoom.id));
-          const timeout = setTimeout(() => {
+          let timeout = setTimeout(() => {
         startRoom(currentRoom);
          }, 20000);
           roomTimeouts.set(currentRoom.id, timeout);
@@ -248,6 +250,15 @@ wss.on("connection", (ws) => {
   ws.on("close", () => {
     if (currentRoom && currentPlayer) {
       currentRoom.removePlayer(currentPlayer.id);
+      if (currentRoom.players.size === 1) {
+        currentRoom.started = false;
+        clearTimeout(roomTimeouts.get(currentRoom.id));
+        roomTimeouts.delete(currentRoom.id);
+        currentRoom.countP = 0;
+        clearInterval(currentRoom.countInterval);
+        currentRoom.countInterval = null;
+
+      }
       currentRoom.broadcast({
         type: "updatePlayers",
         playerCount: currentRoom.players.size,
