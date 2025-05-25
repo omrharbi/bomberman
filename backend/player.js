@@ -390,23 +390,7 @@ export default class Player {
     }, 3000);
   }
 
-  // New method to generate explosion directions based on flame power
-  // #generateExplosionDirections() {
-  //   const directions = [];
-  //   const flameRange = this.powerUps.flames.baseValue;
 
-  //   // Generate directions for each range level
-  //   for (let range = 1; range <= flameRange; range++) {
-  //     directions.push(
-  //       { dr: -range, dc: 0 }, // Up
-  //       { dr: 0, dc: range },  // Right
-  //       { dr: range, dc: 0 },  // Down
-  //       { dr: 0, dc: -range }  // Left
-  //     );
-  //   }
-
-  //   return directions;
-  // }
 
   #drawBomb(row, col, room) {
     room.map[row][col] = 4;

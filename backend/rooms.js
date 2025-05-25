@@ -33,7 +33,7 @@ export default class Room {
         });
       } else if (this.players.size === 0) {
         this.ChatHistory = [];
-        this.started = false
+        this.started = false;
       }
     }
   }
