@@ -54,6 +54,22 @@ img {
     color: transparent;
 }
 
+
+.chat-sidebar-loby{
+    width: 300px;
+    background: linear-gradient(135deg, #162839 0%, #1e3246 100%);
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    border-left: 1px solid #3a7bd5;
+    box-shadow: -5px 0 15px rgba(0, 0, 0, 0.3);
+    height: 100vh; 
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    
+}
+
 #cont {
     margin-bottom: 1.5rem;
 }
@@ -599,14 +615,12 @@ body::before {
     .content-container {
         flex-direction: column;
     }
-    
-    .chat-sidebar {
-        width: 100%;
-        max-height: 250px;
-        border-left: none;
-        border-top: 1px solid #3a7bd5;
+
+    #login {
+        top: 37%;
     }
-    .chat-sidebar-loby {
+    
+    .chat-sidebar, .chat-sidebar-loby {
         width: 100%;
         max-height: 250px;
         border-left: none;
@@ -646,18 +660,13 @@ body::before {
         flex-direction: column;
     }
     
-    .chat-sidebar {
+    .chat-sidebar, .chat-sidebar-loby {
         width: 100%;
         height: 250px;
         border-left: none;
         border-top: 1px solid #3a7bd5;
     }
-    .chat-sidebar-loby {
-        width: 100%;
-        height: 250px;
-        border-left: none;
-        border-top: 1px solid #3a7bd5;
-    }
+
     
     .message-container {
         max-height: 150px;
@@ -798,10 +807,7 @@ body::before {
         font-size: 18px;
     }
     
-    .chat-sidebar {
-        max-height: 200px;
-    }
-    .chat-sidebar-loby {
+    .chat-sidebar,.chat-sidebar-loby {
         max-height: 200px;
     }
     
@@ -876,12 +882,7 @@ body::before {
         flex-direction: row;
     }
     
-    .chat-sidebar {
-        width: 30%;
-        height: auto;
-        max-height: none;
-    }
-    .chat-sidebar-loby {
+    .chat-sidebar, .chat-sidebar-loby {
         width: 30%;
         height: auto;
         max-height: none;
@@ -916,18 +917,3 @@ body::before {
     }
 }
 
-
-.chat-sidebar-loby{
-    width: 300px;
-    background: linear-gradient(135deg, #162839 0%, #1e3246 100%);
-    padding: 15px;
-    display: flex;
-    flex-direction: column;
-    border-left: 1px solid #3a7bd5;
-    box-shadow: -5px 0 15px rgba(0, 0, 0, 0.3);
-    height: 100vh; 
-    position: absolute;
-    top: 0;
-    right: 0;
-    
-}
