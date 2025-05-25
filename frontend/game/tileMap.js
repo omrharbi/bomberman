@@ -187,7 +187,6 @@ export default class Game {
       }
       
       const now = Date.now();
-      const deltaTime = (now - lastUpdateTime) / 100;
       lastUpdateTime = now;
   
       let direction;
@@ -210,7 +209,6 @@ export default class Game {
             JSON.stringify({
               type: "playerMove",
               direction: direction,
-              deltaTime: deltaTime,
             })
           );
           lastSendTime = now;

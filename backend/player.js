@@ -61,9 +61,8 @@ export default class Player {
     let movementStartTime = null;
     const deltaTime = data.deltaTime;
 
-    const moveSpeed = this.powerUps.speed.baseValue * deltaTime;
-    console.log(`Player ${deltaTime} is moving at speed: ${moveSpeed}`);
-    
+    const moveSpeed = this.powerUps.speed.baseValue * (8000 / 60 / 1000); // Convert to pixels per second
+      
     const prevX = this.x;
     const prevY = this.y;
 
@@ -178,6 +177,9 @@ export default class Player {
     const playerCenterY = this.y + this.height / 2;
     const playerTileX = Math.floor(playerCenterX / room.tileSize);
     const playerTileY = Math.floor(playerCenterY / room.tileSize);
+
+    console.log(`playerTileX ${playerTileX} is playerTileY ${playerTileY} room.map[0].length: ${room.map[0].length}`);
+
     for (let y = playerTileY - 1; y <= playerTileY + 1; y++) {
       for (let x = playerTileX - 1; x <= playerTileX + 1; x++) {
         if (y >= 0 && y < room.map.length && x >= 0 && x < room.map[0].length) {
@@ -204,6 +206,7 @@ export default class Player {
               if (this.direction === "down") {
                 const rightEdgeCollision =
                   Math.abs(playerRight - tileLeft + 5) <= 19.75;
+
                 const right = Math.abs(playerRight - tileLeft) > 38;
                 console.log(Math.abs(playerRight - tileLeft + 5));
 
@@ -237,12 +240,12 @@ export default class Player {
                     Math.abs(playerRight - tileLeft + 5) >= 48
                     || Math.abs(playerRight - tileLeft) <= 13;
 
-                  console.log(
-                    rightEdgeCollision,
-                    Math.abs(playerRight - tileLeft + 5),
-                    Math.abs(playerRight - tileLeft - 5),
-                    // liftEdgeCollision,
-                  );
+                  // console.log(
+                  //   rightEdgeCollision,
+                  //   Math.abs(playerRight - tileLeft + 5),
+                  //   Math.abs(playerRight - tileLeft - 5),
+                  //   // liftEdgeCollision,
+                  // );
 
                   if (rightEdgeCollision) {
                     if (rightEdgeCollision && playerLeft <= tileLeft) {
@@ -573,11 +576,12 @@ export default class Player {
 
     const playerTileX = Math.floor(playerCenterX / room.tileSize);
     const playerTileY = Math.floor(playerCenterY / room.tileSize);
-
+    
     if (room.rewards && room.rewards[`${playerTileY}_${playerTileX}`]) {
       const rewardType = room.rewards[`${playerTileY}_${playerTileX}`];
       this.collectReward(rewardType);
-
+      
+      // console.log("here", room.rewards[`${playerTileY}_${playerTileX}`]);
       // Broadcast that the reward has been collected
       room.broadcast({
         type: "rewardCollected",
