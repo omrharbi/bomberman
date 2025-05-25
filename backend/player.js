@@ -1,4 +1,3 @@
-import { log } from "console";
 
 export default class Player {
   constructor(nickname, id, conn) {
@@ -60,14 +59,14 @@ export default class Player {
       return;
     }
     let movementStartTime = null;
-    let lastSendTime = 0;
-    const updateInterval = 50;
-    const now = Date.now();
-    const deltaTime = data.deltaTime;
-    const moveSpeed = this.powerUps.speed.baseValue * deltaTime;
+    // let lastSendTime = 0;
+    // const updateInterval = 50;
+    // const now = Date.now();
+    // const deltaTime = data.deltaTime;
+    const moveSpeed = this.powerUps.speed.baseValue * 8000/60/ 1000; // 8000 // pixels per second  60 // 1000 change to seconds 
 
-    const prevX = this.x;
-    const prevY = this.y;
+    const prevX = this.x; // Store previous position x
+    const prevY = this.y;// Store previous position y
 
     switch (data.direction) {
       case "up":
@@ -94,7 +93,7 @@ export default class Player {
         break;
     }
 
-    const spriteMap = {
+    const spriteMap = { // Sprite positions for each direction
       up: [
         { x: 55, y: 82 },
         { x: 28, y: 82 },
@@ -121,12 +120,12 @@ export default class Player {
       ],
     };
 
-    if (this.#checkCollision(room)) {
+    if (this.#checkCollision(room)) { // Check for collision with walls or blocks
       this.x = prevX;
       this.y = prevY;
     } else {
-      this.#checkRewardCollection(room);
-      this.#updateBombOverlap(room);
+      this.#checkRewardCollection(room); // Check for reward collection
+      this.#updateBombOverlap(room);// Update bomb overlap status
     }
 
     if (this.isMoving) {
@@ -169,7 +168,7 @@ export default class Player {
     }
   }
 
-  #checkCollision(room, moveSpeed) {
+  #checkCollision(room) {
     const playerLeft = this.x;
     const playerTop = this.y;
     const playerRight = this.x + this.width;
@@ -190,7 +189,9 @@ export default class Player {
             tileType === 1 ||
             tileType === 2 ||
             tileType === 3 ||
-            (tileType === 4 && !this.overlappingBombs.has(`${y}_${x}`))
+            (tileType === 4 && !this.overlappingBombs.has(`${y}_${x}`) 
+          
+          )
           ) {
             const tileLeft = x * room.tileSize;
             const tileTop = y * room.tileSize;
@@ -198,16 +199,16 @@ export default class Player {
             const tileBottom = tileTop + room.tileSize;
 
             if (
-              playerLeft < tileRight - 6 &&
+              playerLeft < tileRight - 6 && //  tileRight - 6 
               playerRight > tileLeft - 4 &&
               playerTop < tileBottom - 16 &&
               playerBottom > tileTop
             ) {
               if (this.direction === "down") {
                 const rightEdgeCollision =
-                  Math.abs(playerRight - tileLeft + 5) <= 19.75;
+                  Math.abs(playerRight - tileLeft ) <= 19.75;
                 const right = Math.abs(playerRight - tileLeft) > 38;
-                console.log(Math.abs(playerRight - tileLeft + 5));
+                console.log(Math.abs(playerRight - tileLeft ));
 
                 if (tileType === 0 || tileTypes === 0) {
                   if (rightEdgeCollision) {
@@ -236,13 +237,13 @@ export default class Player {
 
 
                   const rightEdgeCollision =
-                    Math.abs(playerRight - tileLeft + 5) >= 48
+                    Math.abs(playerRight - tileLeft ) >= 48
                     || Math.abs(playerRight - tileLeft) <= 13;
 
                   console.log(
                     rightEdgeCollision,
-                    Math.abs(playerRight - tileLeft + 5),
-                    Math.abs(playerRight - tileLeft - 5),
+                    Math.abs(playerRight - tileLeft ),
+                    Math.abs(playerRight - tileLeft ),
                     // liftEdgeCollision,
                   );
 
