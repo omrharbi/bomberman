@@ -210,7 +210,7 @@ export default class Player {
                   Math.abs(playerRight - tileLeft +5 ) <= 19.75;
                 const right = Math.abs(playerRight - tileLeft +5) > 38;
 
-                console.log("rightEdgeCollision",rightEdgeCollision, Math.abs(playerRight - tileLeft +5));
+                // console.log("rightEdgeCollision",rightEdgeCollision, Math.abs(playerRight - tileLeft +5));
                 // console.log("rightEdgeCollision",rightEdgeCollision, Math.abs(playerRight - tileLeft +5));
                 // console.log(Math.abs(playerRight - tileLeft -5));
                 
@@ -314,7 +314,8 @@ export default class Player {
     const playerTileY = Math.floor(playerCenterY / room.tileSize);
 
     const tileKey = `${playerTileY}_${playerTileX}`;
-
+    console.log("overlappingBombs", this.overlappingBombs);
+    
     const toRemove = [];
     for (const bombKey of this.overlappingBombs) {
       const [bombRow, bombCol] = bombKey.split("_").map(Number);
