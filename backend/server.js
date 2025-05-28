@@ -38,7 +38,6 @@ function startRoom(room) {
   room.started = true;
   console.log(`Starting game in room ${room.id}`);
 
-  // Clear any existing timeout for this room
   if (roomTimeouts.has(room.id)) {
     clearTimeout(roomTimeouts.get(room.id));
     roomTimeouts.delete(room.id);
@@ -73,29 +72,25 @@ function startRoom(room) {
   const playersArray = Array.from(room.players.values());
 
 
-const tileTypes = [0, 3]; // 0 = empty, 3 = breakwall
 
   for (let row = 0; row < map.length; row++) {
     for (let col = 0; col < map[row].length; col++) {
       if (map[row][col] === 3) {
-        // Replace only where there was a break wall
-        map[row][col] = Math.random() < 0.8 ? 3 : 0; // 0 = empty, 3 = breakwall
+        map[row][col] = Math.random() < 0.8 ? 3 : 0
       }
     }
   }
-  // Place players directly in the map with values 5, 6, 7, 8
   for (let i = 0; i < playersArray.length; i++) {
     const pos = positionPlayers[i];
     const player = playersArray[i];
     if (pos) {
       const [row, col] = pos;
-      map[row][col] = 5 + i; // Set player number on map
+      map[row][col] = 5 + i;
       player.x = col * 40;
       player.y = row * 40;
     }
   }
 
-  // Start game for all players
   for (const player of playersArray) {
     console.log(`Player ${player.nickname} in room ${room.id}`);
     startGameForPlayer(player, room, playersArray, map);
@@ -230,9 +225,7 @@ wss.on("connection", (ws) => {
         currentPlayer.isPlayerHitByExplosion(data, currentRoom);
         break;
       case "chatMsg":
-        if (!currentRoom.started) {
-          currentRoom.addchat(currentPlayer.nickname, data.messageText || "");
-        }
+        currentRoom.addchat(currentPlayer.nickname, data.messageText || "");
         currentRoom.broadcast({
           type: "chatMsg",
           nickname: currentPlayer.nickname,

@@ -314,7 +314,7 @@ export default class Player {
     const playerTileY = Math.floor(playerCenterY / room.tileSize);
 
     const tileKey = `${playerTileY}_${playerTileX}`;
-    console.log("overlappingBombs", this.overlappingBombs);
+
     
     const toRemove = [];
     for (const bombKey of this.overlappingBombs) {
@@ -467,7 +467,7 @@ export default class Player {
         });
 
         if (tileValue === 3) {
-          const gift = Math.random() < 0.3;
+          const gift = Math.random() < 0.2;
           const index = Math.floor(Math.random() * 3);
 
           room.map[newRow][newCol] = 0;

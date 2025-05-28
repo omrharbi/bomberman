@@ -16,6 +16,7 @@ export default class Room {
   }
   addchat(nickname, messageText) {
     this.ChatHistory.push({ nickname, messageText });
+    console.log(`Chat message from ${nickname}: ${messageText}`);
   }
   removePlayer(playerID) {
     this.players.delete(playerID);
