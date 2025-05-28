@@ -62,7 +62,7 @@ export default class Player {
     const deltaTime = data.deltaTime;
 
     const moveSpeed = this.powerUps.speed.baseValue * (8000 / 60 / 1000); // Convert to pixels per second
-      
+
     const prevX = this.x;
     const prevY = this.y;
 
@@ -190,9 +190,9 @@ export default class Player {
             tileType === 1 ||
             tileType === 2 ||
             tileType === 3 ||
-            (tileType === 4 && !this.overlappingBombs.has(`${y}_${x}`) 
-          
-          )
+            (tileType === 4 && !this.overlappingBombs.has(`${y}_${x}`)
+
+            )
           ) {
             const tileLeft = x * room.tileSize;
             const tileTop = y * room.tileSize;
@@ -207,13 +207,13 @@ export default class Player {
             ) {
               if (this.direction === "down") {
                 const rightEdgeCollision =
-                  Math.abs(playerRight - tileLeft +5 ) <= 19.75;
-                const right = Math.abs(playerRight - tileLeft +5) > 38;
+                  Math.abs(playerRight - tileLeft + 5) <= 19.75;
+                const right = Math.abs(playerRight - tileLeft + 5) > 38;
 
                 // console.log("rightEdgeCollision",rightEdgeCollision, Math.abs(playerRight - tileLeft +5));
                 // console.log("rightEdgeCollision",rightEdgeCollision, Math.abs(playerRight - tileLeft +5));
                 // console.log(Math.abs(playerRight - tileLeft -5));
-                
+
                 if (tileType === 0 || tileTypes === 0) {
                   if (rightEdgeCollision) {
                     if (playerLeft <= tileLeft) {
@@ -241,8 +241,8 @@ export default class Player {
 
 
                   const rightEdgeCollision =
-                    Math.abs(playerRight - tileLeft +5) >= 48
-                    || Math.abs(playerRight - tileLeft -5) <= 13;
+                    Math.abs(playerRight - tileLeft + 5) >= 48
+                    || Math.abs(playerRight - tileLeft - 5) <= 13;
 
                   // console.log(
                   //   rightEdgeCollision,
@@ -315,7 +315,7 @@ export default class Player {
 
     const tileKey = `${playerTileY}_${playerTileX}`;
 
-    
+
     const toRemove = [];
     for (const bombKey of this.overlappingBombs) {
       const [bombRow, bombCol] = bombKey.split("_").map(Number);
@@ -356,8 +356,14 @@ export default class Player {
   }
 
   placebomb(room) {
+
+    const row = Math.floor((this.y + 20) / room.tileSize);
+    const col = Math.floor((this.x + 20) / room.tileSize);
     if (this.powerUps.bombs.numBomb <= this.bombes) {
       return;
+    }
+    if (room.map[row][col] == 4) {
+      return
     }
 
     if (!this.isAlive()) {
@@ -367,9 +373,6 @@ export default class Player {
     setTimeout(() => {
       this.bombes--;
     }, 3000);
-
-    const row = Math.floor((this.y + 20) / room.tileSize);
-    const col = Math.floor((this.x + 20) / room.tileSize);
 
     // const directions = this.#generateExplosionDirections();
 
@@ -565,11 +568,11 @@ export default class Player {
 
     const playerTileX = Math.floor(playerCenterX / room.tileSize);
     const playerTileY = Math.floor(playerCenterY / room.tileSize);
-    
+
     if (room.rewards && room.rewards[`${playerTileY}_${playerTileX}`]) {
       const rewardType = room.rewards[`${playerTileY}_${playerTileX}`];
       this.collectReward(rewardType);
-      
+
       // console.log("here", room.rewards[`${playerTileY}_${playerTileX}`]);
       // Broadcast that the reward has been collected
       room.broadcast({

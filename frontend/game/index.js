@@ -120,9 +120,7 @@ function handleServerMessages(data) {
       broadcastPlayerInfo(data);
       break;
     case "theWinnerIs":
-      setTimeout(() => {
-        socket.close();
-      }, 5000);
+      socket.close();
       theWinnerIs(data);
       break;
     case "removePlayer":
