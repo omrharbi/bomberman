@@ -1,6 +1,6 @@
 import { MyEventSystem } from "../src/event.js";
 import { createElement, jsx } from "../src/framework.js";
-import { socket } from "./index.js";
+import { OfflinePlayer, socket } from "./index.js";
 
 export const playersElement = new Map();
 export default class Game {
@@ -120,12 +120,13 @@ export default class Game {
             "url('../images/playerGreen.png')",
             "url('../images/playerYallow.png')",
           ];
-          const playerVNode = jsx(
-            "div",
-            {
-              className: "player",
-              id: `player_${data.players[playerIndex].id}`,
-              style: `
+          if (!OfflinePlayer.includes(data.players[playerIndex].id)) {
+            const playerVNode = jsx(
+              "div",
+              {
+                className: "player",
+                id: `player_${data.players[playerIndex].id}`,
+                style: `
                 background-image: ${playerStyles[playerIndex]};
                 width: 27px;
                 height: 40px;
@@ -133,11 +134,12 @@ export default class Game {
                 z-index: 10;
                 transform: translate(${initialX}px, ${initialY}px);
               `
-            }
-          );
-          const playerDiv = createElement(playerVNode);
-          playersElement.set(data.players[playerIndex].id, playerDiv);
-          canvas.appendChild(playerDiv);
+              }
+            );
+            const playerDiv = createElement(playerVNode);
+            playersElement.set(data.players[playerIndex].id, playerDiv);
+            canvas.appendChild(playerDiv);
+          }
         }
       }
     }

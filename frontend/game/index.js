@@ -133,11 +133,16 @@ function handleServerMessages(data) {
   }
 }
 
+export let OfflinePlayer = [];
+
 function removePlayer(id) {
   const playerElement = playersElement.get(id);
   if (playerElement) {
     playerElement.remove();
     playersElement.delete(id);
+  } else {
+    OfflinePlayer.push(id)
+    console.log('1 ===================>', OfflinePlayer);
   }
 }
 function theWinnerIs(data) {
