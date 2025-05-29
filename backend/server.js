@@ -241,7 +241,6 @@ wss.on("connection", (ws) => {
   });
 
   ws.on("close", () => {
-     console.log('==================>');
     if (currentRoom && currentPlayer) {
       currentRoom.removePlayer(currentPlayer.id);
       if (currentRoom.players.size === 1) {

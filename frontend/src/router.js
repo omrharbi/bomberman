@@ -33,9 +33,7 @@ export class Router {
                 render(component,body)
             });
             this.currentRoute = path;
-        } else {
-            console.log('Route not found');
-            
+        } else {            
             this.handle404();
         }
     }

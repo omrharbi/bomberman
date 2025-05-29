@@ -16,7 +16,6 @@ export default class Room {
   }
   addchat(nickname, messageText) {
     this.ChatHistory.push({ nickname, messageText });
-    console.log(`Chat message from ${nickname}: ${messageText}`);
   }
   removePlayer(playerID) {
     this.players.delete(playerID);
@@ -27,7 +26,7 @@ export default class Room {
         id: playerID,
         players: playersArray,
       });
-      if (this.players.size === 1) {
+      if (this.players.size === 1) {        
         this.broadcast({
           type: "theWinnerIs",
           name: this.players.values().next().value.nickname

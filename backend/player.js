@@ -178,7 +178,6 @@ export default class Player {
     const playerTileX = Math.floor(playerCenterX / room.tileSize);
     const playerTileY = Math.floor(playerCenterY / room.tileSize);
 
-    // console.log(`playerTileX ${playerTileX} is playerTileY ${playerTileY} room.map[0].length: ${room.map[0].length}`);
 
     for (let y = playerTileY - 1; y <= playerTileY + 1; y++) {
       for (let x = playerTileX - 1; x <= playerTileX + 1; x++) {
@@ -210,9 +209,6 @@ export default class Player {
                   Math.abs(playerRight - tileLeft + 5) <= 19.75;
                 const right = Math.abs(playerRight - tileLeft + 5) > 38;
 
-                // console.log("rightEdgeCollision",rightEdgeCollision, Math.abs(playerRight - tileLeft +5));
-                // console.log("rightEdgeCollision",rightEdgeCollision, Math.abs(playerRight - tileLeft +5));
-                // console.log(Math.abs(playerRight - tileLeft -5));
 
                 if (tileType === 0 || tileTypes === 0) {
                   if (rightEdgeCollision) {
@@ -244,12 +240,6 @@ export default class Player {
                     Math.abs(playerRight - tileLeft + 5) >= 48
                     || Math.abs(playerRight - tileLeft - 5) <= 13;
 
-                  // console.log(
-                  //   rightEdgeCollision,
-                  //   Math.abs(playerRight - tileLeft + 5),
-                  //   Math.abs(playerRight - tileLeft - 5),
-                  //   // liftEdgeCollision,
-                  // );
 
                   if (rightEdgeCollision) {
                     if (rightEdgeCollision && playerLeft <= tileLeft) {
@@ -374,7 +364,6 @@ export default class Player {
       this.bombes--;
     }, 3000);
 
-    // const directions = this.#generateExplosionDirections();
 
     const frames = [
       { x: -5, y: 0 }, // Frame 1
@@ -573,8 +562,6 @@ export default class Player {
       const rewardType = room.rewards[`${playerTileY}_${playerTileX}`];
       this.collectReward(rewardType);
 
-      // console.log("here", room.rewards[`${playerTileY}_${playerTileX}`]);
-      // Broadcast that the reward has been collected
       room.broadcast({
         type: "rewardCollected",
         position: {

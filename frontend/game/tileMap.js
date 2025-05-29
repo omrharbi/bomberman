@@ -1,6 +1,6 @@
 import { MyEventSystem } from "../src/event.js";
 import { createElement, jsx } from "../src/framework.js";
-import { OfflinePlayer, socket } from "./index.js";
+import { OfflinePlayer, socket, theWinnerIs } from "./index.js";
 
 export const playersElement = new Map();
 export default class Game {
@@ -31,6 +31,15 @@ export default class Game {
   }
 
   #draw(canvas, data) {
+
+    if (OfflinePlayer.length === 3 ){
+      data= {
+        name : 'You'
+      }
+      theWinnerIs(data);
+      socket.close();
+      return
+    }
 
     const rows = this.map.length;
     const columns = this.map[0].length;

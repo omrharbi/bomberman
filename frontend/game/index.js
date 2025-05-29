@@ -120,8 +120,9 @@ function handleServerMessages(data) {
       broadcastPlayerInfo(data);
       break;
     case "theWinnerIs":
-      socket.close();
       theWinnerIs(data);
+      socket.close();
+      OfflinePlayer = null;
       break;
     case "removePlayer":
       console.log("Player removed:", data.id);
@@ -141,11 +142,12 @@ function removePlayer(id) {
     playerElement.remove();
     playersElement.delete(id);
   } else {
-    OfflinePlayer.push(id)
-    console.log('1 ===================>', OfflinePlayer);
+    if (!OfflinePlayer.includes(id)) {
+      OfflinePlayer.push(id)
+    }
   }
 }
-function theWinnerIs(data) {
+export function theWinnerIs(data) {
   let gamepage = Ref.gamePageRef.current;
   const winScreen = jsx(
     "div",
@@ -165,6 +167,7 @@ function theWinnerIs(data) {
     )
   );
   render(winScreen, gamepage);
+  
 }
 
 function notificationPower(data) {
@@ -237,7 +240,6 @@ function animationPlayerDead(data) {
   playerElement.style.backgroundImage = `url('../images/player_dead.png')`;
 
   if (!playerElement) {
-    console.log("player not found", data.Id);
     return;
   }
 
