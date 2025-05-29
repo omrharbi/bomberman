@@ -12,7 +12,7 @@ export default class Game {
     this.MyId = data.MyId;
     this.map = data.map;
     this.canvas = null;
-    this.controlsInitialized = false; 
+    this.controlsInitialized = false;
     this.keydownHandler = null;
     this.keyupHandler = null;
   }
@@ -103,8 +103,8 @@ export default class Game {
             "data-column": column,
             id: divId || `tile_${row}_${column}`,
             style: divStyle ? `background-image: ${divStyle}` : "",
-            "data-initial-x": initialX, 
-            "data-initial-y": initialY, 
+            "data-initial-x": initialX,
+            "data-initial-y": initialY,
           },
           imgnode
         );
@@ -134,7 +134,7 @@ export default class Game {
                 transform: translate(${initialX}px, ${initialY}px);
               `
             }
-          );          
+          );
           const playerDiv = createElement(playerVNode);
           playersElement.set(data.players[playerIndex].id, playerDiv);
           canvas.appendChild(playerDiv);
@@ -153,15 +153,15 @@ export default class Game {
       console.log("Controls are already initialized, using existing handlers");
       return;
     }
-  
+
     let keysPressed = {};
     let lastUpdateTime = Date.now();
     let lastSendTime = 0;
     const updateInterval = 50;
     this.keydownHandler = (e) => {
       if (e.target.tagName == "INPUT" || e.target.tagName == "TEXTAREA") return;
-      keysPressed[e.key] = true;
-  
+      keysPressed[e.key.toLowerCase()] = true;
+
       if ((e.key === "b" || e.key === "B") && !e.repeat) {
         if (socket && socket.readyState === WebSocket.OPEN) {
           socket.send(
@@ -172,23 +172,25 @@ export default class Game {
         }
       }
     };
-  
+
     this.keyupHandler = (e) => {
-      keysPressed[e.key] = false;
+      keysPressed[e.key.toLowerCase()] = false;
     };
-  
+
     MyEventSystem.addEventListener(window, "keydown", this.keydownHandler);
     MyEventSystem.addEventListener(window, "keyup", this.keyupHandler);
-  
+    MyEventSystem.addEventListener(window, 'blur', () => {
+      Object.keys(keysPressed).forEach(key => keysPressed[key] = false);
+    });
     const updatePlayerMovement = () => {
       if (!this.controlsInitialized) {
         console.log("Controls are not initialized, skipping update");
         return;
       }
-      
+
       const now = Date.now();
       lastUpdateTime = now;
-  
+
       let direction;
       if (keysPressed["w"] || keysPressed["W"]) {
         direction = "up";
@@ -202,7 +204,7 @@ export default class Game {
       if (keysPressed["a"] || keysPressed["A"]) {
         direction = "left";
       }
-  
+
       if (now - lastSendTime > updateInterval) {
         if (socket && socket.readyState === WebSocket.OPEN) {
           socket.send(
@@ -214,12 +216,12 @@ export default class Game {
           lastSendTime = now;
         }
       }
-  
+
       if (this.controlsInitialized) {
         requestAnimationFrame(updatePlayerMovement);
       }
     };
-  
+
     this.controlsInitialized = true;
     updatePlayerMovement();
   }
