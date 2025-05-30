@@ -142,7 +142,7 @@ function removePlayer(id) {
     playerElement.remove();
     playersElement.delete(id);
   } else {
-    if (!OfflinePlayer.includes(id)) {
+    if (!OfflinePlayer?.includes(id)) {
       OfflinePlayer.push(id)
     }
   }
@@ -284,10 +284,12 @@ function updateOtherPlayerPosition(data) {
 }
 
 function updatePlayerCount(count, playerId, countP) {
-  console.log(Ref.loginRef.current);
+  // console.log(Ref.loginRef.current);
   
   gameState.playerCount = count;
   let progressText = "";
+  // console.log("+++++++++++++", count, playerId, countP);
+
   if (countP === null) {
     progressText = "Game..."
   } else {

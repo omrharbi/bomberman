@@ -32,7 +32,7 @@ export default class Game {
 
   #draw(canvas, data) {
 
-    if (OfflinePlayer.length === 3 ){
+    if (OfflinePlayer?.length === 3 ){
       data= {
         name : 'You'
       }
@@ -129,7 +129,7 @@ export default class Game {
             "url('../images/playerGreen.png')",
             "url('../images/playerYallow.png')",
           ];
-          if (!OfflinePlayer.includes(data.players[playerIndex].id)) {
+          if (!OfflinePlayer?.includes(data.players[playerIndex].id)) {
             const playerVNode = jsx(
               "div",
               {
