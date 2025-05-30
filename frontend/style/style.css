@@ -248,7 +248,7 @@ body::before {
     flex-direction: column;
     border-left: 1px solid #3a7bd5;
     box-shadow: -5px 0 15px rgba(0, 0, 0, 0.3);
-    height: 100vh; /* Pour qu’elle occupe toute la hauteur */
+    height: 93vh; /* Pour qu’elle occupe toute la hauteur */
     position: sticky;
     top: 0;
 }

@@ -250,7 +250,6 @@ wss.on("connection", (ws) => {
         currentRoom.countP = 0;
         clearInterval(currentRoom.countInterval);
         currentRoom.countInterval = null;
-
       }
       currentRoom.broadcast({
         type: "updatePlayers",

@@ -26,6 +26,9 @@ export default class Room {
         id: playerID,
         players: playersArray,
       });
+      for (let player of this.players.values()) {
+        player.checkPlayerwin(this, Array.from(this.players));
+      }
       if (this.players.size === 1) {        
         this.broadcast({
           type: "theWinnerIs",
