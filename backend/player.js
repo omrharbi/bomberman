@@ -91,7 +91,7 @@ export default class Player {
         break;
     }
 
-    let spriteMap = { // Sprite positions for each direction
+    const spriteMap = { // Sprite positions for each direction
       up: [
         { x: 55, y: 82 },
         { x: 28, y: 82 },
@@ -171,26 +171,23 @@ export default class Player {
     const playerTop = this.y;
     const playerRight = this.x + this.width;
     const playerBottom = this.y + this.height;
-    let isTouchingRightWall = false;
 
     const playerCenterX = this.x + this.width / 2;
     const playerCenterY = this.y + this.height / 2;
+
     const playerTileX = Math.floor(playerCenterX / room.tileSize);
     const playerTileY = Math.floor(playerCenterY / room.tileSize);
-
 
     for (let y = playerTileY - 1; y <= playerTileY + 1; y++) {
       for (let x = playerTileX - 1; x <= playerTileX + 1; x++) {
         if (y >= 0 && y < room.map.length && x >= 0 && x < room.map[0].length) {
           const tileType = room.map[y][x];
-          const tileTypes = room.map[y][x + 1];
-           if (
-            tileType === 1 ||
-            // tileType === 2 ||
-            tileType === 3 ||
-            (tileType === 4 && !this.overlappingBombs.has(`${y}_${x}`)
 
-            )
+          if (
+            tileType === 1 ||
+            tileType === 2 ||
+            tileType === 3 ||
+            tileType === 4 && !this.overlappingBombs.has(`${y}_${x}`)
           ) {
             const tileLeft = x * room.tileSize;
             const tileTop = y * room.tileSize;
@@ -198,94 +195,12 @@ export default class Player {
             const tileBottom = tileTop + room.tileSize;
 
             if (
-              playerLeft < tileRight -6 && //  tileRight - 6 
+              playerLeft < tileRight - 6 &&
               playerRight > tileLeft - 4 &&
               playerTop < tileBottom - 16 &&
               playerBottom > tileTop
             ) {
-              if (this.direction === "down") {
-                const rightEdgeCollision =
-                  Math.abs(playerRight - tileLeft + 5) <= 19.75;
-                const right = Math.abs(playerRight - tileLeft + 5) > 38;
-                // console.log("rightEdgeCollision", "right", rightEdgeCollision, right);
-                // if (tileType === 0 || tileTypes === 0) {
-                  if (rightEdgeCollision) {
-                    console.log("rightEdgeCollision", rightEdgeCollision);
-
-                    if (playerLeft <= tileLeft) {
-                      isTouchingRightWall = true;
-                      this.userPx = Math.min(this.userPx + 0.5, 6);
-                      this.x -= this.userPx;
-                    }
-                    // return false;
-                  // }
-                  if (right) {
-                    console.log("right", right);
-                    if (playerLeft >= tileLeft) {
-                      isTouchingRightWall = true;
-                      this.userPx = Math.min(this.userPx + 1, 6);
-                      this.x += this.userPx;
-                    }
-                  }
-                  return false;
-                }
-                return true;
-              }
-
-              if (this.direction === "up") {
-                // if (tileType === 0 || tileTypes === 0) {
-                  const rightEdgeCollision =
-                    Math.abs(playerRight - tileLeft + 5) >= 49
-                    || Math.abs(playerRight - tileLeft - 5) <= 12;
-
-
-                  if (rightEdgeCollision) {
-                    if (rightEdgeCollision && playerLeft <= tileLeft) {
-                      isTouchingRightWall = true;
-                      this.userPx = Math.min(this.userPx + 1, 6);
-                      this.x -= this.userPx;
-                    } else if (playerRight >= tileLeft) {
-                      isTouchingRightWall = true;
-                      this.userPx = Math.min(this.userPx + 1, 6);
-                      this.x += this.userPx;
-                    }
-                    return false;
-                  // }
-                }
-
-                this.y -= this.userPx; // Move the player vertically upward
-                return true; // Allow movement
-              }
-
-              if (this.direction === "left") {
-                // if (tileType === 0 || tileTypes === 0) {
-                  const bottomEdgeCollision =
-                    Math.abs(playerBottom - tileTop) < 14 && tileTop > 0;
-                  if (bottomEdgeCollision) {
-                    isTouchingRightWall = true;
-                    this.userPx = Math.min(this.userPx + 1, 6);
-                    this.y -= this.userPx;
-                    return false;
-                  // }
-                }
-                return true;
-              }
-              if (this.direction === "right") {
-                // if (tileType === 0 || tileTypes === 0) {
-                  const rightEdgeCollision =
-                    Math.abs(playerBottom - tileTop) < 14;
-                  if (rightEdgeCollision) {
-                    if (playerBottom > tileTop) {
-                      isTouchingRightWall = true;
-                      this.userPx = Math.min(this.userPx + 1, 6);
-                      this.y -= this.userPx;
-                      this.x += this.userPx;
-                      return false;
-                    // }
-                  }
-                }
-                return true;
-              }
+              return true;
             }
           }
         }
